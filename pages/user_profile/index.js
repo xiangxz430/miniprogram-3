@@ -1,6 +1,6 @@
 const app = getApp();
 const logger = require('../../utils/logger');
-const calendar = require('lunar-calendar');
+const calendar = require('../../utils/lunar');
 
 Page({
   data: {
