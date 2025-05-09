@@ -76,22 +76,15 @@ function getDaysOfMonth(year, month) {
  * @param {Number} day - 公历日
  */
 function daysSince1900(year, month, day) {
-  let days = 0;
+  // 基准日期：1900年1月31日
+  let baseDate = new Date(1900, 0, 31); // 注意：JavaScript中月份从0开始
+  let targetDate = new Date(year, month - 1, day); // 目标日期
   
-  // 年份计算
-  for (let i = 1900; i < year; i++) {
-    days += getDaysOfYear(i);
-  }
+  // 计算两个日期之间的毫秒差，然后转换为天数
+  let diffTime = targetDate.getTime() - baseDate.getTime();
+  let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   
-  // 月份计算
-  for (let i = 1; i < month; i++) {
-    days += getDaysOfMonth(year, i);
-  }
-  
-  // 日期计算
-  days += day - 1;
-  
-  return days;
+  return diffDays;
 }
 
 /**
@@ -102,6 +95,11 @@ function daysSince1900(year, month, day) {
  * @returns {Object} 农历日期对象
  */
 function solarToLunar(year, month, day) {
+  // 防止月份和日期是字符串
+  year = parseInt(year);
+  month = parseInt(month);
+  day = parseInt(day);
+  
   if (year < 1900 || year > 2100) {
     return {
       error: '超出可转换范围（1900-2100）'
@@ -110,54 +108,63 @@ function solarToLunar(year, month, day) {
   
   // 计算距离1900年1月31日（农历1900年正月初一）的天数
   const offset = daysSince1900(year, month, day);
+  console.log('距1900年1月31日的天数:', offset);
   
-  // 计算农历年
+  let temp = 0;
   let lunarYear = 1900;
-  let daysInLunarYear = 0;
   
-  // 计算农历年
-  for (; lunarYear <= 2100; lunarYear++) {
-    const daysOfLunarYear = getLunarYearDays(lunarYear);
-    if (offset < daysInLunarYear + daysOfLunarYear) {
+  // 确定农历年份
+  for (let i = 1900; i < 2101 && offset > 0; i++) {
+    temp = getLunarYearDays(i);
+    if (offset < temp) {
+      lunarYear = i;
       break;
+    } else {
+      offset -= temp;
     }
-    daysInLunarYear += daysOfLunarYear;
   }
   
-  // 计算农历月
+  // 确定农历月份
   let lunarMonth = 1;
-  let daysInLunarMonth = 0;
-  const leapMonth = getLeapMonth(lunarYear);
+  let leap = getLeapMonth(lunarYear); // 闰月
   let isLeap = false;
   
-  for (; lunarMonth <= 12; lunarMonth++) {
-    let daysOfLunarMonth = 0;
-    
-    // 处理闰月
-    if (leapMonth > 0 && lunarMonth === leapMonth) {
+  // 处理闰月
+  for (let i = 1; i < 13 && offset > 0; i++) {
+    // 闰月
+    if (leap > 0 && i === leap + 1 && !isLeap) {
+      --i;
       isLeap = true;
-      daysOfLunarMonth = getLeapDays(lunarYear);
-      if (offset < daysInLunarMonth + daysOfLunarMonth) {
-        break;
-      }
-      daysInLunarMonth += daysOfLunarMonth;
+      temp = getLeapDays(lunarYear);
+    } else {
+      temp = getLunarMonthDays(lunarYear, i);
     }
     
-    // 正常月份
-    daysOfLunarMonth = getLunarMonthDays(lunarYear, lunarMonth);
-    isLeap = false;
-    if (offset < daysInLunarMonth + daysOfLunarMonth) {
-      break;
+    // 解除闰月
+    if (isLeap && i === leap + 1) {
+      isLeap = false;
     }
-    daysInLunarMonth += daysOfLunarMonth;
+    
+    if (offset < temp) {
+      lunarMonth = i;
+      break;
+    } else {
+      offset -= temp;
+    }
   }
   
-  // 计算农历日
-  const lunarDay = offset - daysInLunarMonth + 1;
+  // 确定农历日期
+  let lunarDay = offset + 1;
+  
+  console.log('计算结果 - 农历年:', lunarYear, '月:', lunarMonth, '日:', lunarDay, '闰月:', leap, '是否闰月:', isLeap);
   
   // 计算天干地支年
   const cyclicalYear = ((lunarYear - 1900 + 36) % 60);
   const lunarYearText = HEAVENLY_STEMS[cyclicalYear % 10] + EARTHLY_BRANCHES[cyclicalYear % 12] + '年';
+  
+  // 确保月和日索引在有效范围内
+  const monthIndex = Math.max(0, Math.min(lunarMonth - 1, LUNAR_MONTH.length - 1));
+  const dayIndex = Math.max(0, Math.min(lunarDay - 1, LUNAR_DAY.length - 1));
   
   // 返回结果
   return {
@@ -166,10 +173,10 @@ function solarToLunar(year, month, day) {
     lunarDay: lunarDay,
     isLeap: isLeap,
     lunarYearText: lunarYearText,
-    lunarMonthText: (isLeap ? '闰' : '') + LUNAR_MONTH[lunarMonth - 1] + '月',
-    lunarDayText: LUNAR_DAY[lunarDay - 1],
-    monthStr: LUNAR_MONTH[lunarMonth - 1],
-    dayStr: LUNAR_DAY[lunarDay - 1]
+    lunarMonthText: (isLeap ? '闰' : '') + LUNAR_MONTH[monthIndex] + '月',
+    lunarDayText: LUNAR_DAY[dayIndex],
+    monthStr: LUNAR_MONTH[monthIndex],
+    dayStr: LUNAR_DAY[dayIndex]
   };
 }
 

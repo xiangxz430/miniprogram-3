@@ -313,43 +313,44 @@ Page({
     // 计算星座
     let zodiac = this.calculateZodiac(month, day);
     
-    // 使用lunar-calendar库计算农历日期
+    // 使用lunar库计算农历日期
     try {
+      console.log('转换农历输入 - 年:', year, '月:', month, '日:', day);
       const lunarDate = calendar.solarToLunar(year, month, day);
-      
-      // 获取农历年份的天干地支
-      const heavenlyStem = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-      const earthlyBranch = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-      
-      // 计算干支年
-      const baseYear = 1900; // 庚子年
-      const stemIndex = (year - baseYear) % 10;
-      const branchIndex = (year - baseYear) % 12;
+      console.log('转换农历结果:', lunarDate);
       
       // 构造农历日期字符串：干支年+农历月+农历日
-      const lunarYearText = `${heavenlyStem[stemIndex]}${earthlyBranch[branchIndex]}年`;
-      const lunarMonthText = `${lunarDate.monthStr}月`;
-      const lunarDayText = `${lunarDate.dayStr}`;
-      
-      const lunarDateText = `${lunarYearText}${lunarMonthText}${lunarDayText}`;
-      
-      this.setData({
-        'userInfo.zodiac': zodiac,
-        'userInfo.lunarDate': lunarDateText
-      });
+      if (lunarDate && lunarDate.lunarYearText && lunarDate.monthStr && lunarDate.dayStr) {
+        const lunarDateText = `${lunarDate.lunarYearText}${lunarDate.monthStr}月${lunarDate.dayStr}`;
+        
+        this.setData({
+          'userInfo.zodiac': zodiac,
+          'userInfo.lunarDate': lunarDateText
+        });
+        
+        console.log('设置农历日期:', lunarDateText);
+      } else {
+        console.error('农历日期格式不完整:', lunarDate);
+        // 使用备用方案
+        this.setFallbackLunarDate(year, month, day, zodiac);
+      }
     } catch (error) {
       console.error('农历转换失败:', error);
-      
       // 如果转换失败，使用简单方法
-      const lunarYears = ['庚子年', '辛丑年', '壬寅年', '癸卯年', '甲辰年', '乙巳年', '丙午年', '丁未年', '戊申年', '己酉年', '庚戌年', '辛亥年'];
-      const lunarYear = lunarYears[(year - 1900) % 12];
-      const lunarDate = `${lunarYear}正月初一`;
-      
-      this.setData({
-        'userInfo.zodiac': zodiac,
-        'userInfo.lunarDate': lunarDate
-      });
+      this.setFallbackLunarDate(year, month, day, zodiac);
     }
+  },
+  
+  // 设置备用农历日期（当转换失败时使用）
+  setFallbackLunarDate: function(year, month, day, zodiac) {
+    const lunarYears = ['庚子年', '辛丑年', '壬寅年', '癸卯年', '甲辰年', '乙巳年', '丙午年', '丁未年', '戊申年', '己酉年', '庚戌年', '辛亥年'];
+    const lunarYear = lunarYears[(year - 1900) % 12];
+    const lunarDate = `${lunarYear}正月初一`;
+    
+    this.setData({
+      'userInfo.zodiac': zodiac,
+      'userInfo.lunarDate': lunarDate
+    });
   },
   
   // 计算星座
