@@ -1,0 +1,44 @@
+<!-- pages/logs/index.wxml -->
+<view class="logs-container">
+  <view class="header">
+    <view class="title">API调用日志</view>
+    <view class="actions">
+      <button class="btn-small" bindtap="refreshLogs" disabled="{{isLoading}}">刷新</button>
+      <button class="btn-small warning" bindtap="cleanOldLogs" disabled="{{isLoading}}">清理旧日志</button>
+    </view>
+  </view>
+  
+  <view class="content-area" wx:if="{{!isLoading}}">
+    <view class="log-files">
+      <view class="log-files-title">日志文件</view>
+      <scroll-view scroll-y="true" class="file-list">
+        <block wx:if="{{logFiles.length > 0}}">
+          <view 
+            wx:for="{{logFiles}}" 
+            wx:key="index" 
+            class="file-item {{selectedLog === item ? 'selected' : ''}}"
+            data-file="{{item}}"
+            bindtap="selectLog">
+            {{formatDate(item)}}
+          </view>
+        </block>
+        <view wx:else class="no-data">暂无日志文件</view>
+      </scroll-view>
+    </view>
+    
+    <view class="log-content">
+      <view class="log-content-header">
+        <view class="log-title">{{selectedLog ? formatDate(selectedLog) : '日志内容'}}</view>
+        <button class="btn-small" bindtap="copyLogContent" disabled="{{!logContent}}">复制</button>
+      </view>
+      <scroll-view scroll-y="true" class="content-view">
+        <text class="content-text" selectable="true">{{logContent || '选择左侧日志文件查看内容'}}</text>
+      </scroll-view>
+    </view>
+  </view>
+  
+  <view class="loading" wx:else>
+    <view class="loading-icon"></view>
+    <text>加载中...</text>
+  </view>
+</view> 

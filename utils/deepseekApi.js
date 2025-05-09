@@ -1,9 +1,36 @@
 // utils/deepseekApi.js
 const API_CONFIG = require('./config');
+const logger = require('./logger');
 
 // DeepSeek API配置
 const DEEPSEEK_API_KEY = API_CONFIG.DEEPSEEK.API_KEY;
 const DEEPSEEK_API_URL = API_CONFIG.DEEPSEEK.API_URL;
+
+/**
+ * 日志记录函数
+ * @param {String} type - 日志类型
+ * @param {any} data - 要记录的数据
+ */
+function logApiActivity(type, data) {
+  switch (type) {
+    case '请求':
+      logger.logRequest(data);
+      break;
+    case '响应状态':
+    case 'AI回答':
+    case '解析结果':
+    case 'JSON解析':
+      logger.logResponse(data);
+      break;
+    case '错误':
+    case '解析失败':
+    case '解析错误':
+      logger.logError(data);
+      break;
+    default:
+      logger.log(type, data);
+  }
+}
 
 /**
  * 调用DeepSeek API获取每日一挂的解析
@@ -15,6 +42,15 @@ function getHexagramInterpretation(hexagramInfo, userInfo = {}) {
   return new Promise((resolve, reject) => {
     // 构建请求体
     const prompt = buildPrompt(hexagramInfo, userInfo);
+    
+    // 记录请求信息
+    logApiActivity('请求', {
+      url: DEEPSEEK_API_URL,
+      method: 'POST',
+      model: 'deepseek-chat',
+      卦象: `${hexagramInfo.name}(${hexagramInfo.symbol})`,
+      提示词: prompt
+    });
     
     // 调用API
     wx.request({
@@ -40,17 +76,47 @@ function getHexagramInterpretation(hexagramInfo, userInfo = {}) {
         max_tokens: 800
       },
       success: (res) => {
+        // 记录API响应
+        logApiActivity('响应状态', {
+          状态码: res.statusCode,
+          响应头: res.header
+        });
+        
         if (res.statusCode === 200 && res.data && res.data.choices && res.data.choices.length > 0) {
           const aiResponse = res.data.choices[0].message.content;
-          resolve(parseAIResponse(aiResponse, hexagramInfo));
+          
+          // 记录AI回答内容
+          logApiActivity('AI回答', aiResponse);
+          
+          // 解析AI响应
+          const parsedResult = parseAIResponse(aiResponse, hexagramInfo);
+          
+          // 记录解析后的结果
+          logApiActivity('解析结果', {
+            卦象: parsedResult.name,
+            解析: parsedResult.meaning ? parsedResult.meaning.substring(0, 50) + '...' : '无',
+            整体运势: parsedResult.overall ? parsedResult.overall.substring(0, 50) + '...' : '无',
+            财运: parsedResult.finance ? parsedResult.finance.substring(0, 50) + '...' : '无',
+            桃花运: parsedResult.love ? parsedResult.love.substring(0, 50) + '...' : '无'
+          });
+          
+          resolve(parsedResult);
         } else {
           console.error('DeepSeek API调用失败:', res);
+          logApiActivity('错误', {
+            错误类型: 'API调用失败',
+            详情: res
+          });
           // 如果API调用失败，返回原始卦象信息
           resolve(hexagramInfo);
         }
       },
       fail: (err) => {
         console.error('DeepSeek API请求失败:', err);
+        logApiActivity('错误', {
+          错误类型: '网络请求失败',
+          详情: err
+        });
         // 如果网络请求失败，返回原始卦象信息
         resolve(hexagramInfo);
       }
@@ -103,6 +169,13 @@ function parseAIResponse(aiResponse, originalHexagramInfo) {
     const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const jsonStr = jsonMatch[0];
+      
+      // 记录JSON解析过程
+      logApiActivity('JSON解析', {
+        提取的JSON字符串长度: jsonStr.length,
+        JSON示例: jsonStr.substring(0, 100) + '...'
+      });
+      
       const parsedData = JSON.parse(jsonStr);
       
       // 合并原始卦象信息和AI解析结果
@@ -123,9 +196,18 @@ function parseAIResponse(aiResponse, originalHexagramInfo) {
     }
     
     // 如果无法解析JSON，返回原始数据
+    logApiActivity('解析失败', {
+      错误类型: '无法解析JSON',
+      AI响应: aiResponse.substring(0, 200) + '...'
+    });
     console.error('无法解析AI响应为JSON:', aiResponse);
     return originalHexagramInfo;
   } catch (err) {
+    logApiActivity('解析错误', {
+      错误类型: 'JSON解析异常',
+      错误信息: err.message,
+      AI响应: aiResponse.substring(0, 200) + '...'
+    });
     console.error('解析AI响应失败:', err);
     return originalHexagramInfo;
   }

@@ -160,7 +160,13 @@
       <text>解析由 DeepSeek AI 提供技术支持</text>
     </view>
     
-    <!-- 重新占卜按钮 -->
-    <button class="btn-primary redivination-btn" bindtap="reDivination">重新占卜</button>
+    <!-- 按钮区域 -->
+    <view class="button-group">
+      <!-- 重新占卜按钮 -->
+      <button class="btn-primary redivination-btn" bindtap="reDivination">重新占卜</button>
+      
+      <!-- 查看日志按钮 -->
+      <navigator url="/pages/logs/index" class="btn-secondary logs-btn">查看API日志</navigator>
+    </view>
   </view>
 </view> 
