@@ -4,7 +4,8 @@
     <view class="title">API调用日志</view>
     <view class="actions">
       <button class="btn-small" bindtap="refreshLogs" disabled="{{isLoading}}">刷新</button>
-      <button class="btn-small warning" bindtap="cleanOldLogs" disabled="{{isLoading}}">清理旧日志</button>
+      <button class="btn-small info" bindtap="showLogPath" disabled="{{isLoading}}">路径</button>
+      <button class="btn-small warning" bindtap="cleanOldLogs" disabled="{{isLoading}}">清理</button>
     </view>
   </view>
   
@@ -16,7 +17,7 @@
           <view 
             wx:for="{{logFiles}}" 
             wx:key="index" 
-            class="file-item {{selectedLog === item ? 'selected' : ''}}"
+            class="file-item {{selectedLog === item ? 'selected' : ''}} {{item === 'api_log.txt' ? 'backup' : ''}}"
             data-file="{{item}}"
             bindtap="selectLog">
             {{formatDate(item)}}

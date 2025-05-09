@@ -51,6 +51,11 @@
   color: white;
 }
 
+.btn-small.info {
+  background-color: #2196f3;
+  color: white;
+}
+
 .content-area {
   display: flex;
   flex: 1;
@@ -85,6 +90,16 @@
   background-color: #e3f2fd;
   color: #2196f3;
   font-weight: bold;
+}
+
+.file-item.backup {
+  color: #ff5722;
+  font-weight: bold;
+}
+
+.file-item.backup.selected {
+  background-color: #ffebee;
+  color: #f44336;
 }
 
 .no-data {

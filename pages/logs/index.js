@@ -5,7 +5,8 @@ Page({
     logFiles: [],
     selectedLog: '',
     logContent: '',
-    isLoading: false
+    isLoading: false,
+    logDir: ''
   },
 
   onLoad: function() {
@@ -20,16 +21,25 @@ Page({
     
     try {
       const logFiles = logger.getLogFiles();
-      // 按日期降序排列
+      
+      // 按日期降序排列，特殊处理api_log.txt文件
       logFiles.sort((a, b) => {
-        const dateA = a.match(/api_log_(\d{8})\.log/)[1];
-        const dateB = b.match(/api_log_(\d{8})\.log/)[1];
-        return dateB - dateA;
+        if (a === 'api_log.txt') return -1; // 备用日志文件排在最前面
+        if (b === 'api_log.txt') return 1;
+        
+        const dateA = a.match(/api_log_(\d{8})\.log/);
+        const dateB = b.match(/api_log_(\d{8})\.log/);
+        
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        
+        return dateB[1] - dateA[1];
       });
       
       this.setData({
         logFiles: logFiles,
-        isLoading: false
+        isLoading: false,
+        logDir: logger.logDir || wx.env.USER_DATA_PATH
       });
       
       // 默认选中最新的日志
@@ -41,6 +51,7 @@ Page({
         title: '加载日志文件失败',
         icon: 'none'
       });
+      console.error('加载日志文件列表失败:', e);
       this.setData({
         isLoading: false
       });
@@ -62,7 +73,7 @@ Page({
     try {
       const content = logger.readLogFile(fileName);
       this.setData({
-        logContent: content,
+        logContent: content || '日志内容为空',
         isLoading: false
       });
     } catch (e) {
@@ -70,6 +81,7 @@ Page({
         title: '读取日志内容失败',
         icon: 'none'
       });
+      console.error('读取日志内容失败:', e);
       this.setData({
         logContent: '读取失败: ' + e.message,
         isLoading: false
@@ -96,6 +108,7 @@ Page({
               title: '清理失败',
               icon: 'none'
             });
+            console.error('清理日志失败:', e);
           }
         }
       }
@@ -122,10 +135,24 @@ Page({
 
   // 格式化日期
   formatDate: function(fileName) {
+    // 处理备用日志文件
+    if (fileName === 'api_log.txt') {
+      return '备用日志';
+    }
+    
     const match = fileName.match(/api_log_(\d{4})(\d{2})(\d{2})\.log/);
     if (match) {
       return `${match[1]}-${match[2]}-${match[3]}`;
     }
     return fileName;
+  },
+  
+  // 显示日志存储路径
+  showLogPath: function() {
+    wx.showModal({
+      title: '日志存储路径',
+      content: this.data.logDir || '未知',
+      showCancel: false
+    });
   }
 }); 

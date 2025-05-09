@@ -5,10 +5,32 @@ const fs = wx.getFileSystemManager();
  */
 class Logger {
   constructor() {
+    // 确保使用wx.env.USER_DATA_PATH作为基础路径
     this.logDir = `${wx.env.USER_DATA_PATH}/logs`;
     this.initLogDir();
     this.currentDate = this.getDateString();
     this.logFile = `${this.logDir}/api_log_${this.currentDate}.log`;
+    
+    // 测试目录是否可写
+    this.testWritePermission();
+  }
+
+  /**
+   * 测试目录是否可写
+   */
+  testWritePermission() {
+    try {
+      const testFile = `${this.logDir}/test_write.txt`;
+      fs.writeFileSync(testFile, 'test write permission', 'utf8');
+      fs.unlinkSync(testFile);
+      console.log('日志目录写入权限正常');
+    } catch (e) {
+      console.error('日志目录写入测试失败:', e);
+      // 尝试使用备用路径
+      this.logDir = `${wx.env.USER_DATA_PATH}`;
+      this.logFile = `${this.logDir}/api_log_${this.currentDate}.log`;
+      console.log('使用备用日志路径:', this.logDir);
+    }
   }
 
   /**
@@ -18,11 +40,16 @@ class Logger {
     try {
       try {
         fs.accessSync(this.logDir);
+        console.log('日志目录已存在:', this.logDir);
       } catch (e) {
+        console.log('创建日志目录:', this.logDir);
         fs.mkdirSync(this.logDir, true);
       }
     } catch (e) {
       console.error('创建日志目录失败:', e);
+      // 如果创建目录失败，使用根目录
+      this.logDir = wx.env.USER_DATA_PATH;
+      console.log('改用根目录作为日志目录:', this.logDir);
     }
   }
 
@@ -70,13 +97,25 @@ class Logger {
       }
       content += '\n--------------------------------------------------\n';
 
-      // 将日志写入文件
-      fs.appendFileSync(this.logFile, content, 'utf8');
-      
-      // 同时输出到控制台
+      // 输出到控制台
       console.log(`[${type}] ${time}`);
       console.log(data);
       console.log('--------------------------------------------------');
+
+      try {
+        // 将日志写入文件
+        fs.appendFileSync(this.logFile, content, 'utf8');
+      } catch (writeError) {
+        console.error('写入日志文件失败:', writeError);
+        // 尝试使用备用文件名
+        try {
+          const backupFile = `${wx.env.USER_DATA_PATH}/api_log.txt`;
+          fs.appendFileSync(backupFile, content, 'utf8');
+          console.log('已写入备用日志文件:', backupFile);
+        } catch (backupError) {
+          console.error('写入备用日志文件也失败:', backupError);
+        }
+      }
     } catch (e) {
       console.error('写入日志失败:', e);
     }
@@ -112,7 +151,18 @@ class Logger {
    */
   getLogFiles() {
     try {
-      return fs.readdirSync(this.logDir).filter(file => file.startsWith('api_log_'));
+      let files = [];
+      try {
+        // 尝试读取日志目录
+        files = fs.readdirSync(this.logDir);
+      } catch (e) {
+        console.error('读取日志目录失败:', e);
+        // 如果读取失败，尝试读取根目录
+        files = fs.readdirSync(wx.env.USER_DATA_PATH);
+      }
+      
+      // 过滤出api_log开头的文件
+      return files.filter(file => file.startsWith('api_log'));
     } catch (e) {
       console.error('获取日志文件失败:', e);
       return [];
@@ -126,11 +176,18 @@ class Logger {
    */
   readLogFile(fileName) {
     try {
-      const filePath = `${this.logDir}/${fileName}`;
-      return fs.readFileSync(filePath, 'utf8');
+      // 尝试从日志目录读取
+      let filePath = `${this.logDir}/${fileName}`;
+      try {
+        return fs.readFileSync(filePath, 'utf8');
+      } catch (e) {
+        // 如果读取失败，尝试从根目录读取
+        filePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
+        return fs.readFileSync(filePath, 'utf8');
+      }
     } catch (e) {
       console.error('读取日志文件失败:', e);
-      return '';
+      return '读取日志文件失败: ' + e.message;
     }
   }
 
@@ -145,9 +202,19 @@ class Logger {
       const sevenDaysAgoStr = `${sevenDaysAgo.getFullYear()}${(sevenDaysAgo.getMonth() + 1).toString().padStart(2, '0')}${sevenDaysAgo.getDate().toString().padStart(2, '0')}`;
 
       files.forEach(file => {
-        const dateMatch = file.match(/api_log_(\d{8})\.log/);
+        const dateMatch = file.match(/api_log_(\d{8})\.log/) || file.match(/api_log\.txt/);
         if (dateMatch && dateMatch[1] < sevenDaysAgoStr) {
-          fs.unlinkSync(`${this.logDir}/${file}`);
+          try {
+            // 尝试从日志目录删除
+            fs.unlinkSync(`${this.logDir}/${file}`);
+          } catch (e) {
+            // 如果删除失败，尝试从根目录删除
+            try {
+              fs.unlinkSync(`${wx.env.USER_DATA_PATH}/${file}`);
+            } catch (e2) {
+              console.error('删除日志文件失败:', file, e2);
+            }
+          }
         }
       });
     } catch (e) {
