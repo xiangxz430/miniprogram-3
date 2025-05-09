@@ -4,7 +4,9 @@
   <view class="divination-overlay" wx:if="{{showOverlay}}">
     <view class="overlay-content">
       <view class="title">每日一挂</view>
-      <view class="hexagram-symbol-large">☯</view>
+      <view class="hexagram-symbol-large">
+        <text class="iconfont icon-hexagram"></text>
+      </view>
       <view class="overlay-desc">卜问今日运势，择吉避凶</view>
       
       <view class="coin-container">

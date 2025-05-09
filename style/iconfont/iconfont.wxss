@@ -1,0 +1,101 @@
+/* iconfont.wxss - 图标字体样式 */
+
+.iconfont {
+  font-size: 32rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 图标容器通用样式 */
+.icon-container {
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10rpx;
+}
+
+/* 基本图标样式 */
+.icon-hexagram:before { content: "☯"; }
+.icon-star:before { content: "★"; }
+.icon-calendar:before { content: "📅"; }
+.icon-moon:before { content: "🌙"; }
+.icon-zodiac:before { content: "♈"; }
+.icon-mbti:before { content: "𝓜"; }
+.icon-notification:before { content: "🔔"; }
+.icon-privacy:before { content: "🔒"; }
+.icon-theme:before { content: "🎨"; }
+.icon-help:before { content: "❓"; }
+.icon-add-friend:before { content: "👤+"; }
+.icon-wuxing:before { content: "⍟"; }
+.icon-cake:before { content: "🎂"; }
+.icon-user:before { content: "👤"; }
+
+/* 运势图标 */
+.icon-fortune:before { content: "💰"; }
+.icon-love:before { content: "❤️"; }
+.icon-career:before { content: "💼"; }
+
+/* 设置图标 */
+.icon-setting:before { content: "⚙️"; }
+.icon-dream:before { content: "💭"; }
+
+/* 卦象图标 */
+.icon-yinyang:before { content: "☯"; }
+.icon-qian:before { content: "䷀"; } /* 乾 */
+.icon-kun:before { content: "䷁"; } /* 坤 */
+.icon-zhen:before { content: "䷲"; } /* 震 */
+.icon-gen:before { content: "䷳"; } /* 艮 */
+.icon-kan:before { content: "䷜"; } /* 坎 */
+.icon-li:before { content: "䷝"; } /* 离 */
+.icon-xun:before { content: "䷸"; } /* 巽 */
+.icon-dui:before { content: "䷹"; } /* 兑 */
+
+/* 圆形图标容器 */
+.icon-circle {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+}
+
+/* 不同颜色的图标背景 */
+.icon-bg-primary {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+}
+
+.icon-bg-blue {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.icon-bg-green {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.icon-bg-yellow {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.icon-bg-red {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.icon-bg-purple {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+.icon-bg-pink {
+  background-color: rgba(236, 72, 153, 0.1);
+  color: #ec4899;
+} 

@@ -1,0 +1,333 @@
+<!-- pages/user_profile/index.wxml -->
+<view class="container">
+  <!-- 个人资料头部 -->
+  <view class="profile-header">
+    <view class="avatar-container">
+      <view class="avatar" wx:if="{{userInfo.avatar}}">
+        <image src="{{userInfo.avatar}}" mode="aspectFill"></image>
+      </view>
+      <view class="avatar avatar-default" wx:else>{{userInfo.firstLetter}}</view>
+    </view>
+    <view class="user-info">
+      <!-- 非编辑状态显示昵称 -->
+      <text class="nickname" wx:if="{{!isEditing}}">{{userInfo.nickname}}</text>
+      <!-- 编辑状态显示输入框 -->
+      <input wx:else class="nickname-input" type="text" value="{{userInfo.nickname}}" bindinput="inputNickname" placeholder="请输入昵称" maxlength="10"/>
+      <text class="user-description">{{userInfo.zodiac}} · {{userInfo.mbti}} · {{userInfo.lunarDate}}</text>
+    </view>
+    <!-- 添加顶部编辑按钮 -->
+    <view class="edit-btn-header" bindtap="toggleEditMode">
+      <text>{{isEditing ? '保存' : '编辑'}}</text>
+    </view>
+  </view>
+  
+  <!-- 标签页导航 -->
+  <view class="tabs-container">
+    <view class="tabs">
+      <view class="tab {{activeTab === 0 ? 'active' : ''}}" catchtap="switchTab" data-index="0">个人信息</view>
+      <view class="tab {{activeTab === 1 ? 'active' : ''}}" catchtap="switchTab" data-index="1">我的好友</view>
+    </view>
+    
+    <!-- 个人信息内容 -->
+    <view class="tab-content" wx:if="{{activeTab === 0}}">
+      <!-- 今日总览 -->
+      <view class="section">
+        <view class="section-title">今日总览</view>
+        
+        <view class="overview-cards">
+          <view class="profile-card blue-gradient">
+            <view class="card-inner">
+              <view class="card-icon icon-bg-blue">
+                <text class="iconfont icon-hexagram"></text>
+              </view>
+              <view class="card-content">
+                <text class="card-label">今日卦象</text>
+                <text class="card-value">{{dailyData.hexagram.name}} · {{dailyData.hexagram.description}}</text>
+              </view>
+            </view>
+          </view>
+          
+          <view class="profile-card yellow-gradient">
+            <view class="card-inner">
+              <view class="card-icon icon-bg-yellow">
+                <text class="iconfont icon-star"></text>
+              </view>
+              <view class="card-content">
+                <text class="card-label">今日运势</text>
+                <text class="card-value">
+                  <text wx:for="{{dailyData.horoscope.rating}}" wx:key="index" class="star">★</text>
+                  <text wx:for="{{5 - dailyData.horoscope.rating}}" wx:key="index" class="star-empty">☆</text>
+                </text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 基础信息 -->
+      <view class="section">
+        <view class="section-header">
+          <text class="section-title">基础信息</text>
+          <text class="edit-btn" bindtap="toggleEditMode">{{isEditing ? '保存' : '编辑'}}</text>
+        </view>
+        <view class="info-list">
+          <view class="info-item">
+            <view class="info-label">
+              <view class="info-icon">
+                <text class="iconfont icon-calendar"></text>
+              </view>
+              <text>生日</text>
+            </view>
+            <view wx:if="{{!isEditing}}" class="info-value">{{userInfo.birthdate}}</view>
+            <picker wx:else mode="date" value="{{userInfo.birthdate}}" start="1900-01-01" end="2030-12-31" bindchange="bindBirthdateChange" class="picker-input">
+              <view class="info-value editing">{{userInfo.birthdate}}</view>
+            </picker>
+          </view>
+          
+          <view class="info-item">
+            <view class="info-label">
+              <view class="info-icon">
+                <text class="iconfont icon-moon"></text>
+              </view>
+              <text>农历</text>
+            </view>
+            <text class="info-value">{{userInfo.lunarDate}}</text>
+          </view>
+          
+          <view class="info-item">
+            <view class="info-label">
+              <view class="info-icon">
+                <text class="iconfont icon-zodiac"></text>
+              </view>
+              <text>星座</text>
+            </view>
+            <text class="info-value">{{userInfo.zodiac}}</text>
+          </view>
+          
+          <view class="info-item">
+            <view class="info-label">
+              <view class="info-icon">
+                <text class="iconfont icon-mbti"></text>
+              </view>
+              <text>MBTI</text>
+            </view>
+            <view wx:if="{{!isEditing}}" class="info-value">{{userInfo.mbti}}</view>
+            <picker wx:else bindchange="bindMBTIChange" value="{{mbtiIndex}}" range="{{mbtiOptions}}" class="picker-input">
+              <view class="info-value editing">{{userInfo.mbti}}</view>
+            </picker>
+          </view>
+
+          <view class="info-item">
+            <view class="info-label">
+              <view class="info-icon">
+                <text class="iconfont icon-location"></text>
+              </view>
+              <text>出生地</text>
+            </view>
+            <view wx:if="{{!isEditing}}" class="info-value">{{userInfo.birthplace || '未设置'}}</view>
+            <input wx:else type="text" value="{{userInfo.birthplace}}" placeholder="请输入出生地" bindinput="inputBirthplace" class="text-input"/>
+          </view>
+
+          <view class="info-item">
+            <view class="info-label">
+              <view class="info-icon">
+                <text class="iconfont icon-location"></text>
+              </view>
+              <text>当前位置</text>
+            </view>
+            <view class="info-value-row">
+              <text class="info-value">{{userInfo.currentLocation || '未获取'}}</text>
+              <text wx:if="{{!isEditing}}" class="location-btn" bindtap="getLocation">刷新</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 近期梦境 -->
+      <view class="section">
+        <view class="section-header">
+          <text class="section-title">近期梦境</text>
+          <text class="view-all" bindtap="viewAllDreams">查看全部</text>
+        </view>
+        
+        <view class="dream-list">
+          <view class="profile-card" wx:for="{{dreams}}" wx:key="index">
+            <view class="dream-header">
+              <text class="dream-title">{{item.title}}</text>
+              <text class="dream-date">{{item.date}}</text>
+            </view>
+            <text class="dream-content">{{item.content}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 设置菜单 -->
+      <view class="section">
+        <view class="section-title">设置</view>
+        
+        <view class="settings-list">
+          <view class="setting-item" bindtap="goToSettings" data-type="通知">
+            <view class="setting-label">
+              <view class="setting-icon">
+                <text class="iconfont icon-notification"></text>
+              </view>
+              <text class="setting-text">通知设置</text>
+            </view>
+            <view class="setting-arrow"></view>
+          </view>
+          
+          <view class="setting-item" bindtap="goToSettings" data-type="隐私">
+            <view class="setting-label">
+              <view class="setting-icon">
+                <text class="iconfont icon-privacy"></text>
+              </view>
+              <text class="setting-text">隐私设置</text>
+            </view>
+            <view class="setting-arrow"></view>
+          </view>
+          
+          <view class="setting-item" bindtap="goToSettings" data-type="主题">
+            <view class="setting-label">
+              <view class="setting-icon">
+                <text class="iconfont icon-theme"></text>
+              </view>
+              <text class="setting-text">主题设置</text>
+            </view>
+            <view class="setting-arrow"></view>
+          </view>
+          
+          <view class="setting-item" bindtap="goToSettings" data-type="帮助与反馈">
+            <view class="setting-label">
+              <view class="setting-icon">
+                <text class="iconfont icon-help"></text>
+              </view>
+              <text class="setting-text">帮助与反馈</text>
+            </view>
+            <view class="setting-arrow"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 好友内容 -->
+    <view class="tab-content" wx:if="{{activeTab === 1}}">
+      <!-- 好友管理 -->
+      <view class="section">
+        <view class="section-header">
+          <text class="section-title">好友列表</text>
+          <button class="add-friend-btn" catchtap="addFriend">
+            <text class="iconfont icon-add-friend"></text>
+            <text>添加好友</text>
+          </button>
+        </view>
+        
+        <view class="friends-list">
+          <view class="friend-card" wx:for="{{friends}}" wx:key="index" catchtap="viewFriendDetail" data-index="{{index}}">
+            <view class="friend-avatar {{item.bgColor}}">{{item.firstLetter}}</view>
+            <view class="friend-info">
+              <view class="friend-header">
+                <text class="friend-name">{{item.name}}</text>
+                <text class="friend-zodiac {{item.zodiacColor}}">{{item.zodiac}}</text>
+              </view>
+              <view class="friend-details">
+                <text class="friend-mbti">{{item.mbti}} · {{item.lunarYear}}</text>
+                <text class="friend-relation">{{item.relationship}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 生日提醒 -->
+      <view class="section">
+        <view class="section-title">生日提醒</view>
+        
+        <view class="birthday-container">
+          <view class="birthday-header">
+            <text class="birthday-title">即将到来的生日</text>
+            <text class="view-all" bindtap="viewAllBirthdays">全部</text>
+          </view>
+          
+          <view class="birthday-list">
+            <view class="birthday-item" wx:for="{{birthdays}}" wx:key="index" 
+                  style="background-color: {{item.daysLeft <= 7 ? 'rgba(251, 191, 36, 0.1)' : 'rgba(59, 130, 246, 0.1)'}}">
+              <view class="birthday-icon-container" 
+                    style="background-color: {{item.daysLeft <= 7 ? 'rgba(251, 191, 36, 0.2)' : 'rgba(59, 130, 246, 0.2)'}}">
+                <text class="iconfont icon-cake"></text>
+                <view class="badge">{{item.daysLeft}}</view>
+              </view>
+              
+              <view class="birthday-content">
+                <text class="birthday-name">{{item.name}}的生日还有{{item.daysLeft}}天</text>
+                <text class="birthday-date">{{item.date}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 关系匹配 -->
+      <view class="section">
+        <view class="section-title">关系匹配</view>
+        
+        <view class="compatibility-cards">
+          <!-- 五行合作指数卡片 -->
+          <view class="compatibility-card">
+            <view class="compatibility-header">
+              <view class="compatibility-title-container">
+                <text class="compatibility-title">五行合作指数</text>
+                <text class="compatibility-desc">基于八字五行相生相克的关系匹配</text>
+              </view>
+              <text class="compatibility-tag good">良好</text>
+            </view>
+            
+            <view class="compatibility-items">
+              <view class="compatibility-item" wx:for="{{compatibilities.wuxing}}" wx:key="index"
+                    style="background-color: {{item.percentage >= 80 ? 'rgba(34, 197, 94, 0.1)' : 'rgba(234, 179, 8, 0.1)'}}">
+                <view class="compatibility-icon" 
+                      style="background-color: {{item.percentage >= 80 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(234, 179, 8, 0.2)'}}">
+                  <text class="iconfont icon-wuxing"></text>
+                </view>
+                <view class="compatibility-info">
+                  <text class="compatibility-name">{{item.name}}</text>
+                  <text class="compatibility-percent" 
+                        style="color: {{item.percentage >= 80 ? '#16a34a' : '#ca8a04'}}">
+                    五行互补 {{item.percentage}}%
+                  </text>
+                </view>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 星座合盘指数卡片 -->
+          <view class="compatibility-card">
+            <view class="compatibility-header">
+              <view class="compatibility-title-container">
+                <text class="compatibility-title">星座合盘指数</text>
+                <text class="compatibility-desc">基于星座元素与宫位的匹配分析</text>
+              </view>
+              <text class="compatibility-tag excellent">极佳</text>
+            </view>
+            
+            <view class="compatibility-items">
+              <view class="compatibility-item" wx:for="{{compatibilities.zodiac}}" wx:key="index"
+                    style="background-color: {{item.percentage >= 80 ? 'rgba(59, 130, 246, 0.1)' : 'rgba(124, 58, 237, 0.1)'}}">
+                <view class="compatibility-icon" 
+                      style="background-color: {{item.percentage >= 80 ? 'rgba(59, 130, 246, 0.2)' : 'rgba(124, 58, 237, 0.2)'}}">
+                  <text class="iconfont icon-zodiac"></text>
+                </view>
+                <view class="compatibility-info">
+                  <text class="compatibility-name">{{item.name}}</text>
+                  <text class="compatibility-percent" 
+                        style="color: {{item.percentage >= 80 ? '#3b82f6' : '#7c3aed'}}">
+                    星座契合 {{item.percentage}}%
+                  </text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 

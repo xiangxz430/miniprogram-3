@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/daily_hexagram/index",
+    "pages/user_profile/index",
     "pages/logs/index"
   ],
   "window": {
@@ -8,6 +9,26 @@
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "每日算运",
     "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#94a3b8",
+    "selectedColor": "#3b82f6",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/daily_hexagram/index",
+        "text": "每日一挂",
+        "iconPath": "images/icons/hexagram.png",
+        "selectedIconPath": "images/icons/hexagram.png"
+      },
+      {
+        "pagePath": "pages/user_profile/index",
+        "text": "我的",
+        "iconPath": "images/icons/user.png",
+        "selectedIconPath": "images/icons/user.png"
+      }
+    ]
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
