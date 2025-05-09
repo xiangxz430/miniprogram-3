@@ -1,0 +1,542 @@
+/* pages/daily_hexagram/index.wxss */
+
+/* 页面容器 */
+.container {
+  position: relative;
+  min-height: 100vh;
+  background-color: #f8f3e9;
+  padding-bottom: 100rpx;
+}
+
+/* 占卜覆盖层 */
+.divination-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx;
+  width: 80%;
+}
+
+.overlay-content .title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #f8f3e9;
+  margin-bottom: 30rpx;
+}
+
+.overlay-content .hexagram-symbol-large {
+  font-size: 120rpx;
+  color: #f8f3e9;
+  margin: 20rpx 0;
+}
+
+.overlay-desc {
+  font-size: 32rpx;
+  color: #f8f3e9;
+  margin-bottom: 50rpx;
+}
+
+/* 硬币翻转动画 */
+.coin-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin: 40rpx 0;
+}
+
+.coin-flip {
+  perspective: 1000rpx;
+  width: 150rpx;
+  height: 150rpx;
+  margin: 0 20rpx;
+}
+
+.coin {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.coin.flipping {
+  animation: flip 1.5s infinite;
+}
+
+@keyframes flip {
+  0% { transform: rotateY(0); }
+  50% { transform: rotateY(180deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+.coin-front,
+.coin-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.coin-front {
+  background: linear-gradient(145deg, #ffd700, #ffc107);
+  color: #8B4513;
+}
+
+.coin-back {
+  background: linear-gradient(145deg, #b8b8b8, #e0e0e0);
+  color: #333;
+  transform: rotateY(180deg);
+}
+
+/* 加载状态样式 */
+.loading-status {
+  margin: 30rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-icon {
+  width: 60rpx;
+  height: 60rpx;
+  border: 5rpx solid #f8f3e9;
+  border-top: 5rpx solid #ffc107;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  color: #f8f3e9;
+  font-size: 28rpx;
+}
+
+/* 主按钮 */
+.btn-primary {
+  background: linear-gradient(145deg, #ffc107, #ff9800);
+  color: #4a2811;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 50rpx;
+  padding: 20rpx 60rpx;
+  margin-top: 40rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 15rpx rgba(255, 193, 7, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(5rpx);
+  box-shadow: 0 2rpx 8rpx rgba(255, 193, 7, 0.4);
+}
+
+.btn-primary[disabled] {
+  background: linear-gradient(145deg, #cccccc, #dddddd);
+  color: #888888;
+}
+
+.btn-icon {
+  margin-right: 10rpx;
+  font-size: 36rpx;
+}
+
+/* 页面内容 */
+.page-content {
+  width: 100%;
+  padding: 30rpx;
+  box-sizing: border-box;
+}
+
+/* 头部 */
+.header {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.header .title {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #4a2811;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #666;
+  margin-top: 10rpx;
+}
+
+/* 卡片样式 */
+.card {
+  background-color: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 15rpx rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  border-bottom: 1rpx solid #eee;
+  padding-bottom: 20rpx;
+  margin-bottom: 30rpx;
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #4a2811;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.divination-time {
+  font-size: 24rpx;
+  color: #999;
+  font-weight: normal;
+}
+
+/* 卦象内容 */
+.hexagram-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hexagram-symbol-large {
+  font-size: 100rpx;
+  color: #4a2811;
+  margin: 20rpx 0;
+}
+
+.hexagram-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #4a2811;
+  margin-bottom: 10rpx;
+}
+
+.hexagram-desc {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 30rpx;
+}
+
+/* 整体运势样式 */
+.hexagram-overall {
+  width: 100%;
+  background-color: #fef9e8;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 30rpx;
+  text-align: left;
+}
+
+.overall-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #4a2811;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.overall-content {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.hexagram-meaning {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+  margin: 30rpx 0;
+  text-align: justify;
+}
+
+/* 运势网格 */
+.fortune-grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 20rpx;
+}
+
+.fortune-item {
+  padding: 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+  text-align: left;
+}
+
+.fortune-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.fortune-icon {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24rpx;
+  font-weight: bold;
+  margin-right: 10rpx;
+}
+
+.fortune-item.finance {
+  background-color: #fef4e8;
+}
+
+.fortune-item.finance .fortune-icon {
+  background-color: #ffc107;
+  color: #4a2811;
+}
+
+.fortune-item.love {
+  background-color: #feebf0;
+}
+
+.fortune-item.love .fortune-icon {
+  background-color: #ff789e;
+  color: #fff;
+}
+
+.fortune-item.career {
+  background-color: #e8f3fe;
+}
+
+.fortune-item.career .fortune-icon {
+  background-color: #4d90fe;
+  color: #fff;
+}
+
+.fortune-content {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 罗盘 */
+.compass {
+  position: relative;
+  width: 300rpx;
+  height: 300rpx;
+  margin: 40rpx auto;
+  border-radius: 50%;
+  background-color: #fef9e8;
+  border: 2rpx solid #e5d5b5;
+}
+
+.compass-direction {
+  position: absolute;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.compass-direction.north {
+  top: 10rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4a2811;
+}
+
+.compass-direction.east {
+  right: 10rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4a2811;
+}
+
+.compass-direction.south {
+  bottom: 10rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4a2811;
+}
+
+.compass-direction.west {
+  left: 10rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4a2811;
+}
+
+.compass-direction.fortune {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffc107;
+  width: 50rpx;
+  height: 50rpx;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #4a2811;
+}
+
+.compass-direction.love {
+  top: 100rpx;
+  left: 100rpx;
+  background-color: #ff789e;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
+.compass-direction.danger {
+  bottom: 100rpx;
+  right: 100rpx;
+  background-color: #757575;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
+.compass-info {
+  margin-top: 30rpx;
+}
+
+.compass-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.compass-icon {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24rpx;
+  font-weight: bold;
+  margin-right: 10rpx;
+}
+
+.compass-icon.finance {
+  background-color: #ffc107;
+  color: #4a2811;
+}
+
+.compass-icon.love {
+  background-color: #ff789e;
+  color: #fff;
+}
+
+.compass-icon.danger {
+  background-color: #757575;
+  color: #fff;
+}
+
+/* 开运提示 */
+.tip-item {
+  margin-bottom: 25rpx;
+}
+
+.tip-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.tip-icon {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24rpx;
+  font-weight: bold;
+  margin-right: 10rpx;
+}
+
+.tip-icon.clothing {
+  background-color: #8c9eff;
+  color: #fff;
+}
+
+.tip-icon.lucky {
+  background-color: #66bb6a;
+  color: #fff;
+}
+
+.tip-icon.unlucky {
+  background-color: #ef5350;
+  color: #fff;
+}
+
+.tip-content {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.tip-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  margin-right: 15rpx;
+  margin-bottom: 15rpx;
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+/* AI信息显示 */
+.ai-info {
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+  margin: 20rpx 0;
+}
+
+/* 重新占卜按钮 */
+.redivination-btn {
+  margin-top: 40rpx;
+  width: 70% !important;
+} 

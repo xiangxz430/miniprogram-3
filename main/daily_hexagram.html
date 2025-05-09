@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日一挂</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .shake-animation {
+            animation: shake 0.8s ease-in-out;
+        }
+        .coin-flip {
+            perspective: 1000px;
+        }
+        .coin {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s ease-in-out;
+        }
+        .coin.flipping {
+            animation: flipCoin 1s linear infinite;
+        }
+        @keyframes flipCoin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(1800deg); }
+        }
+        .coin-front, .coin-back {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .coin-front {
+            background: linear-gradient(145deg, #ffd700, #f8c400);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .coin-back {
+            background: linear-gradient(145deg, #ffc300, #e6b000);
+            transform: rotateY(180deg);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .hexagram-symbol {
+            font-size: 72px;
+            line-height: 1;
+        }
+        .compass {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            position: relative;
+            background: radial-gradient(circle, #f5f5f7 40%, #e0e0e5 100%);
+            margin: 0 auto;
+            border: 1px solid #ddd;
+        }
+        .compass::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background-color: #222;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .compass-direction {
+            position: absolute;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .north { top: 5px; left: 50%; transform: translateX(-50%); }
+        .east { right: 5px; top: 50%; transform: translateY(-50%); }
+        .south { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .west { left: 5px; top: 50%; transform: translateY(-50%); }
+        .fortune { top: 25%; right: 25%; color: #e74c3c; }
+        .love { bottom: 25%; left: 25%; color: #e84393; }
+        .danger { bottom: 25%; right: 25%; color: #2d3436; }
+        
+        /* 占卜覆盖层 */
+        #divination-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        
+        /* 页面内容容器 */
+        #page-content {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 占卜覆盖层 -->
+    <div id="divination-overlay">
+        <h1 class="text-3xl font-bold text-center mb-12">每日一挂</h1>
+        <div class="text-center mb-12">
+            <div class="hexagram-symbol mb-4">☯</div>
+            <p class="text-gray-600">卜问今日运势，择吉避凶</p>
+        </div>
+        
+        <div id="coin-container" class="flex justify-center gap-6 mb-12">
+            <div class="coin-flip">
+                <div class="coin">
+                    <div class="coin-front">阳</div>
+                    <div class="coin-back">阴</div>
+                </div>
+            </div>
+            <div class="coin-flip">
+                <div class="coin">
+                    <div class="coin-front">阳</div>
+                    <div class="coin-back">阴</div>
+                </div>
+            </div>
+            <div class="coin-flip">
+                <div class="coin">
+                    <div class="coin-front">阳</div>
+                    <div class="coin-back">阴</div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="divination-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-full shadow-lg flex items-center justify-center">
+            <i class="fas fa-yin-yang mr-2"></i>
+            <span>开始占卜</span>
+        </button>
+    </div>
+
+    <!-- 页面内容 -->
+    <div id="page-content">
+        <!-- 顶部状态栏 -->
+        <div class="bg-white text-black py-2 px-6 flex justify-between items-center h-12">
+            <div class="text-sm">10:30</div>
+            <div class="flex items-center space-x-1">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 mb-20">
+            <!-- 页面头部 -->
+            <div class="mt-6 mb-8">
+                <h1 class="text-3xl font-bold text-center">每日一挂</h1>
+                <p class="text-center text-gray-500 mt-2">2023年11月10日 星期五</p>
+            </div>
+            
+            <!-- 今日卦象区域 -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">今日卦象</h2>
+                    <span class="text-sm text-gray-500">11:24:36 已卜</span>
+                </div>
+                
+                <div class="flex flex-col items-center">
+                    <div class="hexagram-symbol mb-4">䷊</div>
+                    <h3 class="text-2xl font-bold mb-2">泰卦</h3>
+                    <p class="text-gray-600 mb-4">地天泰 • 平安亨通</p>
+                    
+                    <div class="w-full bg-blue-50 rounded-lg p-4 mb-6">
+                        <p class="text-gray-700">《焦氏易林》曰："泰卦，明夷致泰，物极必反，无往不复。至微而着，至幽而明。是以乱而治，危而安，塞而通，阂而泰。"</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 w-full">
+                        <div class="bg-orange-50 rounded-lg p-4">
+                            <h4 class="font-bold mb-2 text-orange-600">
+                                <i class="fas fa-coins mr-2"></i>今日财运
+                            </h4>
+                            <p class="text-gray-700">财运顺畅，适合投资与理财。财位在东南方，可佩戴黄色饰品增强运势。</p>
+                        </div>
+                        
+                        <div class="bg-purple-50 rounded-lg p-4">
+                            <h4 class="font-bold mb-2 text-purple-600">
+                                <i class="fas fa-heart mr-2"></i>今日桃花
+                            </h4>
+                            <p class="text-gray-700">桃花位在西南方，今日易遇贵人，社交活动顺利。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 运势罗盘 -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold mb-4">今日罗盘</h2>
+                
+                <div class="compass mb-4">
+                    <div class="compass-direction north">北</div>
+                    <div class="compass-direction east">东</div>
+                    <div class="compass-direction south">南</div>
+                    <div class="compass-direction west">西</div>
+                    <div class="compass-direction fortune">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="compass-direction love">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="compass-direction danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-2 text-center text-sm">
+                    <div class="bg-red-50 p-2 rounded">
+                        <i class="fas fa-coins text-red-500"></i>
+                        <p>财位: 东南</p>
+                    </div>
+                    <div class="bg-pink-50 p-2 rounded">
+                        <i class="fas fa-heart text-pink-500"></i>
+                        <p>桃花: 西南</p>
+                    </div>
+                    <div class="bg-gray-50 p-2 rounded">
+                        <i class="fas fa-exclamation-triangle text-gray-500"></i>
+                        <p>煞位: 东北</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 开运提示 -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-20">
+                <h2 class="text-xl font-bold mb-4">开运提示</h2>
+                
+                <div class="mb-4">
+                    <h3 class="font-bold text-gray-700 mb-2">
+                        <i class="fas fa-tshirt mr-2 text-blue-500"></i>今日穿搭
+                    </h3>
+                    <div class="flex items-center">
+                        <div class="flex-grow">
+                            <p class="text-gray-600">今日宜穿浅蓝色系，有助于提升财运。</p>
+                            <p class="text-sm text-gray-500 mt-1">宜佩戴：银饰 + 海蓝宝石</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full ml-2" style="background-color: #A7C7E7;"></div>
+                    </div>
+                    <div class="mt-2">
+                        <p class="text-xs text-gray-500">推荐色值: #A7C7E7 (水蓝色)</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold text-gray-700 mb-2">
+                        <i class="fas fa-cloud-sun mr-2 text-yellow-500"></i>今日天气
+                    </h3>
+                    <div class="flex items-center">
+                        <div class="mr-4">
+                            <i class="fas fa-sun text-3xl text-yellow-500"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold">晴 26°C</p>
+                            <p class="text-sm text-gray-500">宜携带：遮阳伞、太阳镜</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-6 z-10">
+        <div class="grid grid-cols-6 gap-4">
+            <a href="daily_hexagram.html" class="flex flex-col items-center text-blue-500">
+                <i class="fas fa-yin-yang text-xl"></i>
+                <span class="text-xs mt-1">每日</span>
+            </a>
+            <a href="bazi_overview.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-calendar-alt text-xl"></i>
+                <span class="text-xs mt-1">八字</span>
+            </a>
+            <a href="daily_horoscope.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-star text-xl"></i>
+                <span class="text-xs mt-1">星座</span>
+            </a>
+            <a href="mbti_personality.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-brain text-xl"></i>
+                <span class="text-xs mt-1">MBTI</span>
+            </a>
+            <a href="dream_analysis.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-moon text-xl"></i>
+                <span class="text-xs mt-1">解梦</span>
+            </a>
+            <a href="user_profile.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs mt-1">我的</span>
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // 检查是否已经今天进行过占卜
+        function checkDivinationStatus() {
+            const today = new Date().toDateString();
+            const lastDivination = localStorage.getItem('lastDivination');
+            
+            // 如果今天已经占卜过，则直接显示内容
+            if (lastDivination === today) {
+                showContent();
+            } else {
+                // 显示占卜动画，等待用户点击
+                document.getElementById('divination-overlay').style.display = 'flex';
+            }
+        }
+        
+        // 显示页面内容，隐藏占卜覆盖层
+        function showContent() {
+            const overlay = document.getElementById('divination-overlay');
+            const content = document.getElementById('page-content');
+            
+            // 记录今天已进行占卜
+            const today = new Date().toDateString();
+            localStorage.setItem('lastDivination', today);
+            
+            // 淡出占卜层，淡入内容
+            overlay.style.opacity = '0';
+            content.style.opacity = '1';
+            
+            // 完全移除占卜层
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 500);
+        }
+        
+        // 占卜按钮点击事件
+        document.getElementById('divination-btn').addEventListener('click', function() {
+            // 添加摇晃动画
+            this.classList.add('shake-animation');
+            
+            // 开始铜钱动画
+            const coins = document.querySelectorAll('.coin');
+            coins.forEach(coin => {
+                coin.classList.add('flipping');
+            });
+            
+            // 3秒后停止动画并显示内容
+            setTimeout(() => {
+                this.classList.remove('shake-animation');
+                
+                coins.forEach(coin => {
+                    coin.classList.remove('flipping');
+                    // 随机决定正反面
+                    const isHeads = Math.random() > 0.5;
+                    coin.style.transform = isHeads ? 'rotateY(0deg)' : 'rotateY(180deg)';
+                });
+                
+                // 0.5秒后显示内容
+                setTimeout(showContent, 500);
+                
+            }, 3000);
+        });
+        
+        // 页面加载时检查状态
+        window.addEventListener('DOMContentLoaded', checkDivinationStatus);
+    </script>
+</body>
+</html> 

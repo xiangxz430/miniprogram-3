@@ -1,0 +1,32 @@
+# 系统文件
+.DS_Store
+*.swp
+*.bak
+*.tmp
+
+# 项目文件
+node_modules/
+miniprogram_npm/
+.idea/
+.vscode/
+
+# 编译输出
+dist/
+build/
+
+# 微信开发者工具本地配置
+project.private.config.json
+
+# 本地调试文件
+debug.log
+
+# 敏感信息
+utils/config.js
+secrets.js
+private.key
+*private.key
+*secrets.js
+
+# 其他
+.env
+.env.local 

@@ -1,0 +1,166 @@
+<!-- pages/daily_hexagram/index.wxml -->
+<view class="container">
+  <!-- 占卜覆盖层 -->
+  <view class="divination-overlay" wx:if="{{showOverlay}}">
+    <view class="overlay-content">
+      <view class="title">每日一挂</view>
+      <view class="hexagram-symbol-large">☯</view>
+      <view class="overlay-desc">卜问今日运势，择吉避凶</view>
+      
+      <view class="coin-container">
+        <view class="coin-flip" wx:for="{{3}}" wx:key="index">
+          <view class="coin {{isFlipping ? 'flipping' : ''}}">
+            <view class="coin-front">阳</view>
+            <view class="coin-back">阴</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 加载状态显示 -->
+      <view class="loading-status" wx:if="{{isLoading}}">
+        <view class="loading-icon"></view>
+        <view class="loading-text">{{loadingText}}</view>
+      </view>
+      
+      <button class="btn-primary" bindtap="startDivination" disabled="{{isLoading}}">
+        <text class="btn-icon">卜</text>
+        <text>{{isLoading ? '占卜中...' : '开始占卜'}}</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 页面内容 -->
+  <view class="page-content" wx:if="{{!showOverlay}}">
+    <!-- 页面头部 -->
+    <view class="header">
+      <view class="title">每日一挂</view>
+      <view class="subtitle">{{currentDate || hexagramInfo.date}}</view>
+    </view>
+    
+    <!-- 今日卦象区域 -->
+    <view class="card">
+      <view class="card-title">
+        <text>今日卦象</text>
+        <text class="divination-time">{{hexagramInfo.time}} 已卜</text>
+      </view>
+      
+      <view class="hexagram-content">
+        <view class="hexagram-symbol-large">{{hexagramInfo.symbol}}</view>
+        <view class="hexagram-name">{{hexagramInfo.name}}</view>
+        <view class="hexagram-desc">{{hexagramInfo.description}}</view>
+        
+        <!-- 添加整体运势展示 -->
+        <view class="hexagram-overall" wx:if="{{hexagramInfo.overall}}">
+          <text class="overall-title">今日运势</text>
+          <text class="overall-content">{{hexagramInfo.overall}}</text>
+        </view>
+        
+        <view class="hexagram-meaning">
+          <text>{{hexagramInfo.meaning}}</text>
+        </view>
+        
+        <view class="fortune-grid">
+          <view class="fortune-item finance">
+            <view class="fortune-title">
+              <text class="fortune-icon">财</text>
+              <text>今日财运</text>
+            </view>
+            <text class="fortune-content">{{hexagramInfo.finance}}</text>
+          </view>
+          
+          <view class="fortune-item love">
+            <view class="fortune-title">
+              <text class="fortune-icon">桃</text>
+              <text>今日桃花</text>
+            </view>
+            <text class="fortune-content">{{hexagramInfo.love}}</text>
+          </view>
+          
+          <!-- 新增事业/学业运势展示 -->
+          <view class="fortune-item career" wx:if="{{hexagramInfo.career}}">
+            <view class="fortune-title">
+              <text class="fortune-icon">事</text>
+              <text>今日事业</text>
+            </view>
+            <text class="fortune-content">{{hexagramInfo.career}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 运势罗盘 -->
+    <view class="card">
+      <view class="card-title">
+        <text>今日罗盘</text>
+      </view>
+      
+      <view class="compass">
+        <view class="compass-direction north">北</view>
+        <view class="compass-direction east">东</view>
+        <view class="compass-direction south">南</view>
+        <view class="compass-direction west">西</view>
+        <view class="compass-direction fortune">财</view>
+        <view class="compass-direction love">桃</view>
+        <view class="compass-direction danger">煞</view>
+      </view>
+      
+      <view class="compass-info">
+        <view class="compass-item">
+          <text class="compass-icon finance">财</text>
+          <text>财位: {{hexagramInfo.compass.finance}}</text>
+        </view>
+        <view class="compass-item">
+          <text class="compass-icon love">桃</text>
+          <text>桃花: {{hexagramInfo.compass.love}}</text>
+        </view>
+        <view class="compass-item">
+          <text class="compass-icon danger">煞</text>
+          <text>煞位: {{hexagramInfo.compass.danger}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 开运提示 -->
+    <view class="card">
+      <view class="card-title">
+        <text>开运提示</text>
+      </view>
+      
+      <view class="tip-item">
+        <view class="tip-title">
+          <text class="tip-icon clothing">衣</text>
+          <text>今日穿搭</text>
+        </view>
+        <view class="tip-content">{{hexagramInfo.tips.clothing}}</view>
+      </view>
+      
+      <view class="tip-item">
+        <view class="tip-title">
+          <text class="tip-icon lucky">宜</text>
+          <text>今日宜</text>
+        </view>
+        <view class="tip-tags">
+          <text class="tag" wx:for="{{hexagramInfo.tips.lucky}}" wx:key="index">{{item}}</text>
+        </view>
+      </view>
+      
+      <view class="tip-item">
+        <view class="tip-title">
+          <text class="tip-icon unlucky">忌</text>
+          <text>今日忌</text>
+        </view>
+        <view class="tip-tags">
+          <text class="tag" wx:for="{{hexagramInfo.tips.unlucky}}" wx:key="index">{{item}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- AI解析来源信息 -->
+    <view class="ai-info">
+      <text>解析由 DeepSeek AI 提供技术支持</text>
+    </view>
+    
+    <!-- 重新占卜按钮 -->
+    <button class="btn-primary redivination-btn" bindtap="reDivination">重新占卜</button>
+  </view>
+</view> 

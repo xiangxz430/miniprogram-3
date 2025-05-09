@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 32px;
+        }
+        .profile-card {
+            border-radius: 16px;
+            transition: transform 0.3s ease;
+        }
+        .profile-card:hover {
+            transform: translateY(-3px);
+        }
+        .friends-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            overflow: hidden;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 20px;
+        }
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 顶部状态栏 -->
+    <div class="bg-white text-black py-2 px-6 flex justify-between items-center h-12">
+        <div class="text-sm">10:30</div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-three-quarters"></i>
+        </div>
+    </div>
+    
+    <div class="container mx-auto px-4 pb-20">
+        <!-- 个人资料头部 -->
+        <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-b-3xl p-6 mb-6">
+            <div class="flex items-center">
+                <div class="user-avatar bg-white text-indigo-600">王</div>
+                <div class="ml-4 text-white">
+                    <h1 class="text-2xl font-bold">王小明</h1>
+                    <p class="opacity-80">天秤座 · INFJ · 庚午年</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 标签页导航 -->
+        <div class="bg-white rounded-xl shadow-md mb-6">
+            <div class="grid grid-cols-2 border-b border-gray-200">
+                <button id="tab1-btn" class="py-3 px-2 text-center border-b-2 border-indigo-500 text-indigo-500 font-medium">个人信息</button>
+                <button id="tab2-btn" class="py-3 px-2 text-center border-b-2 border-transparent text-gray-500 font-medium">我的好友</button>
+            </div>
+            
+            <!-- 个人信息内容 -->
+            <div id="tab1-content" class="tab-content active p-6">
+                <!-- 今日总览 -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold mb-4">今日总览</h2>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="profile-card bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl shadow-sm">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-yin-yang text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-700">今日卦象</h3>
+                                    <p class="text-blue-600">泰卦 · 地天泰</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-card bg-gradient-to-br from-yellow-50 to-amber-50 p-4 rounded-xl shadow-sm">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-700">今日运势</h3>
+                                    <p class="text-yellow-600">★★★★☆</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 基础信息 -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold mb-4">基础信息</h2>
+                    
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar-alt text-gray-400 w-6"></i>
+                                    <span class="ml-3 text-gray-700">生日</span>
+                                </div>
+                                <span class="text-gray-900">1990年8月15日</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <i class="fas fa-moon text-gray-400 w-6"></i>
+                                    <span class="ml-3 text-gray-700">农历</span>
+                                </div>
+                                <span class="text-gray-900">庚午年七月廿五</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-gray-400 w-6"></i>
+                                    <span class="ml-3 text-gray-700">星座</span>
+                                </div>
+                                <span class="text-gray-900">天秤座</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <i class="fas fa-brain text-gray-400 w-6"></i>
+                                    <span class="ml-3 text-gray-700">MBTI</span>
+                                </div>
+                                <span class="text-gray-900">INFJ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 近期梦境 -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">近期梦境</h2>
+                        <a href="dream_analysis.html" class="text-sm text-indigo-600">查看全部</a>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="profile-card bg-white rounded-lg shadow-sm p-4">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold">梦见在高处行走</h3>
+                                <span class="text-xs text-gray-500">昨天</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mt-1 line-clamp-2">梦见自己在一座很高的桥上行走，桥下是深深的峡谷，我走得很小心，但不觉得特别害怕...</p>
+                        </div>
+                        
+                        <div class="profile-card bg-white rounded-lg shadow-sm p-4">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold">梦见飞翔</h3>
+                                <span class="text-xs text-gray-500">3天前</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mt-1 line-clamp-2">梦见自己能够飞翔，在城市上空自由翱翔，感觉非常轻松和愉快...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 设置菜单 -->
+                <div>
+                    <h2 class="text-xl font-bold mb-4">设置</h2>
+                    
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <a href="#" class="p-4 border-b border-gray-200 flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-bell text-gray-400 w-6"></i>
+                                <span class="ml-3 text-gray-700">通知设置</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </a>
+                        
+                        <a href="#" class="p-4 border-b border-gray-200 flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-shield-alt text-gray-400 w-6"></i>
+                                <span class="ml-3 text-gray-700">隐私设置</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </a>
+                        
+                        <a href="#" class="p-4 border-b border-gray-200 flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-palette text-gray-400 w-6"></i>
+                                <span class="ml-3 text-gray-700">主题设置</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </a>
+                        
+                        <a href="#" class="p-4 flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-question-circle text-gray-400 w-6"></i>
+                                <span class="ml-3 text-gray-700">帮助与反馈</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 我的好友内容 -->
+            <div id="tab2-content" class="tab-content p-6">
+                <!-- 好友管理 -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">好友列表</h2>
+                        <button class="px-3 py-1 bg-indigo-500 text-white rounded-lg text-sm flex items-center">
+                            <i class="fas fa-user-plus mr-1"></i>
+                            <span>添加好友</span>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-xl shadow-sm p-4">
+                            <div class="flex items-center">
+                                <div class="friends-avatar bg-blue-500 mr-4">张</div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between">
+                                        <h3 class="font-bold">张小红</h3>
+                                        <span class="text-orange-500">射手座</span>
+                                    </div>
+                                    <div class="flex justify-between mt-1">
+                                        <span class="text-gray-500">ENFP · 乙亥年</span>
+                                        <span class="text-gray-500">好友</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-sm p-4">
+                            <div class="flex items-center">
+                                <div class="friends-avatar bg-green-500 mr-4">李</div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between">
+                                        <h3 class="font-bold">李小华</h3>
+                                        <span class="text-blue-500">水瓶座</span>
+                                    </div>
+                                    <div class="flex justify-between mt-1">
+                                        <span class="text-gray-500">INTJ · 丁卯年</span>
+                                        <span class="text-gray-500">好友</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-sm p-4">
+                            <div class="flex items-center">
+                                <div class="friends-avatar bg-pink-500 mr-4">陈</div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between">
+                                        <h3 class="font-bold">陈小明</h3>
+                                        <span class="text-purple-500">双子座</span>
+                                    </div>
+                                    <div class="flex justify-between mt-1">
+                                        <span class="text-gray-500">ESTP · 戊子年</span>
+                                        <span class="text-gray-500">好友</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 生日提醒 -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold mb-4">生日提醒</h2>
+                    
+                    <div class="bg-white rounded-xl shadow-sm p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-700">即将到来的生日</h3>
+                            <a href="#" class="text-sm text-indigo-600">全部</a>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center p-2 bg-amber-50 rounded-lg">
+                                <div class="relative">
+                                    <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                                        <i class="fas fa-birthday-cake text-amber-500"></i>
+                                    </div>
+                                    <div class="badge">3</div>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="font-medium">李小华的生日还有3天</p>
+                                    <p class="text-xs text-gray-500">11月13日</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-2 bg-blue-50 rounded-lg">
+                                <div class="relative">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <i class="fas fa-birthday-cake text-blue-500"></i>
+                                    </div>
+                                    <div class="badge">15</div>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="font-medium">张小红的生日还有15天</p>
+                                    <p class="text-xs text-gray-500">11月25日</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 关系匹配 -->
+                <div>
+                    <h2 class="text-xl font-bold mb-4">关系匹配</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-xl shadow-sm p-4">
+                            <div class="mb-3">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-bold text-gray-700">五行合作指数</h3>
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">良好</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">基于八字五行相生相克的关系匹配</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-green-50 rounded-lg p-3 flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-2">
+                                        <i class="fas fa-user-friends"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">李小华</p>
+                                        <p class="text-xs text-green-600">五行互补 87%</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-yellow-50 rounded-lg p-3 flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 mr-2">
+                                        <i class="fas fa-user-friends"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">陈小明</p>
+                                        <p class="text-xs text-yellow-600">五行互补 65%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-sm p-4">
+                            <div class="mb-3">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-bold text-gray-700">星座合盘指数</h3>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">极佳</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">基于星座元素与宫位的匹配分析</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-blue-50 rounded-lg p-3 flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 mr-2">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">张小红</p>
+                                        <p class="text-xs text-blue-600">星座契合 92%</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-purple-50 rounded-lg p-3 flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 mr-2">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">陈小明</p>
+                                        <p class="text-xs text-purple-600">星座契合 78%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-6 z-10">
+        <div class="grid grid-cols-6 gap-4">
+            <a href="daily_hexagram.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-yin-yang text-xl"></i>
+                <span class="text-xs mt-1">每日</span>
+            </a>
+            <a href="bazi_overview.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-calendar-alt text-xl"></i>
+                <span class="text-xs mt-1">八字</span>
+            </a>
+            <a href="daily_horoscope.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-star text-xl"></i>
+                <span class="text-xs mt-1">星座</span>
+            </a>
+            <a href="mbti_personality.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-brain text-xl"></i>
+                <span class="text-xs mt-1">MBTI</span>
+            </a>
+            <a href="dream_analysis.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-moon text-xl"></i>
+                <span class="text-xs mt-1">解梦</span>
+            </a>
+            <a href="user_profile.html" class="flex flex-col items-center text-blue-500">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs mt-1">我的</span>
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // 标签页切换功能
+        const tabButtons = [
+            document.getElementById('tab1-btn'),
+            document.getElementById('tab2-btn')
+        ];
+        
+        const tabContents = [
+            document.getElementById('tab1-content'),
+            document.getElementById('tab2-content')
+        ];
+        
+        function setActiveTab(index) {
+            // 更新按钮样式
+            tabButtons.forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('border-indigo-500', 'text-indigo-500');
+                    btn.classList.remove('border-transparent', 'text-gray-500');
+                } else {
+                    btn.classList.remove('border-indigo-500', 'text-indigo-500');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                }
+            });
+            
+            // 更新内容显示
+            tabContents.forEach((content, i) => {
+                if (i === index) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+        
+        tabButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => setActiveTab(index));
+        });
+    </script>
+</body>
+</html> 

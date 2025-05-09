@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星座每日运势</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .star-rating {
+            color: #ffd700;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .zodiac-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .aspect-line {
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #ec4899);
+            position: relative;
+        }
+        .aspect-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #fff;
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .planet-orbit {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 1px solid #e5e7eb;
+            position: relative;
+            margin: 0 auto;
+        }
+        .planet {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: translate(-50%, -50%);
+        }
+        .mercury { top: 30%; left: 70%; background-color: #f5f5f5; }
+        .venus { top: 70%; left: 20%; background-color: #fce7f3; }
+        .mars { top: 20%; left: 80%; background-color: #fee2e2; }
+        .jupiter { top: 60%; left: 85%; background-color: #fef3c7; }
+        .saturn { top: 85%; left: 50%; background-color: #e5e7eb; }
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 16px;
+        }
+        .chord-diagram {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto;
+            background-color: #f9fafb;
+        }
+        .chord-sector {
+            position: absolute;
+            width: 2px;
+            height: 120px;
+            background-color: rgba(59, 130, 246, 0.5);
+            left: 50%;
+            top: 0;
+            transform-origin: bottom center;
+        }
+        .chord-connection {
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            border: none;
+            top: 0;
+            left: 0;
+            clip-path: path('M120,120 L200,40 A120,120 0 0,1 210,120 Z');
+            background-color: rgba(236, 72, 153, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 顶部状态栏 -->
+    <div class="bg-white text-black py-2 px-6 flex justify-between items-center h-12">
+        <div class="text-sm">10:30</div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-three-quarters"></i>
+        </div>
+    </div>
+    
+    <div class="container mx-auto px-4 pb-20">
+        <!-- 页面头部 -->
+        <div class="mt-6 mb-8">
+            <h1 class="text-3xl font-bold text-center">星座每日运势</h1>
+            <p class="text-center text-gray-500 mt-2">2023年11月10日 星期五</p>
+        </div>
+        
+        <!-- 我的星座 -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="zodiac-icon bg-blue-100 mr-4">
+                    <i class="fas fa-balance-scale text-blue-500 text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">天秤座</h2>
+                    <p class="text-gray-500">9月23日 - 10月22日</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-2 mb-6">
+                <div class="bg-purple-50 rounded-lg p-3 text-center">
+                    <div class="text-purple-600 mb-1">综合</div>
+                    <div class="star-rating text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                </div>
+                <div class="bg-red-50 rounded-lg p-3 text-center">
+                    <div class="text-red-600 mb-1">爱情</div>
+                    <div class="star-rating text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                </div>
+                <div class="bg-yellow-50 rounded-lg p-3 text-center">
+                    <div class="text-yellow-600 mb-1">财运</div>
+                    <div class="star-rating text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-3 text-center">
+                    <div class="text-green-600 mb-1">事业</div>
+                    <div class="star-rating text-sm">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="font-bold text-gray-700 mb-3">今日运势解读</h3>
+                <p class="text-gray-600">今天的天秤座充满活力和创造力，特别适合处理需要平衡和协调的事务。事业上有不错的发展机会，可能会收到领导的肯定。财运方面表现良好，适合做长期投资规划。</p>
+                <p class="text-gray-600 mt-2">感情上需要更多的耐心和理解，避免因小事引发争执。健康方面注意饮食均衡，保持良好的作息习惯。</p>
+            </div>
+            
+            <div>
+                <h3 class="font-bold text-gray-700 mb-3">今日幸运</h3>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-blue-50 rounded-lg p-3 text-center">
+                        <div class="text-blue-600 mb-1">幸运数字</div>
+                        <div class="font-bold">7</div>
+                    </div>
+                    <div class="bg-blue-50 rounded-lg p-3 text-center">
+                        <div class="text-blue-600 mb-1">幸运色</div>
+                        <div class="flex justify-center mt-1">
+                            <div class="w-6 h-6 rounded-full bg-sky-400"></div>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 rounded-lg p-3 text-center">
+                        <div class="text-blue-600 mb-1">幸运方位</div>
+                        <div class="font-bold">东北</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 功能标签页 -->
+        <div class="bg-white rounded-xl shadow-md mb-6">
+            <div class="grid grid-cols-3 border-b border-gray-200">
+                <button id="tab1-btn" class="py-3 px-2 text-center border-b-2 border-blue-500 text-blue-500 font-medium">人际合盘</button>
+                <button id="tab2-btn" class="py-3 px-2 text-center border-b-2 border-transparent text-gray-500 font-medium">行星预警</button>
+                <button id="tab3-btn" class="py-3 px-2 text-center border-b-2 border-transparent text-gray-500 font-medium">亲友联动</button>
+            </div>
+            
+            <!-- 人际合盘内容 -->
+            <div id="tab1-content" class="tab-content active p-6">
+                <div class="mb-6">
+                    <h3 class="font-bold text-gray-700 mb-3">与朋友的合盘</h3>
+                    
+                    <div class="bg-blue-50 rounded-lg p-4 mb-4 flex items-center">
+                        <div class="contact-avatar bg-blue-500 mr-3">张</div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between">
+                                <h4 class="font-bold">张小红</h4>
+                                <span class="text-orange-500">射手座</span>
+                            </div>
+                            <div class="flex items-center mt-1">
+                                <div class="flex-grow">
+                                    <div class="text-sm text-gray-500">契合度</div>
+                                    <div class="bg-gray-200 rounded-full h-2 mt-1">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                <div class="ml-3 text-blue-600 font-bold">85%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-pink-50 rounded-lg p-4 flex items-center">
+                        <div class="contact-avatar bg-pink-500 mr-3">李</div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between">
+                                <h4 class="font-bold">李小明</h4>
+                                <span class="text-red-500">白羊座</span>
+                            </div>
+                            <div class="flex items-center mt-1">
+                                <div class="flex-grow">
+                                    <div class="text-sm text-gray-500">契合度</div>
+                                    <div class="bg-gray-200 rounded-full h-2 mt-1">
+                                        <div class="bg-pink-500 h-2 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                                <div class="ml-3 text-pink-600 font-bold">60%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold text-gray-700 mb-3">合盘能量图</h3>
+                    
+                    <div class="chord-diagram mb-4">
+                        <div class="chord-sector" style="transform: rotate(0deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(30deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(60deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(90deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(120deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(150deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(180deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(210deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(240deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(270deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(300deg);"></div>
+                        <div class="chord-sector" style="transform: rotate(330deg);"></div>
+                        
+                        <div class="chord-connection"></div>
+                    </div>
+                    
+                    <div class="text-center text-gray-500 text-sm">
+                        <p>各宫位能量交互图，紫色区域代表共振强烈区域</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 行星预警内容 -->
+            <div id="tab2-content" class="tab-content p-6">
+                <div class="mb-6">
+                    <h3 class="font-bold text-gray-700 mb-3">行星状态</h3>
+                    
+                    <div class="planet-orbit mb-6">
+                        <div class="planet mercury">
+                            <i class="fas fa-mercury text-gray-500 text-xs"></i>
+                        </div>
+                        <div class="planet venus">
+                            <i class="fas fa-venus text-pink-500 text-xs"></i>
+                        </div>
+                        <div class="planet mars">
+                            <i class="fas fa-mars text-red-500 text-xs"></i>
+                        </div>
+                        <div class="planet jupiter">
+                            <i class="fas fa-jupiter text-yellow-500 text-xs"></i>
+                        </div>
+                        <div class="planet saturn">
+                            <i class="fas fa-saturn text-gray-500 text-xs"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-50 rounded-lg p-4 mb-4">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                            <h4 class="font-bold text-red-700">水星逆行警告</h4>
+                        </div>
+                        <p class="text-gray-600 text-sm">水星将在11月15日进入逆行期，持续至12月5日。此期间注意：</p>
+                        <ul class="text-gray-600 text-sm mt-2 space-y-1">
+                            <li>· 避免签署重要合同和文件</li>
+                            <li>· 通讯设备可能出现故障，请提前备份数据</li>
+                            <li>· 出行计划可能发生变动，请预留缓冲时间</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-orange-50 rounded-lg p-4">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-fire text-orange-500 mr-2"></i>
+                            <h4 class="font-bold text-orange-700">火星过境提醒</h4>
+                        </div>
+                        <p class="text-gray-600 text-sm">火星将在11月20日过境天秤座，为你带来额外能量。此时适合：</p>
+                        <ul class="text-gray-600 text-sm mt-2 space-y-1">
+                            <li>· 开始新的健身计划或体育活动</li>
+                            <li>· 主动处理一直拖延的任务</li>
+                            <li>· 注意控制情绪，避免冲动决策</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 亲友联动内容 -->
+            <div id="tab3-content" class="tab-content p-6">
+                <div class="mb-6">
+                    <h3 class="font-bold text-gray-700 mb-3">三合宫亲友</h3>
+                    
+                    <div class="bg-green-50 rounded-lg p-4 mb-4">
+                        <div class="flex items-center">
+                            <div class="contact-avatar bg-green-500 mr-3">王</div>
+                            <div class="flex-grow">
+                                <div class="flex justify-between">
+                                    <h4 class="font-bold">王小明</h4>
+                                    <span class="text-blue-500">水瓶座</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">今日位于你的"创意三合宫"，共同创作将事半功倍</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-50 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <div class="contact-avatar bg-yellow-500 mr-3">陈</div>
+                            <div class="flex-grow">
+                                <div class="flex justify-between">
+                                    <h4 class="font-bold">陈小华</h4>
+                                    <span class="text-purple-500">双子座</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">今日位于你的"交流三合宫"，是沟通合作的理想对象</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold text-gray-700 mb-3">元素平衡提示</h3>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="bg-red-50 p-3 rounded-lg text-center">
+                            <div class="text-red-500 mb-1">火象</div>
+                            <div class="font-bold">30%</div>
+                            <div class="bg-gray-200 rounded-full h-2 mt-1">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: 30%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded-lg text-center">
+                            <div class="text-yellow-500 mb-1">土象</div>
+                            <div class="font-bold">20%</div>
+                            <div class="bg-gray-200 rounded-full h-2 mt-1">
+                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 20%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-lg text-center">
+                            <div class="text-blue-500 mb-1">风象</div>
+                            <div class="font-bold">40%</div>
+                            <div class="bg-gray-200 rounded-full h-2 mt-1">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: 40%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded-lg text-center">
+                            <div class="text-green-500 mb-1">水象</div>
+                            <div class="font-bold">10%</div>
+                            <div class="bg-gray-200 rounded-full h-2 mt-1">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 10%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 rounded-lg p-4 text-sm text-gray-600">
+                        <p><i class="fas fa-info-circle text-blue-500 mr-1"></i> 你的朋友圈风象能量较高，适合思考和沟通，团队协作效果良好。建议增加水象元素，平衡情感需求。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-6 z-10">
+        <div class="grid grid-cols-6 gap-4">
+            <a href="daily_hexagram.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-yin-yang text-xl"></i>
+                <span class="text-xs mt-1">每日</span>
+            </a>
+            <a href="bazi_overview.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-calendar-alt text-xl"></i>
+                <span class="text-xs mt-1">八字</span>
+            </a>
+            <a href="daily_horoscope.html" class="flex flex-col items-center text-blue-500">
+                <i class="fas fa-star text-xl"></i>
+                <span class="text-xs mt-1">星座</span>
+            </a>
+            <a href="mbti_personality.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-brain text-xl"></i>
+                <span class="text-xs mt-1">MBTI</span>
+            </a>
+            <a href="dream_analysis.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-moon text-xl"></i>
+                <span class="text-xs mt-1">解梦</span>
+            </a>
+            <a href="user_profile.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs mt-1">我的</span>
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // 标签页切换功能
+        const tabButtons = [
+            document.getElementById('tab1-btn'),
+            document.getElementById('tab2-btn'),
+            document.getElementById('tab3-btn')
+        ];
+        
+        const tabContents = [
+            document.getElementById('tab1-content'),
+            document.getElementById('tab2-content'),
+            document.getElementById('tab3-content')
+        ];
+        
+        function setActiveTab(index) {
+            // 更新按钮样式
+            tabButtons.forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('border-blue-500', 'text-blue-500');
+                    btn.classList.remove('border-transparent', 'text-gray-500');
+                } else {
+                    btn.classList.remove('border-blue-500', 'text-blue-500');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                }
+            });
+            
+            // 更新内容显示
+            tabContents.forEach((content, i) => {
+                if (i === index) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+        
+        tabButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => setActiveTab(index));
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日算运App原型图</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f5f7;
+        }
+        .phone-frame {
+            width: 430px;
+            height: 932px;
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 12px solid #1a1a1a;
+            background: #000;
+        }
+        .screen {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+        }
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #000;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-8">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-10">每日算运App原型图</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center">
+            <!-- 每日一挂 -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 text-center">每日</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="main/daily_hexagram.html" class="screen"></iframe>
+                </div>
+            </div>
+            
+            <!-- 八字总运 -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 text-center">八字</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="main/bazi_overview.html" class="screen"></iframe>
+                </div>
+            </div>
+            
+            <!-- 星座每日运势 -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 text-center">星座</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="main/daily_horoscope.html" class="screen"></iframe>
+                </div>
+            </div>
+            
+            <!-- MBTI人格系统 -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 text-center">MBTI</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="main/mbti_personality.html" class="screen"></iframe>
+                </div>
+            </div>
+            
+            <!-- 周公解梦 -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 text-center">解梦</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="main/dream_analysis.html" class="screen"></iframe>
+                </div>
+            </div>
+            
+            <!-- 我的 -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 text-center">我的</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="main/user_profile.html" class="screen"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

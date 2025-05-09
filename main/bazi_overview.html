@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八字总运</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .bazi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+        .bazi-item {
+            text-align: center;
+            border-radius: 6px;
+            padding: 12px 4px;
+        }
+        .element-wood { background-color: #d1f7c4; color: #2e7d32; }
+        .element-fire { background-color: #ffcccb; color: #c62828; }
+        .element-earth { background-color: #ffe0b2; color: #ef6c00; }
+        .element-metal { background-color: #f5f5f5; color: #616161; }
+        .element-water { background-color: #bbdefb; color: #1565c0; }
+        
+        .chart-bar {
+            height: 24px;
+            border-radius: 12px;
+            transition: width 1s ease-in-out;
+        }
+        
+        .life-stage {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        .life-stage::after {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 30px;
+            bottom: 0;
+            width: 2px;
+            background-color: #ddd;
+        }
+        .life-stage:last-child::after {
+            display: none;
+        }
+        .life-stage-dot {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 顶部状态栏 -->
+    <div class="bg-white text-black py-2 px-6 flex justify-between items-center h-12">
+        <div class="text-sm">10:30</div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-three-quarters"></i>
+        </div>
+    </div>
+    
+    <div class="container mx-auto px-4 pb-20">
+        <!-- 页面头部 -->
+        <div class="mt-6 mb-8">
+            <h1 class="text-3xl font-bold text-center">八字总运</h1>
+            <p class="text-center text-gray-500 mt-2">根据生辰八字推演命格运势</p>
+        </div>
+        
+        <!-- 基本信息卡片 -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+                    <i class="fas fa-user text-blue-500 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-xl font-bold">王小明</h2>
+                    <p class="text-gray-500">1990年8月15日 23:30</p>
+                    <p class="text-gray-500">农历庚午年七月廿五 亥时</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 八字排盘 -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">命盘信息</h2>
+            
+            <div class="bazi-grid mb-6">
+                <div class="flex flex-col">
+                    <span class="text-gray-500 text-sm mb-1">年柱</span>
+                    <div class="bazi-item element-metal">庚</div>
+                    <div class="bazi-item element-fire">午</div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-gray-500 text-sm mb-1">月柱</span>
+                    <div class="bazi-item element-earth">己</div>
+                    <div class="bazi-item element-metal">未</div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-gray-500 text-sm mb-1">日柱</span>
+                    <div class="bazi-item element-wood">乙</div>
+                    <div class="bazi-item element-water">亥</div>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-gray-500 text-sm mb-1">时柱</span>
+                    <div class="bazi-item element-water">癸</div>
+                    <div class="bazi-item element-water">亥</div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <div class="flex justify-between mb-1">
+                    <span class="text-gray-700 font-medium">日主: 乙木</span>
+                    <span class="text-blue-600 font-medium">偏弱</span>
+                </div>
+                <div class="flex justify-between mb-1">
+                    <span class="text-gray-700 font-medium">命局: </span>
+                    <span class="text-purple-600 font-medium">七杀格</span>
+                </div>
+                <div class="flex justify-between mb-1">
+                    <span class="text-gray-700 font-medium">喜用神: </span>
+                    <span class="text-green-600 font-medium">木水</span>
+                </div>
+                <div class="flex justify-between mb-1">
+                    <span class="text-gray-700 font-medium">忌神: </span>
+                    <span class="text-red-600 font-medium">金土</span>
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="font-medium text-gray-700 mb-2">五行能量分布</h3>
+                
+                <div class="mb-3">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-green-700">木</span>
+                        <span class="text-green-700">2</span>
+                    </div>
+                    <div class="bg-gray-200 rounded-full h-3">
+                        <div class="chart-bar bg-green-500" style="width: 25%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-red-700">火</span>
+                        <span class="text-red-700">1</span>
+                    </div>
+                    <div class="bg-gray-200 rounded-full h-3">
+                        <div class="chart-bar bg-red-500" style="width: 12.5%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-yellow-700">土</span>
+                        <span class="text-yellow-700">2</span>
+                    </div>
+                    <div class="bg-gray-200 rounded-full h-3">
+                        <div class="chart-bar bg-yellow-500" style="width: 25%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-gray-700">金</span>
+                        <span class="text-gray-700">1</span>
+                    </div>
+                    <div class="bg-gray-200 rounded-full h-3">
+                        <div class="chart-bar bg-gray-500" style="width: 12.5%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-blue-700">水</span>
+                        <span class="text-blue-700">2</span>
+                    </div>
+                    <div class="bg-gray-200 rounded-full h-3">
+                        <div class="chart-bar bg-blue-500" style="width: 25%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 运势分析 -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">运势分析</h2>
+            
+            <div class="mb-6">
+                <h3 class="font-bold text-gray-700 mb-3">性格特点</h3>
+                <p class="text-gray-600 mb-2">日主乙木，性格温和，有主见，富有创造力和想象力。七杀格显示性格坚毅，意志力强，善于争取自己想要的东西。</p>
+                <p class="text-gray-600">偏弱格局，一生会遇到不少挑战，但通过自身努力，能够获得成功。</p>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="font-bold text-gray-700 mb-3">事业财运</h3>
+                <p class="text-gray-600 mb-2">适合从事创意、设计、文化、教育等行业。木主创新，水主智慧，结合自身特点，文创、媒体、咨询类工作较为适合。</p>
+                <p class="text-gray-600">财运中等偏上，财来财去，难以积累巨大财富，但生活无忧，有善理财的天赋。</p>
+            </div>
+            
+            <div>
+                <h3 class="font-bold text-gray-700 mb-3">健康状况</h3>
+                <p class="text-gray-600 mb-2">需注意肝胆、神经系统方面的健康。水土过多，易有脾胃方面的问题。</p>
+                <p class="text-gray-600">建议:多运动，调节情绪，注意饮食规律，避免过度劳累。</p>
+            </div>
+        </div>
+        
+        <!-- 大运流年 -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">大运流年</h2>
+            
+            <div class="life-stages">
+                <div class="life-stage flex mb-6">
+                    <div class="life-stage-dot bg-gray-200 text-gray-700">
+                        壬
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="font-bold">童年大运 (1-10岁)</h3>
+                        <p class="text-gray-600 text-sm">壬申运 - 水猴</p>
+                        <p class="text-gray-500 mt-1">基础教育阶段，学习能力优秀，但性格较为内向，需要家庭关爱。</p>
+                    </div>
+                </div>
+                
+                <div class="life-stage flex mb-6">
+                    <div class="life-stage-dot bg-red-100 text-red-700">
+                        辛
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="font-bold">青少年大运 (11-20岁)</h3>
+                        <p class="text-gray-600 text-sm">辛未运 - 金羊</p>
+                        <p class="text-gray-500 mt-1">学业压力较大，易有情绪波动，但学习成绩不错，有贵人相助。</p>
+                    </div>
+                </div>
+                
+                <div class="life-stage flex mb-6">
+                    <div class="life-stage-dot bg-yellow-100 text-yellow-700">
+                        庚
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="font-bold">成年大运 (21-30岁)</h3>
+                        <p class="text-gray-600 text-sm">庚午运 - 金马</p>
+                        <p class="text-gray-500 mt-1">事业起步期，有不少机遇，但也会面临竞争和压力，需慎重决策。</p>
+                    </div>
+                </div>
+                
+                <div class="life-stage flex mb-6">
+                    <div class="life-stage-dot bg-green-100 text-green-700">
+                        己
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="font-bold">壮年大运 (31-40岁)</h3>
+                        <p class="text-gray-600 text-sm">己巳运 - 土蛇</p>
+                        <p class="text-gray-500 mt-1">事业发展期，收入稳定增长，家庭和睦，但工作压力较大。</p>
+                    </div>
+                </div>
+                
+                <div class="life-stage flex">
+                    <div class="life-stage-dot bg-blue-100 text-blue-700">
+                        戊
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="font-bold">中年大运 (41-50岁)</h3>
+                        <p class="text-gray-600 text-sm">戊辰运 - 土龙</p>
+                        <p class="text-gray-500 mt-1">事业巅峰期，财富积累明显，但需注意健康，避免过度操劳。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 开运建议 -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">开运建议</h2>
+            
+            <div class="bg-blue-50 rounded-lg p-4 mb-4">
+                <h3 class="font-bold text-blue-700 mb-2">
+                    <i class="fas fa-gem mr-2"></i>幸运物品
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <p class="font-medium text-gray-700">幸运颜色:</p>
+                        <div class="flex mt-1 space-x-2">
+                            <div class="w-6 h-6 rounded-full bg-green-500"></div>
+                            <div class="w-6 h-6 rounded-full bg-blue-500"></div>
+                            <div class="w-6 h-6 rounded-full bg-cyan-500"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-700">吉祥饰物:</p>
+                        <p class="text-gray-600">翡翠、玉器、水晶</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-green-50 rounded-lg p-4 mb-4">
+                <h3 class="font-bold text-green-700 mb-2">
+                    <i class="fas fa-compass mr-2"></i>吉祥方位
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <p class="font-medium text-gray-700">宜居方位:</p>
+                        <p class="text-gray-600">东方、北方</p>
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-700">办公座向:</p>
+                        <p class="text-gray-600">坐北朝南</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-yellow-50 rounded-lg p-4">
+                <h3 class="font-bold text-yellow-700 mb-2">
+                    <i class="fas fa-lightbulb mr-2"></i>开运行动
+                </h3>
+                <ul class="text-gray-600 space-y-2">
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>宜多亲近大自然，尤其是山林水畔</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>室内摆放绿色植物，增强木气</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i>适当接触与水相关的活动，如游泳、钓鱼</li>
+                    <li><i class="fas fa-times text-red-500 mr-2"></i>忌穿大面积金色、灰色衣物</li>
+                    <li><i class="fas fa-times text-red-500 mr-2"></i>避免长期在干燥环境工作生活</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-6 z-10">
+        <div class="grid grid-cols-6 gap-4">
+            <a href="daily_hexagram.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-yin-yang text-xl"></i>
+                <span class="text-xs mt-1">每日</span>
+            </a>
+            <a href="bazi_overview.html" class="flex flex-col items-center text-blue-500">
+                <i class="fas fa-calendar-alt text-xl"></i>
+                <span class="text-xs mt-1">八字</span>
+            </a>
+            <a href="daily_horoscope.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-star text-xl"></i>
+                <span class="text-xs mt-1">星座</span>
+            </a>
+            <a href="mbti_personality.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-brain text-xl"></i>
+                <span class="text-xs mt-1">MBTI</span>
+            </a>
+            <a href="dream_analysis.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-moon text-xl"></i>
+                <span class="text-xs mt-1">解梦</span>
+            </a>
+            <a href="user_profile.html" class="flex flex-col items-center text-gray-500">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs mt-1">我的</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html> 
