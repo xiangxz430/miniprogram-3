@@ -400,21 +400,54 @@ Page({
     wx.showLoading({
       title: '定位中...'
     });
-    
-    wx.getLocation({
-      type: 'gcj02',
+
+    wx.getSetting({
       success: (res) => {
-        // 将经纬度转换为地址
-        this.reverseGeocoding(res.latitude, res.longitude);
-      },
-      fail: (err) => {
-        wx.hideLoading();
-        wx.showToast({
-          title: '获取位置失败',
-          icon: 'none'
-        });
-        
-        console.error('获取位置失败', err);
+        if (res.authSetting['scope.userLocation']) {
+          // 已授权，直接获取
+          wx.getLocation({
+            type: 'gcj02',
+            success: (res) => {
+              this.reverseGeocoding(res.latitude, res.longitude);
+            },
+            fail: (err) => {
+              wx.hideLoading();
+              wx.showToast({ title: '获取位置失败', icon: 'none' });
+              console.error('获取位置失败', err);
+            }
+          });
+        } else {
+          // 未授权，主动申请
+          wx.authorize({
+            scope: 'scope.userLocation',
+            success: () => {
+              wx.getLocation({
+                type: 'gcj02',
+                success: (res) => {
+                  this.reverseGeocoding(res.latitude, res.longitude);
+                },
+                fail: (err) => {
+                  wx.hideLoading();
+                  wx.showToast({ title: '获取位置失败', icon: 'none' });
+                  console.error('获取位置失败', err);
+                }
+              });
+            },
+            fail: () => {
+              wx.hideLoading();
+              wx.showModal({
+                title: '需要授权',
+                content: '请在小程序设置中授权地理位置权限，否则无法获取当前位置。',
+                confirmText: '去设置',
+                success: (modalRes) => {
+                  if (modalRes.confirm) {
+                    wx.openSetting();
+                  }
+                }
+              });
+            }
+          });
+        }
       }
     });
   },
