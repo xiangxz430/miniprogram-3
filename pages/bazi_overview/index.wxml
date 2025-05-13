@@ -1,0 +1,145 @@
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="header">
+    <text class="title">八字总运</text>
+    <text class="subtitle">根据生辰八字推演命格运势</text>
+  </view>
+
+  <!-- 基本信息输入卡片 -->
+  <view class="card input-card">
+    <view class="input-row">
+      <text class="input-label">姓名</text>
+      <input class="input" placeholder="请输入姓名" value="{{form.name}}" bindinput="onInputName" />
+    </view>
+    <view class="input-row">
+      <text class="input-label">性别</text>
+      <picker mode="selector" range="{{genderOptions}}" value="{{form.genderIndex}}" bindchange="onGenderChange">
+        <view class="picker">{{genderOptions[form.genderIndex]}}</view>
+      </picker>
+    </view>
+    <view class="input-row">
+      <text class="input-label">出生日期</text>
+      <picker mode="date" value="{{form.birthDate}}" start="1900-01-01" end="2100-12-31" bindchange="onDateChange">
+        <view class="picker">{{form.birthDate}}</view>
+      </picker>
+    </view>
+    <view class="input-row">
+      <text class="input-label">出生时间</text>
+      <picker mode="time" value="{{form.birthTime}}" start="00:00" end="23:59" bindchange="onTimeChange">
+        <view class="picker">{{form.birthTime}}</view>
+      </picker>
+    </view>
+    <button class="btn-primary" bindtap="onCalc">立即排盘</button>
+  </view>
+
+  <!-- 八字排盘展示 -->
+  <view wx:if="{{baziResult}}" class="card">
+    <view class="user-info">
+      <view class="avatar"><text class="iconfont">&#xe60d;</text></view>
+      <view class="user-meta">
+        <text class="user-name">{{form.name}}</text>
+        <text class="user-birth">{{form.birthDate}} {{form.birthTime}}</text>
+        <text class="user-lunar">{{baziResult.lunarText}} {{baziResult.timeZhi}}时</text>
+      </view>
+    </view>
+    <view class="bazi-grid">
+      <block wx:for="{{baziResult.bazi}}" wx:key="index">
+        <view class="bazi-col">
+          <text class="bazi-label">{{item.label}}</text>
+          <view class="bazi-item {{item.stemElementClass}}">{{item.stem}}</view>
+          <view class="bazi-item {{item.branchElementClass}}">{{item.branch}}</view>
+        </view>
+      </block>
+    </view>
+    <view class="bazi-meta">
+      <view class="meta-row"><text>日主:</text><text class="meta-value">{{baziResult.dayMaster}}</text><text class="meta-tag">{{baziResult.strength}}</text></view>
+      <view class="meta-row"><text>命局:</text><text class="meta-value">{{baziResult.pattern}}</text></view>
+      <view class="meta-row"><text>喜用神:</text><text class="meta-value">{{baziResult.favorable}}</text></view>
+      <view class="meta-row"><text>忌神:</text><text class="meta-value unfavorable">{{baziResult.unfavorable}}</text></view>
+    </view>
+    <view class="element-dist">
+      <text class="dist-title">五行能量分布</text>
+      <block wx:for="{{baziResult.elementDist}}" wx:key="name">
+        <view class="dist-row">
+          <text class="dist-label {{item.class}}">{{item.name}}</text>
+          <text class="dist-count">{{item.count}}</text>
+          <view class="dist-bar-bg">
+            <view class="dist-bar {{item.class}}" style="width:{{item.percent}}%"></view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 运势分析 -->
+  <view wx:if="{{baziResult}}" class="card">
+    <text class="section-title">运势分析</text>
+    <view class="analysis-block">
+      <text class="analysis-title">性格特点</text>
+      <text class="analysis-text">{{baziResult.character}}</text>
+    </view>
+    <view class="analysis-block">
+      <text class="analysis-title">事业财运</text>
+      <text class="analysis-text">{{baziResult.career}}</text>
+    </view>
+    <view class="analysis-block">
+      <text class="analysis-title">健康状况</text>
+      <text class="analysis-text">{{baziResult.health}}</text>
+    </view>
+  </view>
+
+  <!-- 大运流年（静态示例，可后续扩展） -->
+  <view wx:if="{{baziResult}}" class="card">
+    <text class="section-title">大运流年</text>
+    <view class="life-stages">
+      <block wx:for="{{baziResult.lifeStages}}" wx:key="index">
+        <view class="life-stage">
+          <view class="life-stage-dot {{item.class}}">{{item.stem}}</view>
+          <view class="life-stage-meta">
+            <text class="life-stage-title">{{item.title}}</text>
+            <text class="life-stage-desc">{{item.desc}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 开运建议（静态示例，可后续扩展） -->
+  <view wx:if="{{baziResult}}" class="card">
+    <text class="section-title">开运建议</text>
+    <view class="lucky-block">
+      <text class="lucky-title">幸运颜色</text>
+      <view class="lucky-colors">
+        <block wx:for="{{baziResult.luckyColors}}" wx:key="color">
+          <view class="lucky-color" style="background:{{item}}"></view>
+        </block>
+      </view>
+    </view>
+    <view class="lucky-block">
+      <text class="lucky-title">吉祥饰物</text>
+      <text class="lucky-text">{{baziResult.luckyItems}}</text>
+    </view>
+    <view class="lucky-block">
+      <text class="lucky-title">吉祥方位</text>
+      <text class="lucky-text">{{baziResult.luckyDirections}}</text>
+    </view>
+    <view class="lucky-block">
+      <text class="lucky-title">开运行动</text>
+      <view class="lucky-actions">
+        <block wx:for="{{baziResult.luckyActions}}" wx:key="action">
+          <view class="lucky-action">{{item}}</view>
+        </block>
+      </view>
+    </view>
+    <view class="lucky-block">
+      <text class="lucky-title">忌讳</text>
+      <view class="lucky-actions">
+        <block wx:for="{{baziResult.unluckyActions}}" wx:key="action">
+          <view class="lucky-action unlucky">{{item}}</view>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <tcb-agent-ui env-id="你的云开发环境ID" agent-id="你的AgentID" />
+</view>

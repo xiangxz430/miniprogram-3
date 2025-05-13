@@ -213,6 +213,36 @@ function parseAIResponse(aiResponse, originalHexagramInfo) {
   }
 }
 
+/**
+ * 通过云函数调用 DeepSeek API
+ * @param {Array} messages - openai标准消息体
+ * @param {String} model - 模型名，默认 deepseek-chat
+ * @returns {Promise<Object>} - AI返回内容
+ */
+function callDeepseek(messages, model = 'deepseek-chat') {
+  return new Promise((resolve, reject) => {
+    wx.cloud.callFunction({
+      name: 'deepseekProxy',
+      data: {
+        apiKey: require('./config').DEEPSEEK.API_KEY,
+        messages,
+        model
+      },
+      success: res => {
+        if (res.result && res.result.choices && res.result.choices.length > 0) {
+          resolve(res.result.choices[0].message.content);
+        } else {
+          reject(res.result);
+        }
+      },
+      fail: err => {
+        reject(err);
+      }
+    });
+  });
+}
+
 module.exports = {
-  getHexagramInterpretation
+  getHexagramInterpretation,
+  callDeepseek
 }; 

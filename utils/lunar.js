@@ -95,43 +95,37 @@ function daysSince1900(year, month, day) {
  * @returns {Object} 农历日期对象
  */
 function solarToLunar(year, month, day) {
-  // 防止月份和日期是字符串
   year = parseInt(year);
   month = parseInt(month);
   day = parseInt(day);
-  
+
   if (year < 1900 || year > 2100) {
-    return {
-      error: '超出可转换范围（1900-2100）'
-    };
+    return { error: '超出可转换范围（1900-2100）' };
   }
-  
-  // 计算距离1900年1月31日（农历1900年正月初一）的天数
-  const offset = daysSince1900(year, month, day);
-  console.log('距1900年1月31日的天数:', offset);
-  
+
+  // 计算距离1900年1月31日的天数
+  let offset = daysSince1900(year, month, day);
   let temp = 0;
   let lunarYear = 1900;
-  
+  let tempOffset = offset; // 用于递减的临时变量
+
   // 确定农历年份
-  for (let i = 1900; i < 2101 && offset > 0; i++) {
+  for (let i = 1900; i < 2101 && tempOffset > 0; i++) {
     temp = getLunarYearDays(i);
-    if (offset < temp) {
+    if (tempOffset < temp) {
       lunarYear = i;
       break;
     } else {
-      offset -= temp;
+      tempOffset -= temp;
     }
   }
-  
+
   // 确定农历月份
   let lunarMonth = 1;
   let leap = getLeapMonth(lunarYear); // 闰月
   let isLeap = false;
-  
-  // 处理闰月
-  for (let i = 1; i < 13 && offset > 0; i++) {
-    // 闰月
+
+  for (let i = 1; i < 13 && tempOffset > 0; i++) {
     if (leap > 0 && i === leap + 1 && !isLeap) {
       --i;
       isLeap = true;
@@ -139,34 +133,27 @@ function solarToLunar(year, month, day) {
     } else {
       temp = getLunarMonthDays(lunarYear, i);
     }
-    
-    // 解除闰月
     if (isLeap && i === leap + 1) {
       isLeap = false;
     }
-    
-    if (offset < temp) {
+    if (tempOffset < temp) {
       lunarMonth = i;
       break;
     } else {
-      offset -= temp;
+      tempOffset -= temp;
     }
   }
-  
-  // 确定农历日期
-  let lunarDay = offset + 1;
-  
-  console.log('计算结果 - 农历年:', lunarYear, '月:', lunarMonth, '日:', lunarDay, '闰月:', leap, '是否闰月:', isLeap);
-  
+
+  let lunarDay = tempOffset + 1;
+
   // 计算天干地支年
   const cyclicalYear = ((lunarYear - 1900 + 36) % 60);
   const lunarYearText = HEAVENLY_STEMS[cyclicalYear % 10] + EARTHLY_BRANCHES[cyclicalYear % 12] + '年';
-  
+
   // 确保月和日索引在有效范围内
   const monthIndex = Math.max(0, Math.min(lunarMonth - 1, LUNAR_MONTH.length - 1));
   const dayIndex = Math.max(0, Math.min(lunarDay - 1, LUNAR_DAY.length - 1));
-  
-  // 返回结果
+
   return {
     lunarYear: lunarYear,
     lunarMonth: lunarMonth,

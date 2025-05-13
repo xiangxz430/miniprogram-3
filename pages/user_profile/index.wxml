@@ -30,7 +30,7 @@
     
     <!-- 个人信息内容 -->
     <view class="tab-content" wx:if="{{activeTab === 0}}">
-      <!-- 今日总览 -->
+      <!-- 今日总览
       <view class="section">
         <view class="section-title">今日总览</view>
         
@@ -63,7 +63,7 @@
           </view>
         </view>
       </view>
-      
+       -->
       <!-- 基础信息 -->
       <view class="section">
         <view class="section-header">

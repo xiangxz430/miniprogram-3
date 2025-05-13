@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/daily_hexagram/index",
+    "pages/bazi_overview/index",
     "pages/user_profile/index",
     "pages/logs/index"
   ],
@@ -21,6 +22,12 @@
         "text": "每日一挂",
         "iconPath": "images/icons/hexagram.png",
         "selectedIconPath": "images/icons/hexagram.png"
+      },
+      {
+        "pagePath": "pages/bazi_overview/index",
+        "text": "八字总运",
+        "iconPath": "images/icons/bazi.png",
+        "selectedIconPath": "images/icons/bazi.png"
       },
       {
         "pagePath": "pages/user_profile/index",

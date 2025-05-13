@@ -173,20 +173,27 @@
   color: #6366f1;
 }
 
-/* 卡片样式 */
+/* 今日纵览卡片容器 */
 .overview-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 20rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* 单个卡片 */
 .profile-card {
+  flex: 1 1 45%;
+  min-width: 44vw;
+  max-width: 48vw;
+  box-sizing: border-box;
   padding: 24rpx;
   border-radius: 16rpx;
   background-color: #fff;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s;
   margin-bottom: 16rpx;
+  overflow: hidden;
 }
 
 .profile-card:active {
@@ -239,12 +246,14 @@
   font-weight: 600;
 }
 
+/* 卡片内容不换行溢出时省略 */
 .card-value {
   font-size: 30rpx;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .blue-gradient .card-value {

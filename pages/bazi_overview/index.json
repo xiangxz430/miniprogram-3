@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "八字总运",
+  "usingComponents": {
+    "tcb-agent-ui": "/tcb-agent-ui/miniprogram/components/agent-ui/index"
+  }
+}
+

@@ -1,0 +1,8 @@
+{
+  "name": "deepseekProxy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "openai": "^4.38.2"
+  }
+} 

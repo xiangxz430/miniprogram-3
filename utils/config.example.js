@@ -5,7 +5,7 @@
 const API_CONFIG = {
   // DeepSeek API配置
   DEEPSEEK: {
-    API_KEY: 'your-api-key-here', // 替换为你的DeepSeek API Key
+    API_KEY: 'sk-1dddec045f294806a60a7afbf3b85476', // 替换为你的DeepSeek API Key
     API_URL: 'https://api.deepseek.com/v1/chat/completions'
   }
 };

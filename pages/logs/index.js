@@ -1,4 +1,5 @@
 const logger = require('../../utils/logger');
+const { getHexagramInterpretation } = require('../../utils/deepseekApi.js');
 
 Page({
   data: {
@@ -11,6 +12,28 @@ Page({
 
   onLoad: function() {
     this.loadLogFiles();
+    // DeepSeek API 测试
+    const testHexagram = {
+      name: '乾卦',
+      symbol: '䷀',
+      description: '天天乾 • 刚健中正'
+    };
+    const userInfo = {
+      name: '测试用户',
+      birthdate: '1990-01-01'
+    };
+    getHexagramInterpretation(testHexagram, userInfo).then(res => {
+      console.log('DeepSeek API 测试结果：', res);
+      wx.showModal({
+        title: 'DeepSeek API 测试',
+        content: JSON.stringify(res).substring(0, 200)
+      });
+    }).catch(err => {
+      wx.showModal({
+        title: 'DeepSeek API 测试失败',
+        content: JSON.stringify(err)
+      });
+    });
   },
 
   // 加载日志文件列表

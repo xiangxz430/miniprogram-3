@@ -1,6 +1,15 @@
 // app.js
 App({
   onLaunch: function () {
+    // 初始化云开发
+    if (wx.cloud) {
+      wx.cloud.init({
+        env: 'cloud1-3go3cn2v0cb22666', // 已替换为你的实际环境ID
+        traceUser: true
+      });
+    } else {
+      console.error('请使用 2.2.3 或以上的基础库以使用云能力');
+    }
     // 展示本地存储能力
     const logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
