@@ -38,6 +38,21 @@ App({
           data: { timestamp: new Date().getTime() }, // 添加时间戳防止缓存
           success: res => {
             console.log('获取tab配置成功, 原始返回:', JSON.stringify(res.result));
+            
+            // 检查是否包含MBTI功能
+            if (res.result && res.result.data) {
+              const hasMBTI = res.result.data.some(item => 
+                item.pagePath && item.pagePath.includes('mbti_personality')
+              );
+              console.log('配置中是否包含MBTI测试功能:', hasMBTI);
+              
+              // 打印每个Tab项
+              console.log('配置项详情:');
+              res.result.data.forEach((item, index) => {
+                console.log(`Tab项 ${index+1}: 路径=${item.pagePath}, 文本=${item.text}, 索引=${item.index}`);
+              });
+            }
+            
             if (res.result && res.result.code === 0 && res.result.data) {
               const tabConfig = res.result.data;
               

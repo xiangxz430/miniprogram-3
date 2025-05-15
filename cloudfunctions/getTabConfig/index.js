@@ -18,6 +18,7 @@ exports.main = async (event, context) => {
     }).get();
     
     console.log('查询到的gnpz记录:', JSON.stringify(data));
+    console.log('查询到的记录数量:', data.length);
     
     // 如果没有数据，返回错误信息，让客户端知道需要配置数据库
     if (!data || data.length === 0) {
@@ -49,6 +50,14 @@ exports.main = async (event, context) => {
       },
       {
         index: 2,
+        id: 'mbti_personality',
+        pagePath: 'pages/mbti_personality/index',
+        text: 'MBTI测试',
+        iconPath: 'images/icons/mbti.png',
+        selectedIconPath: 'images/icons/mbti.png'
+      },
+      {
+        index: 3,
         id: 'user_profile',
         pagePath: 'pages/user_profile/index',
         text: '我的',
@@ -57,29 +66,49 @@ exports.main = async (event, context) => {
       }
     ];
     
+    console.log('预定义的TabBar项:', JSON.stringify(predefinedTabBarItems));
+    
     // 从数据库记录中提取gnm值列表
     const enabledIds = data.map(item => item.gnm);
-    console.log('启用的功能ID:', enabledIds);
+    console.log('启用的功能ID列表:', JSON.stringify(enabledIds));
+    
+    // 打印每个预定义项是否在启用列表中
+    predefinedTabBarItems.forEach(item => {
+      console.log(`检查ID: ${item.id}, 路径: ${item.pagePath}, 是否在启用列表中: ${enabledIds.includes(item.id)}`);
+    });
     
     // 根据数据库记录过滤predefinedTabBarItems
-    const filteredTabBarItems = predefinedTabBarItems.filter(item => 
-      enabledIds.includes(item.id)
-    ).map(item => {
+    const filteredTabBarItems = predefinedTabBarItems.filter(item => {
+      const isEnabled = enabledIds.includes(item.id);
+      console.log(`过滤项 - ID: ${item.id}, 是否启用: ${isEnabled}`);
+      return isEnabled;
+    }).map(item => {
       // 查找对应的数据库记录，以便使用自定义文本
       const dbItem = data.find(d => d.gnm === item.id);
-      if (dbItem && dbItem.wdm) {
-        item.text = dbItem.wdm;
+      console.log(`处理项 - ID: ${item.id}, 找到匹配的数据库项: ${dbItem ? '是' : '否'}`);
+      
+      if (dbItem) {
+        console.log(`数据库项详情 - gnm: ${dbItem.gnm}, wdm: ${dbItem.wdm}, sfsy: ${dbItem.sfsy}`);
+        if (dbItem.wdm) {
+          console.log(`使用自定义文本: ${dbItem.wdm} 替换原文本: ${item.text}`);
+          item.text = dbItem.wdm;
+        }
       }
-      return {
+      
+      const result = {
         index: item.index,
         pagePath: item.pagePath,
         text: item.text,
         iconPath: item.iconPath,
         selectedIconPath: item.selectedIconPath
       };
+      
+      console.log(`最终项配置 - 索引: ${result.index}, 路径: ${result.pagePath}, 文本: ${result.text}`);
+      return result;
     });
     
-    console.log('过滤后的TabBar项:', JSON.stringify(filteredTabBarItems));
+    console.log('过滤后的TabBar项数量:', filteredTabBarItems.length);
+    console.log('过滤后的TabBar项详情:', JSON.stringify(filteredTabBarItems));
     
     // 不重新分配索引，让每个TabBar项保持其原始索引
     // 这样虽然索引可能不连续，但确保了TabBar项的顺序与app.json中的顺序一致

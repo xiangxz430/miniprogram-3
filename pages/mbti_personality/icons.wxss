@@ -1,0 +1,266 @@
+/* MBTI测试图标样式 */
+
+/* 通用图标样式 */
+.icon {
+  display: inline-block;
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: 16rpx;
+  position: relative;
+  text-align: center;
+  line-height: 48rpx;
+  border-radius: 50%;
+}
+
+/* 图标颜色 */
+.icon-blue {
+  background-color: #3b82f6;
+  color: #ffffff;
+}
+
+.icon-purple {
+  background-color: #8b5cf6;
+  color: #ffffff;
+}
+
+.icon-green {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.icon-orange {
+  background-color: #f59e0b;
+  color: #ffffff;
+}
+
+.icon-red {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+/* 功能图标 */
+.function-icon {
+  display: inline-block;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  color: white;
+  text-align: center;
+  line-height: 40rpx;
+  font-size: 20rpx;
+  margin-right: 12rpx;
+}
+
+/* 功能图标颜色 */
+.function-icon.icon-Te {
+  background-color: #3b82f6;
+}
+
+.function-icon.icon-Ti {
+  background-color: #8b5cf6;
+}
+
+.function-icon.icon-Fe {
+  background-color: #f59e0b;
+}
+
+.function-icon.icon-Fi {
+  background-color: #ef4444;
+}
+
+.function-icon.icon-Ne {
+  background-color: #10b981;
+}
+
+.function-icon.icon-Ni {
+  background-color: #0ea5e9;
+}
+
+.function-icon.icon-Se {
+  background-color: #6366f1;
+}
+
+.function-icon.icon-Si {
+  background-color: #8b5cf6;
+}
+
+/* 雷达图样式 */
+.radar-section {
+  margin: 40rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.radar-chart {
+  width: 450rpx;
+  height: 450rpx;
+  position: relative;
+  margin: 0 auto 30rpx;
+  background-color: #f8fafc;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+/* 使用CSS绘制雷达图 */
+.radar-chart:before {
+  content: '';
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  border: 1px dashed #cbd5e1;
+  border-radius: 50%;
+}
+
+.radar-chart:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #cbd5e1;
+}
+
+.radar-chart::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background-color: #cbd5e1;
+}
+
+.radar-value {
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  width: 60%;
+  height: 70%;
+  clip-path: polygon(50% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+  background-color: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+}
+
+.radar-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 450rpx;
+  padding: 0 20rpx;
+}
+
+.radar-label {
+  font-size: 24rpx;
+  color: #64748b;
+  text-align: center;
+}
+
+/* 行业图标 */
+.icon-design::before {
+  content: "设";
+}
+
+.icon-edit::before {
+  content: "编";
+}
+
+.icon-edu::before {
+  content: "教";
+}
+
+.icon-eco::before {
+  content: "环";
+}
+
+.icon-strategy::before {
+  content: "策";
+}
+
+.icon-architecture::before {
+  content: "架";
+}
+
+.icon-research::before {
+  content: "研";
+}
+
+.icon-art::before {
+  content: "艺";
+}
+
+.icon-science::before {
+  content: "科";
+}
+
+.icon-finance::before {
+  content: "财";
+}
+
+.icon-medical::before {
+  content: "医";
+}
+
+.icon-law::before {
+  content: "法";
+}
+
+/* 方位图标样式 */
+.direction-icon {
+  display: inline-block;
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  text-align: center;
+  margin-right: 12rpx;
+  border-radius: 50%;
+}
+
+.direction-icon.good {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.direction-icon.good::before {
+  content: "✓";
+}
+
+.direction-icon.bad {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.direction-icon.bad::before {
+  content: "✗";
+}
+
+/* 提示图标 */
+.tip-icon {
+  display: inline-block;
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  text-align: center;
+  border-radius: 50%;
+  background-color: rgba(3, 105, 161, 0.1);
+  color: #0369a1;
+  margin-right: 12rpx;
+}
+
+.tip-icon::before {
+  content: "i";
+  font-style: italic;
+  font-weight: bold;
+}
+
+/* 完善图标 */
+.icon-code::before {
+  content: "代";
+}
+
+.icon-briefcase::before {
+  content: "职";
+} 

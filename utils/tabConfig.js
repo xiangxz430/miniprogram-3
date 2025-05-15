@@ -25,6 +25,7 @@ const convertToTabBarConfig = (dbConfig) => {
   const pathMap = {
     'daily_hexagram': 'pages/daily_hexagram/index',
     'bazi_overview': 'pages/bazi_overview/index',
+    'mbti_personality': 'pages/mbti_personality/index',
     'user_profile': 'pages/user_profile/index'
   };
   
@@ -32,6 +33,7 @@ const convertToTabBarConfig = (dbConfig) => {
   const iconMap = {
     'daily_hexagram': 'hexagram',
     'bazi_overview': 'bazi',
+    'mbti_personality': 'mbti',
     'user_profile': 'user'
   };
   
@@ -39,6 +41,7 @@ const convertToTabBarConfig = (dbConfig) => {
   const textMap = {
     'daily_hexagram': '每日一挂',
     'bazi_overview': '八字总运',
+    'mbti_personality': 'MBTI测试',
     'user_profile': '我的'
   };
   
@@ -46,7 +49,8 @@ const convertToTabBarConfig = (dbConfig) => {
   const indexMap = {
     'daily_hexagram': 0,
     'bazi_overview': 1,
-    'user_profile': 2
+    'mbti_personality': 2,
+    'user_profile': 3
   };
   
   // 转换配置

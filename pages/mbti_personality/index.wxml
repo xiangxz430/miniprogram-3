@@ -1,0 +1,255 @@
+<!-- MBTI人格测试页面 -->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="header">
+    <text class="title">MBTI人格系统</text>
+    <text class="subtitle">探索你的人格特质与潜能</text>
+  </view>
+  
+  <!-- 标签页导航 -->
+  <view class="tab-nav">
+    <view class="tab-item {{activeTab == 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0">性格测试</view>
+    <view class="tab-item {{activeTab == 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">人格模型</view>
+  </view>
+  
+  <!-- 测试内容标签页 -->
+  <view class="tab-content" hidden="{{activeTab != 0}}">
+    <!-- 测试未完成时显示题目 -->
+    <block wx:if="{{!testCompleted}}">
+      <view class="progress-container">
+        <view class="progress-text">问题 {{currentQuestion + 1}}/{{questions.length}}</view>
+        <view class="progress-bar">
+          <view class="progress-value" style="width: {{(currentQuestion + 1) / questions.length * 100}}%;"></view>
+        </view>
+      </view>
+      
+      <view class="question-card">
+        <view class="question-text">{{questions[currentQuestion].question}}</view>
+        <view class="options-container">
+          <view class="option {{selectedOption === 'A' ? 'active' : ''}}" bindtap="selectOption" data-value="A">
+            <view class="radio {{selectedOption === 'A' ? 'checked' : ''}}"></view>
+            <text>{{questions[currentQuestion].optionA}}</text>
+          </view>
+          <view class="option {{selectedOption === 'B' ? 'active' : ''}}" bindtap="selectOption" data-value="B">
+            <view class="radio {{selectedOption === 'B' ? 'checked' : ''}}"></view>
+            <text>{{questions[currentQuestion].optionB}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="navigation-buttons">
+        <button class="prev-btn" bindtap="prevQuestion" disabled="{{currentQuestion === 0}}">上一题</button>
+        <button class="next-btn" bindtap="nextQuestion" disabled="{{!selectedOption}}">{{currentQuestion === questions.length - 1 ? '完成测试' : '下一题'}}</button>
+      </view>
+    </block>
+    
+    <!-- 测试完成后显示结果 -->
+    <block wx:else>
+      <view class="result-section">
+        <view class="section-title">你的MBTI类型</view>
+        <view class="personality-card">
+          <view class="personality-type">{{result.type}}</view>
+          <view class="personality-name">{{result.name}}</view>
+          <view class="personality-percentage">占比 {{result.percentage}}</view>
+          <view class="personality-description">{{result.description}}</view>
+        </view>
+        
+        <view class="section-title">性格偏好分析</view>
+        <view class="preference-container">
+          <view class="preference-item">
+            <view class="preference-labels">
+              <text class="preference-label">内向 (I)</text>
+              <text class="preference-label">外向 (E)</text>
+            </view>
+            <view class="preference-bar">
+              <view class="preference-value" style="width: {{result.scores.I}}%;"></view>
+            </view>
+            <view class="preference-percentage">{{result.scores.I}}%</view>
+          </view>
+          
+          <view class="preference-item">
+            <view class="preference-labels">
+              <text class="preference-label">直觉 (N)</text>
+              <text class="preference-label">实感 (S)</text>
+            </view>
+            <view class="preference-bar">
+              <view class="preference-value" style="width: {{result.scores.N}}%;"></view>
+            </view>
+            <view class="preference-percentage">{{result.scores.N}}%</view>
+          </view>
+          
+          <view class="preference-item">
+            <view class="preference-labels">
+              <text class="preference-label">情感 (F)</text>
+              <text class="preference-label">思考 (T)</text>
+            </view>
+            <view class="preference-bar">
+              <view class="preference-value" style="width: {{result.scores.F}}%;"></view>
+            </view>
+            <view class="preference-percentage">{{result.scores.F}}%</view>
+          </view>
+          
+          <view class="preference-item">
+            <view class="preference-labels">
+              <text class="preference-label">判断 (J)</text>
+              <text class="preference-label">认知 (P)</text>
+            </view>
+            <view class="preference-bar">
+              <view class="preference-value" style="width: {{result.scores.J}}%;"></view>
+            </view>
+            <view class="preference-percentage">{{result.scores.J}}%</view>
+          </view>
+        </view>
+        
+        <view class="section-title">认知功能栈</view>
+        <view class="cognitive-functions">
+          <view class="function-item primary">
+            <view class="function-header">
+              <view class="function-icon icon-{{result.functions[0].code}}">{{result.functions[0].code}}</view>
+              <text class="function-name">{{result.functions[0].name}}</text>
+              <text class="function-role">主导功能</text>
+            </view>
+            <text class="function-description">{{result.functions[0].description}}</text>
+          </view>
+          
+          <view class="function-item secondary">
+            <view class="function-header">
+              <view class="function-icon icon-{{result.functions[1].code}}">{{result.functions[1].code}}</view>
+              <text class="function-name">{{result.functions[1].name}}</text>
+              <text class="function-role">辅助功能</text>
+            </view>
+            <text class="function-description">{{result.functions[1].description}}</text>
+          </view>
+          
+          <view class="function-item tertiary">
+            <view class="function-header">
+              <view class="function-icon icon-{{result.functions[2].code}}">{{result.functions[2].code}}</view>
+              <text class="function-name">{{result.functions[2].name}}</text>
+              <text class="function-role">第三功能</text>
+            </view>
+            <text class="function-description">{{result.functions[2].description}}</text>
+          </view>
+          
+          <view class="function-item inferior">
+            <view class="function-header">
+              <view class="function-icon icon-{{result.functions[3].code}}">{{result.functions[3].code}}</view>
+              <text class="function-name">{{result.functions[3].name}}</text>
+              <text class="function-role">劣势功能</text>
+            </view>
+            <text class="function-description">{{result.functions[3].description}}</text>
+          </view>
+        </view>
+        
+        <button class="restart-btn" bindtap="restartTest">重新测试</button>
+      </view>
+    </block>
+  </view>
+  
+  <!-- 人格模型标签页 -->
+  <view class="tab-content" hidden="{{activeTab != 1}}">
+    <view class="model-section">
+      <view class="section-title">命理人格模型</view>
+      
+      <view class="model-card">
+        <view class="model-header">
+          <view class="model-icon"></view>
+          <view class="model-title">
+            <text class="model-name">四柱与MBTI转化</text>
+            <text class="model-subtitle">将八字十神对应MBTI功能轴</text>
+          </view>
+        </view>
+        
+        <view class="model-content">
+          <view class="connection-item">
+            <text class="connection-left">正官</text>
+            <view class="connection-line"></view>
+            <text class="connection-right">Te</text>
+          </view>
+          <view class="connection-item">
+            <text class="connection-left">伤官</text>
+            <view class="connection-line"></view>
+            <text class="connection-right">Ne</text>
+          </view>
+          <view class="connection-item">
+            <text class="connection-left">食神</text>
+            <view class="connection-line"></view>
+            <text class="connection-right">Fe</text>
+          </view>
+          <view class="connection-item">
+            <text class="connection-left">偏印</text>
+            <view class="connection-line"></view>
+            <text class="connection-right">Ni</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="personality-grid">
+        <view class="personality-grid-item">
+          <view class="grid-title">原生人格</view>
+          <view class="grid-type">{{modelData.nativeType}}</view>
+          <view class="grid-name">{{modelData.nativeName}}</view>
+          <view class="grid-description">{{modelData.nativeDescription}}</view>
+        </view>
+        
+        <view class="personality-grid-item">
+          <view class="grid-title">社会面具</view>
+          <view class="grid-type">{{modelData.socialType}}</view>
+          <view class="grid-name">{{modelData.socialName}}</view>
+          <view class="grid-description">{{modelData.socialDescription}}</view>
+        </view>
+      </view>
+      
+      <view class="radar-section">
+        <view class="section-title">人格能量雷达</view>
+        <view class="radar-chart">
+          <view class="radar-value"></view>
+        </view>
+        <view class="radar-labels">
+          <text class="radar-label">思考力</text>
+          <text class="radar-label">创造力</text>
+          <text class="radar-label">执行力</text>
+          <text class="radar-label">感知力</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="career-section">
+      <view class="section-title">职业罗盘</view>
+      
+      <view class="industry-match">
+        <view class="industry-header">
+          <view class="icon icon-blue icon-briefcase">💼</view>
+          <view class="industry-title">行业匹配</view>
+        </view>
+        
+        <view class="industry-description">根据你的五行喜用神和MBTI特质，以下行业最适合你：</view>
+        
+        <view class="industry-grid">
+          <view class="industry-item" wx:for="{{modelData.industries}}" wx:key="index">
+            <view class="icon {{item.icon}} icon-blue"></view>
+            <text class="industry-item-name">{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="direction-match">
+        <view class="direction-header">
+          <view class="icon icon-blue">🧭</view>
+          <view class="direction-title">工作方位</view>
+        </view>
+        
+        <view class="direction-grid">
+          <view class="direction-item {{item.type}}" wx:for="{{modelData.directions}}" wx:key="index">
+            <view class="direction-icon {{item.type}}"></view>
+            <text class="direction-item-name">{{item.name}} ({{item.type === 'good' ? '吉' : '忌'}})</text>
+          </view>
+        </view>
+        
+        <view class="direction-tip">
+          <view class="tip-icon"></view>
+          <text class="tip-text">{{modelData.directionTip}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 

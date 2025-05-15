@@ -28,6 +28,18 @@ Component({
       // 首次加载时使用全局配置或调用云函数获取
       if (app.globalData.tabConfig && app.globalData.tabConfig.length > 0) {
         console.log('自定义TabBar从全局加载配置:', JSON.stringify(app.globalData.tabConfig));
+        
+        // 检查是否包含MBTI功能
+        const hasMBTI = app.globalData.tabConfig.some(item => 
+          item.pagePath && item.pagePath.includes('mbti_personality')
+        );
+        console.log('自定义TabBar配置中是否包含MBTI测试功能:', hasMBTI);
+        
+        // 记录全部TabBar项
+        app.globalData.tabConfig.forEach((item, index) => {
+          console.log(`自定义TabBar项 ${index+1}: 路径=${item.pagePath}, 文本=${item.text}, 索引=${item.index}`);
+        });
+        
         this.setData({
           tabConfig: app.globalData.tabConfig,
           loaded: true

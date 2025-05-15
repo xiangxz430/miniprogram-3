@@ -3,6 +3,7 @@
     "pages/daily_hexagram/index",
     "pages/bazi_overview/index",
     "pages/user_profile/index",
+    "pages/mbti_personality/index",
     "pages/test_db/index",
     "pages/logs/index"
   ],
@@ -30,6 +31,12 @@
         "text": "八字总运",
         "iconPath": "images/icons/bazi.png",
         "selectedIconPath": "images/icons/bazi.png"
+      },
+      {
+        "pagePath": "pages/mbti_personality/index",
+        "text": "MBTI测试",
+        "iconPath": "images/icons/mbti.png",
+        "selectedIconPath": "images/icons/mbti.png"
       },
       {
         "pagePath": "pages/user_profile/index",

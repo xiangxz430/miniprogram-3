@@ -1,0 +1,602 @@
+@import "./icons.wxss";
+
+/* 公共样式 */
+.container {
+  padding: 30rpx;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  box-sizing: border-box;
+}
+
+.header {
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+
+.title {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #1e293b;
+  display: block;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #64748b;
+  margin-top: 10rpx;
+  display: block;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #1e293b;
+  margin-bottom: 20rpx;
+  margin-top: 40rpx;
+  padding-left: 10rpx;
+  border-left: 6rpx solid #3b82f6;
+}
+
+/* 标签页导航 */
+.tab-nav {
+  display: flex;
+  background-color: #f8fafc;
+  border-radius: 12rpx;
+  overflow: hidden;
+  margin-bottom: 30rpx;
+  border: 1rpx solid #e2e8f0;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #64748b;
+  position: relative;
+}
+
+.tab-item.active {
+  color: #3b82f6;
+  font-weight: bold;
+  background-color: #fff;
+  border-bottom: 4rpx solid #3b82f6;
+}
+
+/* 标签页内容 */
+.tab-content {
+  background-color: transparent;
+  margin-bottom: 30rpx;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* 进度条 */
+.progress-container {
+  margin-bottom: 30rpx;
+  background-color: #fff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.progress-text {
+  font-size: 28rpx;
+  color: #475569;
+  margin-bottom: 15rpx;
+  font-weight: 500;
+}
+
+.progress-bar {
+  height: 10rpx;
+  background-color: #e2e8f0;
+  border-radius: 5rpx;
+  overflow: hidden;
+}
+
+.progress-value {
+  height: 100%;
+  background-color: #3b82f6;
+  transition: width 0.3s ease;
+  border-radius: 5rpx;
+}
+
+/* 问题卡片 */
+.question-card {
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.question-text {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #1e293b;
+  margin-bottom: 30rpx;
+  line-height: 1.6;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background-color: #f8fafc;
+  border-radius: 12rpx;
+  transition: all 0.2s ease;
+  border: 1rpx solid #e2e8f0;
+}
+
+.option:active, .option.active {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.radio {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid #cbd5e1;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.radio.checked {
+  border-color: #3b82f6;
+  background-color: #3b82f6;
+}
+
+.radio.checked::after {
+  content: '';
+  position: absolute;
+  width: 20rpx;
+  height: 20rpx;
+  background-color: white;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 导航按钮 */
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-top: 30rpx;
+}
+
+.prev-btn, .next-btn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 44rpx;
+  font-size: 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.prev-btn {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1rpx solid #e2e8f0;
+}
+
+.prev-btn[disabled] {
+  opacity: 0.5;
+  color: #94a3b8;
+}
+
+.next-btn {
+  background-color: #3b82f6;
+  color: white;
+  font-weight: 500;
+}
+
+.next-btn[disabled] {
+  opacity: 0.5;
+  background-color: #93c5fd;
+}
+
+/* 结果部分 */
+.result-section {
+  padding: 20rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.personality-card {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 16rpx;
+  padding: 40rpx;
+  color: #fff;
+  margin-bottom: 30rpx;
+  box-shadow: 0 8rpx 30rpx rgba(59, 130, 246, 0.2);
+}
+
+.personality-type {
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.personality-name {
+  font-size: 32rpx;
+  margin-bottom: 20rpx;
+  opacity: 0.9;
+}
+
+.personality-percentage {
+  font-size: 24rpx;
+  margin-bottom: 20rpx;
+  opacity: 0.8;
+}
+
+.personality-description {
+  font-size: 28rpx;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* 性格偏好分析 */
+.preference-container {
+  margin-bottom: 40rpx;
+}
+
+.preference-item {
+  margin-bottom: 20rpx;
+}
+
+.preference-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.preference-label {
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.preference-bar {
+  height: 16rpx;
+  background-color: #e2e8f0;
+  border-radius: 8rpx;
+  overflow: hidden;
+  margin-bottom: 4rpx;
+}
+
+.preference-value {
+  height: 100%;
+  background-color: #3b82f6;
+  border-radius: 8rpx;
+}
+
+.preference-percentage {
+  text-align: right;
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+/* 认知功能栈 */
+.cognitive-functions {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.function-item {
+  border-radius: 12rpx;
+  padding: 20rpx;
+}
+
+.function-item.primary {
+  background-color: #EFF6FF;
+}
+
+.function-item.secondary {
+  background-color: #F0FDF4;
+}
+
+.function-item.tertiary {
+  background-color: #FEF9C3;
+}
+
+.function-item.inferior {
+  background-color: #FEECEC;
+}
+
+.function-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.function-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1e293b;
+  margin-right: 16rpx;
+}
+
+.function-role {
+  font-size: 24rpx;
+  color: #64748b;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+}
+
+.function-description {
+  font-size: 26rpx;
+  color: #475569;
+  line-height: 1.6;
+}
+
+/* 重新测试按钮 */
+.restart-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #3b82f6;
+  color: white;
+  font-size: 28rpx;
+  border-radius: 8rpx;
+  text-align: center;
+  margin-top: 20rpx;
+}
+
+/* 模型部分 */
+.model-section, .career-section {
+  margin-bottom: 30rpx;
+}
+
+.model-card {
+  background-color: #f8fafc;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.model-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.model-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 16rpx;
+  background-color: #dbeafe;
+  margin-right: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.model-title {
+  flex: 1;
+}
+
+.model-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1e293b;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.model-subtitle {
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.model-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.connection-item {
+  display: flex;
+  align-items: center;
+}
+
+.connection-left, .connection-right {
+  flex: 0 0 80rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.connection-left {
+  color: #6366f1;
+}
+
+.connection-right {
+  color: #3b82f6;
+}
+
+.connection-line {
+  flex: 1;
+  height: 2rpx;
+  background: linear-gradient(to right, #6366f1, #3b82f6);
+  position: relative;
+  margin: 0 20rpx;
+}
+
+.connection-line::after {
+  content: '';
+  position: absolute;
+  right: -4rpx;
+  top: -4rpx;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background-color: #3b82f6;
+}
+
+/* 人格网格 */
+.personality-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.personality-grid-item {
+  background-color: #f8fafc;
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+
+.grid-title {
+  font-size: 24rpx;
+  color: #64748b;
+  margin-bottom: 10rpx;
+}
+
+.grid-type {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #3b82f6;
+  margin-bottom: 4rpx;
+}
+
+.grid-name {
+  font-size: 28rpx;
+  color: #334155;
+  margin-bottom: 10rpx;
+}
+
+.grid-description {
+  font-size: 24rpx;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* 雷达部分样式在icons.wxss中 */
+
+/* 行业匹配 */
+.industry-match {
+  background-color: #f8fafc;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.industry-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.industry-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1e293b;
+  margin-left: 10rpx;
+}
+
+.industry-description {
+  font-size: 24rpx;
+  color: #64748b;
+  margin-bottom: 20rpx;
+}
+
+.industry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+}
+
+.industry-item {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.05);
+}
+
+.industry-item-name {
+  font-size: 26rpx;
+  color: #334155;
+}
+
+/* 方位匹配 */
+.direction-match {
+  background-color: #f8fafc;
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+
+.direction-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.direction-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1e293b;
+  margin-left: 10rpx;
+}
+
+.direction-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.direction-item {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.05);
+}
+
+.direction-item.good {
+  border-left: 4rpx solid #10b981;
+}
+
+.direction-item.bad {
+  border-left: 4rpx solid #ef4444;
+}
+
+.direction-item-name {
+  font-size: 26rpx;
+  color: #334155;
+}
+
+.direction-tip {
+  display: flex;
+  align-items: flex-start;
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  margin-top: 16rpx;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #64748b;
+  line-height: 1.6;
+  flex: 1;
+} 
