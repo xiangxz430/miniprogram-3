@@ -46,6 +46,7 @@
       <view class="test-tips">
         <text class="tip-text">请根据您的第一反应选择最符合的选项</text>
         <text class="tip-text">答案没有对错之分，选择最适合您的选项即可</text>
+      </view>
     </block>
     
     <!-- 测试完成后显示结果 -->
