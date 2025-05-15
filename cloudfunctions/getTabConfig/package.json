@@ -1,0 +1,9 @@
+{
+  "name": "getTabConfig",
+  "version": "1.0.0",
+  "description": "获取应用tab栏配置",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "^3.0.1"
+  }
+}

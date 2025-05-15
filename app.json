@@ -3,6 +3,7 @@
     "pages/daily_hexagram/index",
     "pages/bazi_overview/index",
     "pages/user_profile/index",
+    "pages/test_db/index",
     "pages/logs/index"
   ],
   "window": {
@@ -12,6 +13,7 @@
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
+    "custom": true,
     "color": "#94a3b8",
     "selectedColor": "#3b82f6",
     "backgroundColor": "#ffffff",
@@ -63,5 +65,30 @@
   },
   "cloud": true,
   "lazyCodeLoading": "requiredComponents",
-  "debug": true
+  "debug": true,
+  "miniprogramRoot": "./",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "coverView": true,
+    "nodeModules": true,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "scopeDataCheck": false,
+    "checkInvalidKey": true,
+    "checkSiteMap": true,
+    "uploadWithSourceMap": true,
+    "compileHotReLoad": false,
+    "useMultiFrameRuntime": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    },
+    "bundle": false
+  },
+  "libVersion": "2.17.0"
 } 

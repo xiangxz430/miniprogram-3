@@ -1,6 +1,7 @@
 const app = getApp()
 const hexagramUtil = require('../../utils/hexagram')
 const deepseekApi = require('../../utils/deepseekApi')
+const tabConfigUtil = require('../../utils/tabConfig')
 
 Page({
   data: {
@@ -38,6 +39,18 @@ Page({
       this.setData({
         hexagramInfo: app.globalData.hexagramInfo || {}
       });
+    }
+  },
+
+  onShow: function() {
+    // 应用动态TabBar样式
+    if (typeof this.getTabBar === 'function') {
+      const tabBar = this.getTabBar();
+      if (tabBar) {
+        tabBar.setData({
+          selected: 0
+        });
+      }
     }
   },
 

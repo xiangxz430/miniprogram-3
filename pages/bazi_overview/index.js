@@ -1,6 +1,7 @@
 const app = getApp();
 const lunar = require('../../utils/lunar.js');
 const { getHexagramInterpretation } = require('../../utils/deepseekApi.js');
+const tabConfigUtil = require('../../utils/tabConfig');
 
 // 五行与天干地支映射
 const STEM_ELEMENT = ['wood', 'wood', 'fire', 'fire', 'earth', 'earth', 'metal', 'metal', 'water', 'water'];
@@ -35,6 +36,15 @@ Page({
   },
   onShow() {
     this.syncUserData();
+    // 应用动态TabBar样式
+    if (typeof this.getTabBar === 'function') {
+      const tabBar = this.getTabBar();
+      if (tabBar) {
+        tabBar.setData({
+          selected: 1
+        });
+      }
+    }
   },
   syncUserData() {
     // 优先本地缓存，其次全局

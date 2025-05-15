@@ -1,6 +1,7 @@
 const app = getApp();
 const logger = require('../../utils/logger');
 const calendar = require('../../utils/lunar');
+const tabConfigUtil = require('../../utils/tabConfig');
 
 Page({
   data: {
@@ -131,6 +132,16 @@ Page({
     
     // 输出当前标签状态，用于调试
     console.log('页面显示 - 当前activeTab:', this.data.activeTab);
+    
+    // 应用动态TabBar样式
+    if (typeof this.getTabBar === 'function') {
+      const tabBar = this.getTabBar();
+      if (tabBar) {
+        tabBar.setData({
+          selected: 2
+        });
+      }
+    }
   },
 
   // 初始化用户数据

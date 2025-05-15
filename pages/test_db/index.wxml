@@ -1,0 +1,56 @@
+<view class="container">
+  <view class="header">
+    <text class="title">云数据库连接测试</text>
+  </view>
+
+  <view class="btn-group">
+    <button bindtap="testDBConnection" disabled="{{loading}}" type="primary">测试数据库连接</button>
+    <button bindtap="testGetTabConfig" disabled="{{loading}}" type="primary" style="margin-top: 10px;">测试获取Tab配置</button>
+    <button bindtap="clearLogs" type="default" style="margin-top: 10px;">清空日志</button>
+  </view>
+
+  <view class="result-section" wx:if="{{testResult}}">
+    <text class="section-title">测试结果</text>
+    <view class="result-card">
+      <text>状态: {{testResult.code === 0 ? '成功' : '失败'}}</text>
+      <text>消息: {{testResult.message}}</text>
+      <text wx:if="{{testResult.data.collections}}">
+        集合列表: {{testResult.data.collections.join(', ')}}
+      </text>
+      <view wx:if="{{testResult.data.gnpzData && testResult.data.gnpzData.length > 0}}">
+        <text>gnpz数据:</text>
+        <view class="data-item" wx:for="{{testResult.data.gnpzData}}" wx:key="data_id">
+          <text>gnm: {{item.gnm}}</text>
+          <text>wdm: {{item.wdm}}</text>
+          <text>sfsy: {{item.sfsy ? '是' : '否'}}</text>
+          <text>data_id: {{item.data_id}}</text>
+        </view>
+      </view>
+      <text wx:else>gnpz集合中没有数据</text>
+    </view>
+  </view>
+
+  <view class="result-section" wx:if="{{tabConfig}}">
+    <text class="section-title">Tab配置结果</text>
+    <view class="result-card">
+      <text>状态: {{tabConfig.code === 0 ? '成功' : '失败'}}</text>
+      <text>消息: {{tabConfig.message}}</text>
+      <view wx:if="{{tabConfig.data && tabConfig.data.length > 0}}">
+        <text>配置数据:</text>
+        <view class="data-item" wx:for="{{tabConfig.data}}" wx:key="pagePath">
+          <text>页面路径: {{item.pagePath}}</text>
+          <text>文本: {{item.text}}</text>
+          <text>图标: {{item.iconPath}}</text>
+        </view>
+      </view>
+      <text wx:else>没有找到Tab配置数据</text>
+    </view>
+  </view>
+
+  <view class="log-section">
+    <text class="section-title">日志</text>
+    <scroll-view scroll-y class="log-container">
+      <text wx:for="{{logs}}" wx:key="index" class="log-item">{{item}}</text>
+    </scroll-view>
+  </view>
+</view> 

@@ -1,12 +1,18 @@
 // app.js
+const tabConfigUtil = require('./utils/tabConfig');
+
 App({
   onLaunch: function () {
     // 初始化云开发
     if (wx.cloud) {
       wx.cloud.init({
-        env: 'cloud1-3go3cn2v0cb22666', // 已替换为你的实际环境ID
+        env: 'cloud1-3go3cn2v0cb22666', // 确保这个环境ID是正确的
         traceUser: true
       });
+      console.log('云环境初始化成功');
+      
+      // 加载tab栏配置
+      this.loadTabConfig();
     } else {
       console.error('请使用 2.2.3 或以上的基础库以使用云能力');
     }
@@ -17,6 +23,118 @@ App({
 
     // 加载用户设置
     this.loadUserSettings();
+  },
+
+  // 加载tab栏配置
+  loadTabConfig: function() {
+    console.log('开始加载tab栏配置...');
+    
+    // 使用Promise处理异步流程
+    const loadConfigFromCloud = () => {
+      return new Promise((resolve) => {
+        console.log('从云函数获取tab配置...');
+        wx.cloud.callFunction({
+          name: 'getTabConfig',
+          data: { timestamp: new Date().getTime() }, // 添加时间戳防止缓存
+          success: res => {
+            console.log('获取tab配置成功, 原始返回:', JSON.stringify(res.result));
+            if (res.result && res.result.code === 0 && res.result.data) {
+              const tabConfig = res.result.data;
+              
+              // 检查每个配置项是否具有必要的属性
+              const validConfig = tabConfig.every(item => 
+                item.index !== undefined && 
+                item.pagePath && 
+                item.text && 
+                item.iconPath && 
+                item.selectedIconPath
+              );
+              
+              if (validConfig) {
+                // 更新全局数据
+                this.globalData.tabConfig = tabConfig;
+                // 缓存到本地
+                wx.setStorageSync('tabConfig', tabConfig);
+                console.log('已更新全局数据并缓存有效配置');
+                
+                // 触发自定义TabBar更新
+                this.updateCustomTabBar();
+                resolve(tabConfig);
+              } else {
+                console.error('云函数返回的配置项缺少必要属性');
+                wx.showToast({
+                  title: '配置项缺少必要属性',
+                  icon: 'none',
+                  duration: 3000
+                });
+                resolve(null);
+              }
+            } else {
+              console.error('云函数返回结果格式不正确:', res.result);
+              // 显示具体的错误信息
+              if (res.result && res.result.message) {
+                wx.showToast({
+                  title: res.result.message,
+                  icon: 'none',
+                  duration: 3000
+                });
+              } else {
+                wx.showToast({
+                  title: '云函数返回数据格式有误',
+                  icon: 'none',
+                  duration: 3000
+                });
+              }
+              resolve(null);
+            }
+          },
+          fail: err => {
+            console.error('获取tab配置失败:', err);
+            wx.showToast({
+              title: '获取TabBar配置失败: ' + (err.errMsg || JSON.stringify(err)),
+              icon: 'none',
+              duration: 3000
+            });
+            resolve(null);
+          }
+        });
+      });
+    };
+    
+    // 直接从云端加载配置
+    loadConfigFromCloud().then(tabConfig => {
+      if (!tabConfig) {
+        console.error('未能获取云数据库TabBar配置');
+        
+        // 显示错误提示，但不使用默认值以确保用户知道需要配置数据库
+        wx.showModal({
+          title: '配置加载失败',
+          content: '未能从云数据库加载TabBar配置。请检查云数据库中是否存在有效的配置记录，或联系管理员。',
+          showCancel: false
+        });
+      }
+    });
+  },
+  
+  // 更新自定义TabBar
+  updateCustomTabBar: function() {
+    // 获取当前页面栈
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const page = pages[pages.length - 1];
+      // 如果页面有getTabBar方法，则调用获取自定义tabBar实例
+      if (typeof page.getTabBar === 'function') {
+        const tabBar = page.getTabBar();
+        // 如果实例存在，则通过setData更新数据
+        if (tabBar) {
+          tabBar.setData({
+            tabConfig: this.globalData.tabConfig,
+            loaded: true
+          });
+          tabBar.updateCurrentTab();
+        }
+      }
+    }
   },
 
   // 加载用户设置
@@ -98,6 +216,8 @@ App({
       birthplace: '北京市',
       currentLocation: ''
     },
+    // Tab栏配置
+    tabConfig: [],
     // 每日一挂相关信息
     hexagramInfo: {
       date: '2023年11月10日 星期五',
