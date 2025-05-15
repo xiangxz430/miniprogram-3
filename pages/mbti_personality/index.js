@@ -207,10 +207,18 @@ Page({
 
   // 选择选项
   selectOption(e) {
-    const value = e.currentTarget.dataset.value
+    const value = e.currentTarget.dataset.value;
+    console.log('选择选项:', value);
     this.setData({
       selectedOption: value
-    })
+    });
+    
+    // 短暂延迟后自动进入下一题（如果不是最后一题）
+    if (this.data.currentQuestion < this.data.questions.length - 1) {
+      setTimeout(() => {
+        this.nextQuestion();
+      }, 300);
+    }
   },
 
   // 上一题
@@ -336,15 +344,57 @@ Page({
     
     console.log(`获取到类型信息:`, typeInfo);
     
+    // 格式化测试时间
+    const now = new Date();
+    const timeStr = this.formatTime(now);
+    
     return {
       type: type,
       name: typeInfo.name,
       description: typeInfo.description,
       percentage: typeInfo.percentage,
-      timestamp: new Date().getTime(),
+      timestamp: now.getTime(),
+      timeStr: timeStr,
       scores: scores,
-      functions: typeInfo.functions || []
+      functions: typeInfo.functions || [],
+      alias: this.getTypeAlias(type)
     }
+  },
+  
+  // 格式化时间
+  formatTime(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+    
+    return `${year}年${month}月${day}日 ${hour}:${minute < 10 ? '0' + minute : minute}`;
+  },
+  
+  // 获取类型别称
+  getTypeAlias(type) {
+    const aliases = {
+      'INTJ': '建筑师',
+      'INTP': '逻辑学家',
+      'ENTJ': '指挥官',
+      'ENTP': '辩论家',
+      'INFJ': '提倡者',
+      'INFP': '调停者',
+      'ENFJ': '主人公',
+      'ENFP': '竞选者',
+      'ISTJ': '物流师',
+      'ISFJ': '守卫者',
+      'ESTJ': '总经理',
+      'ESFJ': '执政官',
+      'ISTP': '鉴赏家',
+      'ISFP': '探险家',
+      'ESTP': '企业家',
+      'ESFP': '表演者'
+    };
+    
+    return aliases[type] || '';
   },
   
   // 重新开始测试

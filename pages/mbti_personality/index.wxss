@@ -102,21 +102,23 @@
   border-radius: 5rpx;
 }
 
-/* 问题卡片 */
-.question-card {
-  margin-bottom: 30rpx;
-  padding: 20rpx;
-  background-color: #fff;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+/* 问题卡片改进 */
+.question-number {
+  font-size: 24rpx;
+  color: #64748b;
+  margin-bottom: 16rpx;
+  background-color: #f1f5f9;
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
 }
 
 .question-text {
-  font-size: 32rpx;
-  font-weight: 500;
+  font-size: 34rpx;
+  font-weight: 600;
   color: #1e293b;
-  margin-bottom: 30rpx;
-  line-height: 1.6;
+  margin-bottom: 40rpx;
+  line-height: 1.5;
 }
 
 .options-container {
@@ -128,14 +130,15 @@
 .option {
   display: flex;
   align-items: center;
-  padding: 20rpx;
+  padding: 24rpx;
   background-color: #f8fafc;
   border-radius: 12rpx;
   transition: all 0.2s ease;
   border: 1rpx solid #e2e8f0;
+  margin-bottom: 16rpx;
 }
 
-.option:active, .option.active {
+.option.active {
   background-color: #eff6ff;
   border-color: #3b82f6;
 }
@@ -207,14 +210,29 @@
   background-color: #93c5fd;
 }
 
-/* 结果部分 */
-.result-section {
+/* 测试提示 */
+.test-tips {
+  margin-top: 40rpx;
   padding: 20rpx;
-  background-color: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  background-color: #f8fafc;
+  border-radius: 12rpx;
+  border: 1rpx solid #e2e8f0;
 }
 
+.tip-text {
+  display: block;
+  font-size: 24rpx;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 8rpx;
+}
+
+.tip-text:before {
+  content: "• ";
+  color: #3b82f6;
+}
+
+/* 结果页面改进 */
 .personality-card {
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   border-radius: 16rpx;
@@ -222,12 +240,14 @@
   color: #fff;
   margin-bottom: 30rpx;
   box-shadow: 0 8rpx 30rpx rgba(59, 130, 246, 0.2);
+  text-align: center;
 }
 
 .personality-type {
-  font-size: 48rpx;
+  font-size: 64rpx;
   font-weight: bold;
-  margin-bottom: 10rpx;
+  margin-bottom: 16rpx;
+  letter-spacing: 4rpx;
 }
 
 .personality-name {
@@ -599,4 +619,72 @@
   color: #64748b;
   line-height: 1.6;
   flex: 1;
+}
+
+/* 结果部分 */
+.result-section {
+  padding: 20rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.result-time {
+  font-size: 24rpx;
+  color: #94a3b8;
+}
+
+.personality-description-box {
+  background-color: #f8fafc;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 30rpx;
+}
+
+.personality-alias {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 8rpx;
+}
+
+/* 偏好分析改进 */
+.preference-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.preference-letter {
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #94a3b8;
+  background-color: #f1f5f9;
+}
+
+.preference-letter.letter-active {
+  color: white;
+  background-color: #3b82f6;
+}
+
+.preference-name {
+  font-size: 26rpx;
+  color: #64748b;
+}
+
+.preference-vs {
+  font-size: 22rpx;
+  color: #cbd5e1;
+  font-style: italic;
 } 

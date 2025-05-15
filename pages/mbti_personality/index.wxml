@@ -24,6 +24,7 @@
       </view>
       
       <view class="question-card">
+        <view class="question-number">第{{currentQuestion + 1}}题</view>
         <view class="question-text">{{questions[currentQuestion].question}}</view>
         <view class="options-container">
           <view class="option {{selectedOption === 'A' ? 'active' : ''}}" bindtap="selectOption" data-value="A">
@@ -41,25 +42,40 @@
         <button class="prev-btn" bindtap="prevQuestion" disabled="{{currentQuestion === 0}}">上一题</button>
         <button class="next-btn" bindtap="nextQuestion" disabled="{{!selectedOption}}">{{currentQuestion === questions.length - 1 ? '完成测试' : '下一题'}}</button>
       </view>
+      
+      <view class="test-tips">
+        <text class="tip-text">请根据您的第一反应选择最符合的选项</text>
+        <text class="tip-text">答案没有对错之分，选择最适合您的选项即可</text>
     </block>
     
     <!-- 测试完成后显示结果 -->
     <block wx:else>
       <view class="result-section">
-        <view class="section-title">你的MBTI类型</view>
+        <view class="result-header">
+          <text class="result-time">测试完成时间: {{result.timeStr || '刚刚'}}</text>
+        </view>
+        
         <view class="personality-card">
           <view class="personality-type">{{result.type}}</view>
           <view class="personality-name">{{result.name}}</view>
-          <view class="personality-percentage">占比 {{result.percentage}}</view>
+          <view class="personality-percentage">全球人口占比约 {{result.percentage}}</view>
+          <view class="personality-alias">别称：{{result.alias || '思想家'}}</view>
+        </view>
+        
+        <view class="personality-description-box">
+          <view class="section-title">性格特点概述</view>
           <view class="personality-description">{{result.description}}</view>
         </view>
         
         <view class="section-title">性格偏好分析</view>
         <view class="preference-container">
           <view class="preference-item">
-            <view class="preference-labels">
-              <text class="preference-label">内向 (I)</text>
-              <text class="preference-label">外向 (E)</text>
+            <view class="preference-header">
+              <view class="preference-letter letter-active">I</view>
+              <view class="preference-name">内向</view>
+              <view class="preference-vs">vs</view>
+              <view class="preference-name">外向</view>
+              <view class="preference-letter">E</view>
             </view>
             <view class="preference-bar">
               <view class="preference-value" style="width: {{result.scores.I}}%;"></view>
@@ -68,9 +84,12 @@
           </view>
           
           <view class="preference-item">
-            <view class="preference-labels">
-              <text class="preference-label">直觉 (N)</text>
-              <text class="preference-label">实感 (S)</text>
+            <view class="preference-header">
+              <view class="preference-letter letter-active">N</view>
+              <view class="preference-name">直觉</view>
+              <view class="preference-vs">vs</view>
+              <view class="preference-name">实感</view>
+              <view class="preference-letter">S</view>
             </view>
             <view class="preference-bar">
               <view class="preference-value" style="width: {{result.scores.N}}%;"></view>
@@ -79,9 +98,12 @@
           </view>
           
           <view class="preference-item">
-            <view class="preference-labels">
-              <text class="preference-label">情感 (F)</text>
-              <text class="preference-label">思考 (T)</text>
+            <view class="preference-header">
+              <view class="preference-letter letter-active">F</view>
+              <view class="preference-name">情感</view>
+              <view class="preference-vs">vs</view>
+              <view class="preference-name">思考</view>
+              <view class="preference-letter">T</view>
             </view>
             <view class="preference-bar">
               <view class="preference-value" style="width: {{result.scores.F}}%;"></view>
@@ -90,14 +112,17 @@
           </view>
           
           <view class="preference-item">
-            <view class="preference-labels">
-              <text class="preference-label">判断 (J)</text>
-              <text class="preference-label">认知 (P)</text>
+            <view class="preference-header">
+              <view class="preference-letter letter-active">P</view>
+              <view class="preference-name">灵活</view>
+              <view class="preference-vs">vs</view>
+              <view class="preference-name">判断</view>
+              <view class="preference-letter">J</view>
             </view>
             <view class="preference-bar">
-              <view class="preference-value" style="width: {{result.scores.J}}%;"></view>
+              <view class="preference-value" style="width: {{result.scores.P}}%;"></view>
             </view>
-            <view class="preference-percentage">{{result.scores.J}}%</view>
+            <view class="preference-percentage">{{result.scores.P}}%</view>
           </view>
         </view>
         
