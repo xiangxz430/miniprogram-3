@@ -324,19 +324,82 @@
         <view class="radar-section">
           <view class="section-title">人格能量雷达</view>
           <view class="radar-chart">
-            <view class="radar-value"></view>
+            <view class="radar-axis">
+              <view class="radar-axis-line"></view>
+              <view class="radar-axis-line"></view>
+              <view class="radar-axis-line"></view>
+              <view class="radar-axis-line"></view>
+            </view>
+            <view class="radar-value" style="--thinking: {{modelData.radarData.thinking}}; --creativity: {{modelData.radarData.creativity}}; --execution: {{modelData.radarData.execution}}; --perception: {{modelData.radarData.perception}};"></view>
+            <view class="radar-point radar-point-thinking"></view>
+            <view class="radar-point radar-point-creativity"></view>
+            <view class="radar-point radar-point-execution"></view>
+            <view class="radar-point radar-point-perception"></view>
           </view>
           <view class="radar-labels">
-            <text class="radar-label">思考力</text>
-            <text class="radar-label">创造力</text>
-            <text class="radar-label">执行力</text>
-            <text class="radar-label">感知力</text>
+            <text class="radar-label">思考力
+              <text class="radar-value-label">{{modelData.radarData.thinking}}%</text>
+            </text>
+            <text class="radar-label">创造力
+              <text class="radar-value-label">{{modelData.radarData.creativity}}%</text>
+            </text>
+            <text class="radar-label">执行力
+              <text class="radar-value-label">{{modelData.radarData.execution}}%</text>
+            </text>
+            <text class="radar-label">感知力
+              <text class="radar-value-label">{{modelData.radarData.perception}}%</text>
+            </text>
           </view>
         </view>
       </view>
       
       <view class="career-section">
         <view class="section-title">职业罗盘</view>
+        
+        <view class="career-traits">
+          <view class="career-traits-header">
+            <view class="icon icon-purple">🧠</view>
+            <view class="career-traits-title">职业特质分析</view>
+          </view>
+          
+          <view class="traits-grid">
+            <view class="trait-item">
+              <view class="trait-title">工作风格</view>
+              <view class="trait-content">{{modelData.careerTraits.workStyle}}</view>
+            </view>
+            
+            <view class="trait-item">
+              <view class="trait-title">团队角色</view>
+              <view class="trait-content">{{modelData.careerTraits.teamRole}}</view>
+            </view>
+          </view>
+          
+          <view class="trait-strength-weakness">
+            <view class="trait-sw-item advantage">
+              <view class="trait-sw-header">
+                <view class="trait-sw-icon">💪</view>
+                <view class="trait-sw-title">职场优势</view>
+              </view>
+              <view class="trait-sw-content">{{modelData.careerTraits.advantage}}</view>
+            </view>
+            
+            <view class="trait-sw-item challenge">
+              <view class="trait-sw-header">
+                <view class="trait-sw-icon">⚠️</view>
+                <view class="trait-sw-title">潜在挑战</view>
+              </view>
+              <view class="trait-sw-content">{{modelData.careerTraits.challenge}}</view>
+            </view>
+          </view>
+          
+          <view class="trait-development">
+            <view class="trait-dev-header">
+              <view class="trait-dev-icon">🌱</view>
+              <view class="trait-dev-title">成长建议</view>
+            </view>
+            <view class="trait-dev-content">{{modelData.careerTraits.development}}</view>
+          </view>
+        </view>
         
         <view class="industry-match">
           <view class="industry-header">

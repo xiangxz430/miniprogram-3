@@ -661,7 +661,7 @@ Page({
     const mbtiType = result.type;
     const typeInfo = this.getTypeInfo(mbtiType);
     
-    // 计算社会面具(假设社会面具是首字母变成相反的类型)
+    // 计算社会面具(基于MBTI认知功能理论的阴影面)
     const socialType = this.calculateSocialMask(mbtiType);
     const socialTypeInfo = this.getTypeInfo(socialType);
     
@@ -671,6 +671,12 @@ Page({
     // 根据类型生成方位建议
     const directions = this.getDirectionsByType(mbtiType);
     
+    // 计算人格能量雷达数据
+    const radarData = this.calculatePersonalityRadar(mbtiType);
+    
+    // 获取职业特质分析
+    const careerTraits = this.getCareerTraits(mbtiType);
+    
     // 更新modelData
     this.setData({
       modelData: {
@@ -679,10 +685,12 @@ Page({
         nativeDescription: typeInfo.description || '暂无描述',
         socialType: socialType,
         socialName: socialTypeInfo.name || '未知类型',
-        socialDescription: socialTypeInfo.description ? socialTypeInfo.description.substring(0, 30) + '...' : '暂无描述',
+        socialDescription: socialTypeInfo.description ? socialTypeInfo.description.substring(0, 60) + '...' : '暂无描述',
         industries: industries,
         directions: directions,
-        directionTip: this.getDirectionTip(mbtiType)
+        directionTip: this.getDirectionTip(mbtiType),
+        radarData: radarData,
+        careerTraits: careerTraits
       }
     });
     
@@ -693,9 +701,48 @@ Page({
   calculateSocialMask(mbtiType) {
     if (!mbtiType || mbtiType.length !== 4) return 'ENFP';
     
-    // 简单实现：将首字母E/I翻转，其他保持不变
+    // 实现更合理的社会面具计算规则
+    // 每种MBTI类型的社会面具，通常是原生人格的"阴影面"
+    // 第一个字母反转（内外向），其他根据认知功能理论调整
+    
+    let socialType = '';
+    
+    // 第一个字母E/I翻转
     const firstLetter = mbtiType.charAt(0) === 'E' ? 'I' : 'E';
-    return firstLetter + mbtiType.substring(1);
+    socialType += firstLetter;
+    
+    // 根据MBTI认知功能理论，计算社会面具
+    // INFP —> ESTJ, ENFJ —> ISTP 等
+    
+    const socialMaskMap = {
+      'INTJ': 'ESFP', // 思维型内向 —> 感觉型外向
+      'INTP': 'ESFJ', // 思维型内向 —> 感觉型外向
+      'ENTJ': 'ISFP', // 思维型外向 —> 感觉型内向
+      'ENTP': 'ISFJ', // 思维型外向 —> 感觉型内向
+      
+      'INFJ': 'ESTP', // 感觉型内向 —> 思维型外向
+      'INFP': 'ESTJ', // 感觉型内向 —> 思维型外向
+      'ENFJ': 'ISTP', // 感觉型外向 —> 思维型内向
+      'ENFP': 'ISTJ', // 感觉型外向 —> 思维型内向
+      
+      'ISTJ': 'ENFP', // 守卫型内向 —> 探索型外向
+      'ISFJ': 'ENTP', // 守卫型内向 —> 探索型外向
+      'ESTJ': 'INFP', // 守卫型外向 —> 探索型内向
+      'ESFJ': 'INTP', // 守卫型外向 —> 探索型内向
+      
+      'ISTP': 'ENFJ', // 探索型内向 —> 守卫型外向
+      'ISFP': 'ENTJ', // 探索型内向 —> 守卫型外向
+      'ESTP': 'INFJ', // 探索型外向 —> 守卫型内向
+      'ESFP': 'INTJ'  // 探索型外向 —> 守卫型内向
+    };
+    
+    // 如果存在于映射表中，返回映射值，否则使用简单规则
+    if (socialMaskMap[mbtiType]) {
+      return socialMaskMap[mbtiType];
+    } else {
+      // 简单的首字母翻转规则作为后备
+      return firstLetter + mbtiType.substring(1);
+    }
   },
   
   // 根据MBTI类型获取适合的行业
@@ -889,5 +936,251 @@ Page({
     };
     
     return tipMap[mbtiType] || '根据你的人格类型特点，选择合适的工作方位可以有效提升工作效率和创造力。';
+  },
+  
+  // 计算人格能量雷达数据
+  calculatePersonalityRadar(mbtiType) {
+    if (!mbtiType || mbtiType.length !== 4) {
+      return {
+        thinking: 50,
+        creativity: 50,
+        execution: 50,
+        perception: 50
+      };
+    }
+    
+    // 根据MBTI类型计算四个维度的能力值
+    let thinking = 50;
+    let creativity = 50;
+    let execution = 50;
+    let perception = 50;
+    
+    // 思考力：T > F, 内向 I 稍有加成
+    if (mbtiType.includes('T')) thinking += 25;
+    if (mbtiType.includes('I')) thinking += 10;
+    
+    // 创造力：N > S, 外向 E 稍有加成
+    if (mbtiType.includes('N')) creativity += 25;
+    if (mbtiType.includes('E')) creativity += 10;
+    
+    // 执行力：J > P, 外向 E 稍有加成
+    if (mbtiType.includes('J')) execution += 25;
+    if (mbtiType.includes('E')) execution += 10;
+    
+    // 感知力：F > T, N > S 各有加成
+    if (mbtiType.includes('F')) perception += 20;
+    if (mbtiType.includes('N')) perception += 15;
+    
+    // 根据具体类型进行额外调整
+    switch(mbtiType) {
+      case 'INTJ': // 学者型——思考力和创造力特别强
+        thinking += 15;
+        creativity += 10;
+        break;
+      case 'INTP': // 学者型——思考力和创造力特别强
+        thinking += 10;
+        creativity += 15;
+        break;
+      case 'ENTJ': // 指挥官——思考力和执行力特别强
+        thinking += 15;
+        execution += 15;
+        break;
+      case 'ENTP': // 辩论家——思考力和创造力特别强
+        thinking += 10;
+        creativity += 15;
+        break;
+      case 'INFJ': // 提倡者——创造力和感知力特别强
+        creativity += 15;
+        perception += 15;
+        break;
+      case 'INFP': // 调停者——创造力和感知力特别强
+        creativity += 10;
+        perception += 20;
+        break;
+      case 'ENFJ': // 主人公——执行力和感知力特别强
+        execution += 15;
+        perception += 15;
+        break;
+      case 'ENFP': // 竞选者——创造力和感知力特别强
+        creativity += 15;
+        perception += 15;
+        break;
+      case 'ISTJ': // 物流师——思考力和执行力特别强
+        thinking += 10;
+        execution += 20;
+        break;
+      case 'ISFJ': // 守卫者——执行力和感知力特别强
+        execution += 15;
+        perception += 15;
+        break;
+      case 'ESTJ': // 总经理——思考力和执行力特别强
+        thinking += 10;
+        execution += 20;
+        break;
+      case 'ESFJ': // 执政官——执行力和感知力特别强
+        execution += 15;
+        perception += 15;
+        break;
+      case 'ISTP': // 鉴赏家——思考力和感知力特别强
+        thinking += 15;
+        perception += 10;
+        break;
+      case 'ISFP': // 探险家——感知力特别强
+        perception += 25;
+        break;
+      case 'ESTP': // 企业家——执行力特别强
+        execution += 25;
+        break;
+      case 'ESFP': // 表演者——感知力和执行力特别强
+        perception += 15;
+        execution += 15;
+        break;
+    }
+    
+    // 确保数值在合理范围内(0-100)
+    thinking = Math.min(Math.max(thinking, 0), 100);
+    creativity = Math.min(Math.max(creativity, 0), 100);
+    execution = Math.min(Math.max(execution, 0), 100);
+    perception = Math.min(Math.max(perception, 0), 100);
+    
+    return {
+      thinking,
+      creativity,
+      execution,
+      perception
+    };
+  },
+  
+  // 获取职业特质分析
+  getCareerTraits(mbtiType) {
+    if (!mbtiType) return {};
+    
+    // 根据MBTI类型返回职业特质分析
+    // 包括工作风格、团队角色和成长建议
+    const careerTraitsMap = {
+      'INTJ': {
+        workStyle: '战略性思考者，注重效率和长期规划',
+        teamRole: '战略顾问，系统设计师，革新者',
+        advantage: '独立思考、善于规划、追求卓越',
+        challenge: '有时过于理论化，可能忽略他人感受',
+        development: '培养耐心，提高人际沟通技巧，学习接受多元观点'
+      },
+      'INTP': {
+        workStyle: '逻辑思考者，自主性强，喜欢解决复杂问题',
+        teamRole: '分析师，研究员，创新思想家',
+        advantage: '逻辑清晰、创新思维、擅长系统分析',
+        challenge: '可能缺乏执行力，容易陷入过度分析',
+        development: '提高实践能力，设定明确期限，减少拖延'
+      },
+      'ENTJ': {
+        workStyle: '决策者，目标导向，善于组织和领导',
+        teamRole: '领导者，策略家，变革推动者',
+        advantage: '领导力强、决策果断、高效组织',
+        challenge: '有时过于专制，可能给他人带来压力',
+        development: '学会倾听，培养同理心，提高情感智能'
+      },
+      'ENTP': {
+        workStyle: '创新者，善于辩论，喜欢挑战和变化',
+        teamRole: '创意生成者，辩论者，解决方案提供者',
+        advantage: '思维敏捷、创意丰富、适应性强',
+        challenge: '容易失去兴趣，项目可能半途而废',
+        development: '培养恒心，设定短期目标，强化执行力'
+      },
+      'INFJ': {
+        workStyle: '理想主义工作者，寻求意义，关注人的需求',
+        teamRole: '愿景创造者，和谐促进者，人员发展者',
+        advantage: '洞察力强、有创意、关注团队和谐',
+        challenge: '可能过于追求完美，工作压力大',
+        development: '学会放松，培养实用主义态度，设立界限'
+      },
+      'INFP': {
+        workStyle: '价值驱动型工作者，重视真实性和个人成长',
+        teamRole: '价值观守护者，创意思想家，人文关怀者',
+        advantage: '有创意、有同理心、价值观坚定',
+        challenge: '可能回避冲突，不擅长处理批评',
+        development: '培养客观处事能力，提高实践技能，接受建设性反馈'
+      },
+      'ENFJ': {
+        workStyle: '人员发展导向，善于激励，追求集体成功',
+        teamRole: '教练，协调者，团队建设者',
+        advantage: '沟通技巧强、有感染力、关注团队成长',
+        challenge: '可能过度关注他人需求而忽视自己',
+        development: '学会自我照顾，培养直接沟通，设立个人界限'
+      },
+      'ENFP': {
+        workStyle: '热情的创新者，灵活多变，重视可能性',
+        teamRole: '激励者，创意催化剂，连接者',
+        advantage: '思维灵活、热情高涨、人际关系好',
+        challenge: '可能难以坚持常规工作，注意力分散',
+        development: '培养专注力，加强时间管理，坚持完成任务'
+      },
+      'ISTJ': {
+        workStyle: '系统性工作者，负责任，关注细节和质量',
+        teamRole: '组织者，执行者，稳定器',
+        advantage: '可靠、有条理、注重质量',
+        challenge: '可能过于保守，抗拒变化',
+        development: '培养适应能力，接受新方法，增强灵活性'
+      },
+      'ISFJ': {
+        workStyle: '服务型工作者，尽职尽责，重视他人需求',
+        teamRole: '支持者，维护者，服务提供者',
+        advantage: '细心、忠诚、有同理心',
+        challenge: '可能难以拒绝请求，工作过度',
+        development: '学会设定界限，培养自我主张，平衡工作与休息'
+      },
+      'ESTJ': {
+        workStyle: '结构化管理者，追求效率，注重成果',
+        teamRole: '管理者，监督者，传统维护者',
+        advantage: '高效、有条理、结果导向',
+        challenge: '可能过于强硬，忽视过程和人的感受',
+        development: '培养耐心和灵活性，关注人际关系，接纳多样观点'
+      },
+      'ESFJ': {
+        workStyle: '协作型工作者，团队导向，重视和谐关系',
+        teamRole: '和谐促进者，团队建设者，服务领导者',
+        advantage: '人际关系好、有合作精神、注重团队氛围',
+        challenge: '可能过于在意他人评价，避免冲突',
+        development: '培养独立思考，提高决策自信，学会处理冲突'
+      },
+      'ISTP': {
+        workStyle: '实践型问题解决者，独立自主，关注效率',
+        teamRole: '技术专家，故障排除者，实用创新者',
+        advantage: '动手能力强、灵活应变、注重实效',
+        challenge: '可能缺乏长期规划，沟通简短直接',
+        development: '加强长期规划，提高沟通技巧，培养团队意识'
+      },
+      'ISFP': {
+        workStyle: '灵活的创意工作者，重视自主性和真实表达',
+        teamRole: '艺术家，审美专家，和平使者',
+        advantage: '审美敏感、真诚、适应性强',
+        challenge: '可能难以坚持常规工作，回避复杂问题',
+        development: '培养结构化工作习惯，提高直接沟通能力，强化逻辑思维'
+      },
+      'ESTP': {
+        workStyle: '行动导向型工作者，喜欢冒险和即时回馈',
+        teamRole: '问题解决者，谈判者，行动催化剂',
+        advantage: '反应迅速、务实、擅长危机处理',
+        challenge: '可能缺乏耐心，忽视长期后果',
+        development: '培养长期思维，提高计划能力，关注细节'
+      },
+      'ESFP': {
+        workStyle: '社交型工作者，灵活多变，注重当下体验',
+        teamRole: '调解者，团队活力源，现场应变者',
+        advantage: '适应性强、人际关系好、工作热情高',
+        challenge: '可能难以专注于细节，组织能力弱',
+        development: '培养计划习惯，提高专注能力，完善时间管理'
+      }
+    };
+    
+    // 默认特质
+    const defaultTraits = {
+      workStyle: '注重平衡的工作方式，灵活适应不同环境',
+      teamRole: '多功能团队成员，根据需要调整自身角色',
+      advantage: '适应性强、多元思维、平衡发展',
+      challenge: '可能需要更清晰的职业定位和发展方向',
+      development: '明确优势领域，培养专精技能，建立职业规划'
+    };
+    
+    return careerTraitsMap[mbtiType] || defaultTraits;
   }
 }) 
