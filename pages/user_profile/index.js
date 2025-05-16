@@ -13,11 +13,13 @@ Page({
       avatar: null,
       nickname: '王小明',
       birthdate: '1990年8月15日', // 默认生日
+      birthtime: '12:00', // 默认出生时间
       lunarDate: '庚午年七月廿五', // 默认农历
       zodiac: '天秤座', // 默认星座
       mbti: 'INFJ', // 默认MBTI
       firstLetter: '王', // 用于显示默认头像的首字母
       birthplace: '北京市', // 默认出生地
+      birthplaceArray: ['北京市', '北京市', '东城区'], // 默认出生地数组
       currentLocation: '' // 当前位置
     },
     dailyData: {
@@ -178,8 +180,10 @@ Page({
         'userInfo.nickname': userSettings.nickname || this.data.userInfo.nickname,
         'userInfo.firstLetter': userSettings.firstLetter || this.data.userInfo.firstLetter,
         'userInfo.birthdate': userSettings.birthdate || this.data.userInfo.birthdate,
+        'userInfo.birthtime': userSettings.birthtime || this.data.userInfo.birthtime,
         'userInfo.mbti': userSettings.mbti || this.data.userInfo.mbti,
-        'userInfo.birthplace': userSettings.birthplace || this.data.userInfo.birthplace
+        'userInfo.birthplace': userSettings.birthplace || this.data.userInfo.birthplace,
+        'userInfo.birthplaceArray': userSettings.birthplaceArray || this.data.userInfo.birthplaceArray
       });
       
       // 如果有生日信息，更新星座和农历
@@ -263,10 +267,23 @@ Page({
     }
   },
 
-  // 出生地输入事件
-  inputBirthplace: function(e) {
+  // 出生时间选择器事件
+  bindBirthtimeChange: function(e) {
+    const timeStr = e.detail.value;
+    
     this.setData({
-      'userInfo.birthplace': e.detail.value
+      'userInfo.birthtime': timeStr
+    });
+  },
+
+  // 出生地选择器事件
+  bindBirthplaceChange: function(e) {
+    const region = e.detail.value;
+    const formattedPlace = region.join(' ');
+    
+    this.setData({
+      'userInfo.birthplace': formattedPlace,
+      'userInfo.birthplaceArray': region
     });
   },
 
@@ -276,8 +293,10 @@ Page({
       nickname: this.data.userInfo.nickname,
       firstLetter: this.data.userInfo.firstLetter,
       birthdate: this.data.userInfo.birthdate,
+      birthtime: this.data.userInfo.birthtime,
       mbti: this.data.userInfo.mbti,
       birthplace: this.data.userInfo.birthplace,
+      birthplaceArray: this.data.userInfo.birthplaceArray,
       currentLocation: this.data.userInfo.currentLocation
     };
     

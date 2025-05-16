@@ -84,6 +84,20 @@
             </picker>
           </view>
           
+          <!-- 添加出生时间字段 -->
+          <view class="info-item">
+            <view class="info-label">
+              <view class="info-icon">
+                <text class="iconfont icon-time"></text>
+              </view>
+              <text>出生时间</text>
+            </view>
+            <view wx:if="{{!isEditing}}" class="info-value">{{userInfo.birthtime || '未设置'}}</view>
+            <picker wx:else mode="time" value="{{userInfo.birthtime}}" bindchange="bindBirthtimeChange" class="picker-input">
+              <view class="info-value editing">{{userInfo.birthtime || '请选择出生时间'}}</view>
+            </picker>
+          </view>
+          
           <view class="info-item">
             <view class="info-label">
               <view class="info-icon">
@@ -125,7 +139,9 @@
               <text>出生地</text>
             </view>
             <view wx:if="{{!isEditing}}" class="info-value">{{userInfo.birthplace || '未设置'}}</view>
-            <input wx:else type="text" value="{{userInfo.birthplace}}" placeholder="请输入出生地" bindinput="inputBirthplace" class="text-input"/>
+            <picker wx:else mode="region" value="{{userInfo.birthplaceArray}}" bindchange="bindBirthplaceChange" class="picker-input">
+              <view class="info-value editing">{{userInfo.birthplace || '请选择出生地'}}</view>
+            </picker>
           </view>
 
           <view class="info-item">
@@ -139,24 +155,6 @@
               <text class="info-value">{{userInfo.currentLocation || '未获取'}}</text>
               <text wx:if="{{!isEditing}}" class="location-btn" bindtap="getLocation">刷新</text>
             </view>
-          </view>
-        </view>
-      </view>
-      
-      <!-- 近期梦境 -->
-      <view class="section">
-        <view class="section-header">
-          <text class="section-title">近期梦境</text>
-          <text class="view-all" bindtap="viewAllDreams">查看全部</text>
-        </view>
-        
-        <view class="dream-list">
-          <view class="profile-card" wx:for="{{dreams}}" wx:key="index">
-            <view class="dream-header">
-              <text class="dream-title">{{item.title}}</text>
-              <text class="dream-date">{{item.date}}</text>
-            </view>
-            <text class="dream-content">{{item.content}}</text>
           </view>
         </view>
       </view>

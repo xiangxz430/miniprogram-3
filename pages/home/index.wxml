@@ -8,7 +8,7 @@
 
   <!-- 自动跳转提示 -->
   <view class="auto-redirect-tip" wx:if="{{autoCloseTimer}}">
-    <text>{{countDown || 5}}秒后自动关闭</text>
+    <text>{{countDown || 10}}秒后自动关闭</text>
   </view>
   
   <!-- 功能导航区 -->
@@ -37,6 +37,34 @@
     <view class="quote-author">{{dailyQuote.author || '古谚语'}}</view>
   </view>
   
+  <!-- 用户隐私数据声明 -->
+  <view class="privacy-statement">
+    <view class="privacy-header">
+      <view class="privacy-title">
+        <view class="privacy-icon">🔒</view>
+        <text>用户隐私数据声明</text>
+      </view>
+      <view class="privacy-line"></view>
+    </view>
+    <view class="privacy-content">
+      <view class="privacy-item">
+        <view class="privacy-bullet"></view>
+        <text>您的所有数据仅存储在手机本地</text>
+      </view>
+      <view class="privacy-item">
+        <view class="privacy-bullet"></view>
+        <text>我们不会上传任何用户隐私数据</text>
+      </view>
+      <view class="privacy-item">
+        <view class="privacy-bullet"></view>
+        <text>更换设备登录将无法恢复之前的数据</text>
+      </view>
+    </view>
+    <view class="privacy-tip">
+      <text class="privacy-tip-icon">💡</text>
+      <text>我们致力于保护您的隐私安全</text>
+    </view>
+  </view>
   
   <!-- 版权信息 -->
   <view class="footer">

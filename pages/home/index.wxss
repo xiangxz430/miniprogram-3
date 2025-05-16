@@ -421,7 +421,7 @@
   transform: rotate(5deg);
 }
 
-/* 每日一言 */
+/* 每日一言卡片 */
 .daily-quote-card {
   background: linear-gradient(135deg, #f9f1dd 0%, #ffebc4 100%);
   border-radius: 24rpx;
@@ -486,6 +486,114 @@
   z-index: 1;
   font-style: italic;
   margin-right: 10rpx;
+}
+
+/* 用户隐私数据声明 */
+.privacy-statement {
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.06);
+  border: 1rpx solid rgba(243, 166, 64, 0.1);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 1.2s ease-out;
+  animation-delay: 0.3s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.privacy-statement::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 160rpx;
+  height: 160rpx;
+  background: radial-gradient(circle, rgba(255, 193, 7, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+  z-index: 0;
+}
+
+.privacy-header {
+  margin-bottom: 24rpx;
+  position: relative;
+}
+
+.privacy-title {
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #3d1f00;
+  margin-bottom: 16rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.privacy-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48rpx;
+  height: 48rpx;
+  font-size: 32rpx;
+  margin-right: 12rpx;
+  background: linear-gradient(to bottom, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.1));
+  border-radius: 50%;
+  padding: 4rpx;
+}
+
+.privacy-line {
+  height: 2rpx;
+  background: linear-gradient(to right, rgba(243, 166, 64, 0.2), rgba(243, 166, 64, 0.05));
+  margin-bottom: 20rpx;
+}
+
+.privacy-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.privacy-item {
+  display: flex;
+  align-items: flex-start;
+  font-size: 28rpx;
+  color: #57534e;
+  line-height: 1.5;
+}
+
+.privacy-bullet {
+  width: 8rpx;
+  height: 8rpx;
+  background: linear-gradient(to bottom, #ffc107, #ff9800);
+  border-radius: 50%;
+  margin-right: 12rpx;
+  margin-top: 16rpx;
+  flex-shrink: 0;
+}
+
+.privacy-tip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  color: #8c6d3f;
+  background-color: rgba(255, 193, 7, 0.08);
+  padding: 12rpx 20rpx;
+  border-radius: 12rpx;
+  margin-top: 16rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.privacy-tip-icon {
+  margin-right: 8rpx;
+  font-size: 24rpx;
 }
 
 /* 文章区域 */

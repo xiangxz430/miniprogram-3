@@ -17,7 +17,7 @@ Page({
     },
     articles: [],
     autoCloseTimer: null,
-    countDown: 5,
+    countDown: 10,
     pageHidden: false // 控制页面显示/隐藏
   },
 
@@ -67,7 +67,7 @@ Page({
     
     // 初始化倒计时
     this.setData({
-      countDown: 5,
+      countDown: 10,
       pageHidden: false
     })
     

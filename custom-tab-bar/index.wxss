@@ -1,33 +1,108 @@
 /* custom-tab-bar/index.wxss */
-.tab-bar {
+.tab-bar-container {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 56px;
-  background: white;
-  display: flex;
   padding-bottom: env(safe-area-inset-bottom);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 9999;
+}
+
+.tab-bar-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -3px 15px rgba(0, 0, 0, 0.05);
+  border-top-left-radius: 24rpx;
+  border-top-right-radius: 24rpx;
+}
+
+.tab-bar {
+  position: relative;
+  display: flex;
+  height: 110rpx;
+  background: transparent;
+  border-top-left-radius: 24rpx;
+  border-top-right-radius: 24rpx;
+  overflow: hidden;
 }
 
 .tab-bar-item {
   flex: 1;
-  text-align: center;
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.tab-bar-item.active {
+  transform: translateY(-5rpx);
+}
+
+.tab-bar-item-content {
+  display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2px;
 }
 
 .tab-bar-item-icon {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 4px;
+  width: 50rpx;
+  height: 50rpx;
+  transition: all 0.3s ease;
+}
+
+.tab-bar-item.active .tab-bar-item-icon {
+  transform: scale(1.15);
+}
+
+.tab-bar-item-circle {
+  position: absolute;
+  width: 70rpx;
+  height: 70rpx;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.1);
+  z-index: -1;
+  animation: pulse 2s infinite;
 }
 
 .tab-bar-item-text {
-  font-size: 10px;
+  font-size: 22rpx;
+  line-height: 1;
   font-weight: 500;
+  transition: all 0.3s ease;
+  margin-top: 6rpx;
+}
+
+.tab-bar-item.active .tab-bar-item-text {
+  font-weight: 600;
+  transform: scale(1.05);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
 } 
