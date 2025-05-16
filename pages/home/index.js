@@ -15,7 +15,10 @@ Page({
       content: '',
       author: ''
     },
-    articles: []
+    articles: [],
+    autoCloseTimer: null,
+    countDown: 5,
+    pageHidden: false // 控制页面显示/隐藏
   },
 
   onLoad: function() {
@@ -30,6 +33,9 @@ Page({
 
     // 添加页面加载动画效果
     this.addLoadingAnimation()
+    
+    // 设置5秒后自动跳转
+    this.setAutoClose()
   },
   
   onShow: function() {
@@ -41,6 +47,106 @@ Page({
           selected: 0
         })
       }
+    }
+  },
+  
+  onHide: function() {
+    // 页面隐藏时清除定时器
+    this.clearAutoCloseTimer()
+  },
+  
+  onUnload: function() {
+    // 页面卸载时清除定时器
+    this.clearAutoCloseTimer()
+  },
+  
+  // 设置自动关闭定时器
+  setAutoClose: function() {
+    // 清除可能存在的旧定时器
+    this.clearAutoCloseTimer()
+    
+    // 初始化倒计时
+    this.setData({
+      countDown: 5,
+      pageHidden: false
+    })
+    
+    // 创建倒计时定时器
+    const countDownInterval = setInterval(() => {
+      const currentCount = this.data.countDown - 1
+      
+      if (currentCount <= 0) {
+        // 倒计时结束，清除间隔定时器
+        clearInterval(countDownInterval)
+        
+        // 隐藏页面内容
+        this.setData({
+          pageHidden: true
+        })
+        
+        setTimeout(() => {
+          // 获取应用实例
+          const app = getApp()
+          // 检查是否有TabBar配置
+          if (app.globalData && app.globalData.tabConfig && app.globalData.tabConfig.length > 0) {
+            // 获取TabBar配置
+            const tabConfig = app.globalData.tabConfig
+            
+            // 寻找除了首页以外的第一个TabBar页面
+            const currentPagePath = 'pages/home/index'
+            let targetTab = null
+            
+            for (let tab of tabConfig) {
+              // 跳过当前页面(首页)
+              if (tab.pagePath !== currentPagePath) {
+                targetTab = tab
+                break
+              }
+            }
+            
+            // 如果找到了合适的目标页面
+            if (targetTab) {
+              console.log('关闭首页，跳转到:', targetTab.pagePath)
+              wx.switchTab({
+                url: '/' + targetTab.pagePath
+              })
+            } else {
+              // 如果没有其他TabBar页面，跳转到首页的下一级页面或者一个通用的页面
+              console.log('没有找到合适的TabBar页面，跳转到通用页面')
+              wx.navigateTo({
+                url: '/pages/mbti_personality/index'
+              })
+            }
+          } else {
+            // 如果没有TabBar配置，则跳转到默认页面
+            console.log('没有TabBar配置，跳转到默认页面')
+            // 考虑到你提到每日一挂可能不存在，这里使用MBTI测试页面作为默认备选
+            wx.navigateTo({
+              url: '/pages/mbti_personality/index'
+            })
+          }
+        }, 100)
+      } else {
+        // 更新倒计时
+        this.setData({
+          countDown: currentCount
+        })
+      }
+    }, 1000)
+    
+    // 保存定时器ID以便后续清除
+    this.setData({
+      autoCloseTimer: countDownInterval
+    })
+  },
+  
+  // 清除自动关闭定时器
+  clearAutoCloseTimer: function() {
+    if (this.data.autoCloseTimer) {
+      clearInterval(this.data.autoCloseTimer)
+      this.setData({
+        autoCloseTimer: null
+      })
     }
   },
   
@@ -164,6 +270,9 @@ Page({
   
   // 查看更多运势
   viewMoreFortune: function() {
+    // 取消自动跳转
+    this.clearAutoCloseTimer()
+    
     wx.navigateTo({
       url: '/pages/daily_hexagram/index'
     })
@@ -171,6 +280,9 @@ Page({
   
   // 跳转到MBTI测试页面
   goToMbtiTest: function() {
+    // 取消自动跳转
+    this.clearAutoCloseTimer()
+    
     wx.navigateTo({
       url: '/pages/mbti_personality/index'
     })
@@ -187,9 +299,15 @@ Page({
   
   // 下拉刷新
   onPullDownRefresh: function() {
+    // 取消自动跳转
+    this.clearAutoCloseTimer()
+    
     // 重新生成运势数据
     this.generateRandomFortune()
     this.getRandomQuote()
+    
+    // 重新设置自动跳转
+    this.setAutoClose()
     
     setTimeout(function() {
       wx.stopPullDownRefresh()
