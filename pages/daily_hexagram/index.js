@@ -48,7 +48,7 @@ Page({
       const tabBar = this.getTabBar();
       if (tabBar) {
         tabBar.setData({
-          selected: 0
+          selected: 1
         });
       }
     }

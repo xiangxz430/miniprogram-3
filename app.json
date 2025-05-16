@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/home/index",
     "pages/daily_hexagram/index",
     "pages/bazi_overview/index",
     "pages/user_profile/index",
@@ -9,7 +10,7 @@
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
+    "navigationBarBackgroundColor": "#f8f3e9",
     "navigationBarTitleText": "每日算运",
     "navigationBarTextStyle": "black"
   },
@@ -20,6 +21,12 @@
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "images/icons/home.png",
+        "selectedIconPath": "images/icons/home.png"
+      },
       {
         "pagePath": "pages/daily_hexagram/index",
         "text": "每日一挂",

@@ -63,6 +63,13 @@ Component({
               const defaultConfig = [
                 {
                   index: 0,
+                  pagePath: 'pages/home/index',
+                  text: '首页',
+                  iconPath: 'images/icons/home.png',
+                  selectedIconPath: 'images/icons/home.png'
+                },
+                {
+                  index: 1,
                   pagePath: 'pages/daily_hexagram/index',
                   text: '每日一挂',
                   iconPath: 'images/icons/hexagram.png',
@@ -88,6 +95,13 @@ Component({
             const defaultConfig = [
               {
                 index: 0,
+                pagePath: 'pages/home/index',
+                text: '首页',
+                iconPath: 'images/icons/home.png',
+                selectedIconPath: 'images/icons/home.png'
+              },
+              {
+                index: 1,
                 pagePath: 'pages/daily_hexagram/index',
                 text: '每日一挂',
                 iconPath: 'images/icons/hexagram.png',

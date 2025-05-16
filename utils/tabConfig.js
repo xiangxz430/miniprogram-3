@@ -23,6 +23,7 @@ const convertToTabBarConfig = (dbConfig) => {
   
   // 页面路径映射表（gnm字段值 -> 实际页面路径）
   const pathMap = {
+    'home': 'pages/home/index',
     'daily_hexagram': 'pages/daily_hexagram/index',
     'bazi_overview': 'pages/bazi_overview/index',
     'mbti_personality': 'pages/mbti_personality/index',
@@ -31,6 +32,7 @@ const convertToTabBarConfig = (dbConfig) => {
   
   // 图标映射表（gnm字段值 -> 图标名称）
   const iconMap = {
+    'home': 'home',
     'daily_hexagram': 'hexagram',
     'bazi_overview': 'bazi',
     'mbti_personality': 'mbti',
@@ -39,6 +41,7 @@ const convertToTabBarConfig = (dbConfig) => {
   
   // 文本映射表（gnm字段值 -> 显示文本）
   const textMap = {
+    'home': '首页',
     'daily_hexagram': '每日一挂',
     'bazi_overview': '八字总运',
     'mbti_personality': 'MBTI测试',
@@ -47,10 +50,11 @@ const convertToTabBarConfig = (dbConfig) => {
   
   // 索引映射表（gnm字段值 -> 索引）
   const indexMap = {
-    'daily_hexagram': 0,
-    'bazi_overview': 1,
-    'mbti_personality': 2,
-    'user_profile': 3
+    'home': 0,
+    'daily_hexagram': 1,
+    'bazi_overview': 2,
+    'mbti_personality': 3,
+    'user_profile': 4
   };
   
   // 转换配置

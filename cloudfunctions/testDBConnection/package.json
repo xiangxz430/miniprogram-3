@@ -1,9 +1,0 @@
-{
-  "name": "testDBConnection",
-  "version": "1.0.0",
-  "description": "测试数据库连接",
-  "main": "index.js",
-  "dependencies": {
-    "wx-server-sdk": "^3.0.1"
-  }
-}

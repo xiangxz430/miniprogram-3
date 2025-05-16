@@ -69,7 +69,8 @@ Page({
         { name: '西南方', type: 'bad' }
       ],
       directionTip: '东南方向适合设立工作台，有助于提升思考能力和创造力。'
-    }
+    },
+    tabNavClass: '' // 初始化标签导航类
   },
 
   onLoad() {
@@ -77,7 +78,8 @@ Page({
     console.log('从mbtiData加载问题...');
     this.setData({
       questions: mbtiData.questions,
-      activeTab: 0  // 确保默认选中"性格测试"标签页
+      activeTab: 0,  // 确保默认选中"性格测试"标签页
+      tabNavClass: '' // 初始化标签导航类
     })
     
     this.loadLatestResult()
@@ -129,7 +131,7 @@ Page({
       const tabBar = this.getTabBar()
       if (tabBar) {
         tabBar.setData({
-          selected: 2
+          selected: 3 // 更新为3，因为首页是0，每日一挂是1，八字总运是2
         })
       }
     }
@@ -172,6 +174,17 @@ Page({
       currentQuestion: 0,
       selectedOption: ''
     });
+    
+    // 更新标签指示器位置
+    if (index == 1) {
+      this.setData({
+        tabNavClass: 'tab-2-active'
+      });
+    } else {
+      this.setData({
+        tabNavClass: ''
+      });
+    }
   },
 
   // 切换到测试标签页
@@ -348,17 +361,29 @@ Page({
     const now = new Date();
     const timeStr = this.formatTime(now);
     
-    return {
+    // 最后格式化结果
+    const result = {
       type: type,
       name: typeInfo.name,
-      description: typeInfo.description,
       percentage: typeInfo.percentage,
-      timestamp: now.getTime(),
-      timeStr: timeStr,
-      scores: scores,
+      description: typeInfo.description,
       functions: typeInfo.functions || [],
-      alias: this.getTypeAlias(type)
-    }
+      alias: this.getTypeAlias(type),
+      scores: {
+        I: Math.round(scores.EI <= 0 ? Math.abs(scores.EI) / 35 * 100 : 0),
+        E: Math.round(scores.EI > 0 ? scores.EI / 35 * 100 : 0),
+        N: Math.round(scores.SN <= 0 ? Math.abs(scores.SN) / 35 * 100 : 0),
+        S: Math.round(scores.SN > 0 ? scores.SN / 35 * 100 : 0),
+        T: Math.round(scores.TF <= 0 ? Math.abs(scores.TF) / 35 * 100 : 0),
+        F: Math.round(scores.TF > 0 ? scores.TF / 35 * 100 : 0),
+        J: Math.round(scores.JP <= 0 ? Math.abs(scores.JP) / 35 * 100 : 0),
+        P: Math.round(scores.JP > 0 ? scores.JP / 35 * 100 : 0)
+      },
+      timestamp: Date.now(),
+      timeStr: this.formatTime(now)
+    };
+
+    return result;
   },
   
   // 格式化时间
@@ -397,17 +422,13 @@ Page({
     return aliases[type] || '';
   },
   
-  // 重新开始测试
+  // 重启测试
   restartTest() {
-    console.log('重新开始测试');
-    // 初始化答案数组
-    const answers = new Array(this.data.questions.length).fill(null)
-    
     this.setData({
-      testCompleted: false,
       currentQuestion: 0,
       selectedOption: '',
-      answers
+      answers: new Array(this.data.questions.length).fill(null),
+      testCompleted: false
     })
   },
   

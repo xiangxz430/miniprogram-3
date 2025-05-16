@@ -1,0 +1,41 @@
+<!-- 首页 -->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="header">
+    <view class="title">性格测算</view>
+    <view class="subtitle">根据数据进行分析，探索未知轨迹</view>
+  </view>
+
+  
+  <!-- 功能导航区 -->
+  <view class="feature-section">
+    <view class="section-title">精选功能</view>
+    <view class="feature-grid">
+      <navigator url="/pages/mbti_personality/index" class="feature-item">
+        <image class="feature-icon" src="/images/icons/mbti.png" />
+        <text class="feature-name">MBTI测试</text>
+        <text class="feature-desc">性格特质分析</text>
+      </navigator>
+      
+      <view class="feature-item coming-soon">
+        <image class="feature-icon" src="/images/icons/zodiac.png" />
+        <text class="feature-name">其他功能</text>
+        <text class="feature-desc">敬请期待</text>
+        <view class="coming-soon-tag">Soon</view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 每日一言 -->
+  <view class="daily-quote-card">
+    <view class="quote-icon">『</view>
+    <view class="quote-content">{{dailyQuote.content || '人生如棋，落子无悔。把握当下，静观未来。'}}</view>
+    <view class="quote-author">{{dailyQuote.author || '古谚语'}}</view>
+  </view>
+  
+  
+  <!-- 版权信息 -->
+  <view class="footer">
+    <text>© 2025 ai小神算 - 探索数字的秘密</text>
+  </view>
+</view> 

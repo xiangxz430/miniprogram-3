@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 用户头像 -->
+  <g stroke="#94a3b8" stroke-width="2" fill="none">
+    <!-- 头部 -->
+    <circle cx="24" cy="18" r="8"/>
+    <!-- 身体 -->
+    <path d="M12 40 C12 32 18 28 24 28 C30 28 36 32 36 40"/>
+  </g>
+</svg> 

@@ -7,9 +7,9 @@
   </view>
   
   <!-- 标签页导航 -->
-  <view class="tab-nav">
+  <view class="tab-nav {{tabNavClass}}">
     <view class="tab-item {{activeTab == 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0">性格测试</view>
-    <view class="tab-item {{activeTab == 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">人格模型</view>
+    <view class="tab-item {{activeTab == 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">玄学人格模型</view>
   </view>
   
   <!-- 测试内容标签页 -->
@@ -53,18 +53,20 @@
     <block wx:else>
       <view class="result-section">
         <view class="result-header">
-          <text class="result-time">测试完成时间: {{result.timeStr || '刚刚'}}</text>
+          <view class="result-title">你的MBTI类型</view>
+          <text class="result-time">{{result.timeStr || '刚刚'}}</text>
         </view>
         
         <view class="personality-card">
-          <view class="personality-type">{{result.type}}</view>
+          <view class="flex justify-between items-center">
+            <view class="personality-type">{{result.type}}</view>
+            <view class="personality-percentage">占比 {{result.percentage}}</view>
+          </view>
           <view class="personality-name">{{result.name}}</view>
-          <view class="personality-percentage">全球人口占比约 {{result.percentage}}</view>
-          <view class="personality-alias">别称：{{result.alias || '思想家'}}</view>
+          <view class="personality-alias">{{result.alias || '思想家'}}</view>
         </view>
         
         <view class="personality-description-box">
-          <view class="section-title">性格特点概述</view>
           <view class="personality-description">{{result.description}}</view>
         </view>
         
@@ -72,11 +74,9 @@
         <view class="preference-container">
           <view class="preference-item">
             <view class="preference-header">
-              <view class="preference-letter letter-active">I</view>
-              <view class="preference-name">内向</view>
+              <view class="preference-name">内向 (I)</view>
               <view class="preference-vs">vs</view>
-              <view class="preference-name">外向</view>
-              <view class="preference-letter">E</view>
+              <view class="preference-name">外向 (E)</view>
             </view>
             <view class="preference-bar">
               <view class="preference-value" style="width: {{result.scores.I}}%;"></view>
@@ -86,11 +86,9 @@
           
           <view class="preference-item">
             <view class="preference-header">
-              <view class="preference-letter letter-active">N</view>
-              <view class="preference-name">直觉</view>
+              <view class="preference-name">直觉 (N)</view>
               <view class="preference-vs">vs</view>
-              <view class="preference-name">实感</view>
-              <view class="preference-letter">S</view>
+              <view class="preference-name">实感 (S)</view>
             </view>
             <view class="preference-bar">
               <view class="preference-value" style="width: {{result.scores.N}}%;"></view>
@@ -100,11 +98,9 @@
           
           <view class="preference-item">
             <view class="preference-header">
-              <view class="preference-letter letter-active">F</view>
-              <view class="preference-name">情感</view>
+              <view class="preference-name">情感 (F)</view>
               <view class="preference-vs">vs</view>
-              <view class="preference-name">思考</view>
-              <view class="preference-letter">T</view>
+              <view class="preference-name">思考 (T)</view>
             </view>
             <view class="preference-bar">
               <view class="preference-value" style="width: {{result.scores.F}}%;"></view>
@@ -114,11 +110,9 @@
           
           <view class="preference-item">
             <view class="preference-header">
-              <view class="preference-letter letter-active">P</view>
-              <view class="preference-name">灵活</view>
+              <view class="preference-name">判断 (J)</view>
               <view class="preference-vs">vs</view>
-              <view class="preference-name">判断</view>
-              <view class="preference-letter">J</view>
+              <view class="preference-name">认知 (P)</view>
             </view>
             <view class="preference-bar">
               <view class="preference-value" style="width: {{result.scores.P}}%;"></view>
@@ -131,8 +125,7 @@
         <view class="cognitive-functions">
           <view class="function-item primary">
             <view class="function-header">
-              <view class="function-icon icon-{{result.functions[0].code}}">{{result.functions[0].code}}</view>
-              <text class="function-name">{{result.functions[0].name}}</text>
+              <text class="function-name">{{result.functions[0].code}} - {{result.functions[0].name}}</text>
               <text class="function-role">主导功能</text>
             </view>
             <text class="function-description">{{result.functions[0].description}}</text>
@@ -140,8 +133,7 @@
           
           <view class="function-item secondary">
             <view class="function-header">
-              <view class="function-icon icon-{{result.functions[1].code}}">{{result.functions[1].code}}</view>
-              <text class="function-name">{{result.functions[1].name}}</text>
+              <text class="function-name">{{result.functions[1].code}} - {{result.functions[1].name}}</text>
               <text class="function-role">辅助功能</text>
             </view>
             <text class="function-description">{{result.functions[1].description}}</text>
@@ -149,8 +141,7 @@
           
           <view class="function-item tertiary">
             <view class="function-header">
-              <view class="function-icon icon-{{result.functions[2].code}}">{{result.functions[2].code}}</view>
-              <text class="function-name">{{result.functions[2].name}}</text>
+              <text class="function-name">{{result.functions[2].code}} - {{result.functions[2].name}}</text>
               <text class="function-role">第三功能</text>
             </view>
             <text class="function-description">{{result.functions[2].description}}</text>
@@ -158,8 +149,7 @@
           
           <view class="function-item inferior">
             <view class="function-header">
-              <view class="function-icon icon-{{result.functions[3].code}}">{{result.functions[3].code}}</view>
-              <text class="function-name">{{result.functions[3].name}}</text>
+              <text class="function-name">{{result.functions[3].code}} - {{result.functions[3].name}}</text>
               <text class="function-role">劣势功能</text>
             </view>
             <text class="function-description">{{result.functions[3].description}}</text>
@@ -178,7 +168,7 @@
       
       <view class="model-card">
         <view class="model-header">
-          <view class="model-icon"></view>
+          <view class="model-icon">☯</view>
           <view class="model-title">
             <text class="model-name">四柱与MBTI转化</text>
             <text class="model-subtitle">将八字十神对应MBTI功能轴</text>
@@ -244,7 +234,7 @@
       
       <view class="industry-match">
         <view class="industry-header">
-          <view class="icon icon-blue icon-briefcase">💼</view>
+          <view class="icon icon-blue">💼</view>
           <view class="industry-title">行业匹配</view>
         </view>
         
@@ -266,13 +256,12 @@
         
         <view class="direction-grid">
           <view class="direction-item {{item.type}}" wx:for="{{modelData.directions}}" wx:key="index">
-            <view class="direction-icon {{item.type}}"></view>
             <text class="direction-item-name">{{item.name}} ({{item.type === 'good' ? '吉' : '忌'}})</text>
           </view>
         </view>
         
         <view class="direction-tip">
-          <view class="tip-icon"></view>
+          <view class="tip-icon">ℹ️</view>
           <text class="tip-text">{{modelData.directionTip}}</text>
         </view>
       </view>

@@ -34,6 +34,14 @@ exports.main = async (event, context) => {
     const predefinedTabBarItems = [
       {
         index: 0,
+        id: 'home',
+        pagePath: 'pages/home/index',
+        text: '首页',
+        iconPath: 'images/icons/home.png',
+        selectedIconPath: 'images/icons/home.png'
+      },
+      {
+        index: 1,
         id: 'daily_hexagram',
         pagePath: 'pages/daily_hexagram/index',
         text: '每日一挂',
@@ -41,7 +49,7 @@ exports.main = async (event, context) => {
         selectedIconPath: 'images/icons/hexagram.png'
       },
       {
-        index: 1,
+        index: 2,
         id: 'bazi_overview',
         pagePath: 'pages/bazi_overview/index',
         text: '八字总运',
@@ -49,7 +57,7 @@ exports.main = async (event, context) => {
         selectedIconPath: 'images/icons/bazi.png'
       },
       {
-        index: 2,
+        index: 3,
         id: 'mbti_personality',
         pagePath: 'pages/mbti_personality/index',
         text: 'MBTI测试',
@@ -57,7 +65,7 @@ exports.main = async (event, context) => {
         selectedIconPath: 'images/icons/mbti.png'
       },
       {
-        index: 3,
+        index: 4,
         id: 'user_profile',
         pagePath: 'pages/user_profile/index',
         text: '我的',

@@ -138,7 +138,7 @@ Page({
       const tabBar = this.getTabBar();
       if (tabBar) {
         tabBar.setData({
-          selected: 2
+          selected: 4 // 更新为4，因为首页是0，每日一挂是1，八字总运是2，MBTI测试是3
         });
       }
     }
