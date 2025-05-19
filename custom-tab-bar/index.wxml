@@ -1,7 +1,7 @@
 <!-- custom-tab-bar/index.wxml -->
 <view class="tab-bar-container">
   <view class="tab-bar-bg"></view>
-  <view class="tab-bar" wx:if="{{loaded}}">
+  <view class="tab-bar" wx:if="{{loaded && tabConfig && tabConfig.length > 0}}">
     <view wx:for="{{tabConfig}}" wx:key="index" 
           class="tab-bar-item {{selected === index ? 'active' : ''}}" 
           data-index="{{index}}" 

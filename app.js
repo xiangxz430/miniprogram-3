@@ -29,6 +29,9 @@ App({
   loadTabConfig: function() {
     console.log('开始加载tab栏配置...');
     
+    // 默认清空TabBar配置
+    this.globalData.tabConfig = [];
+    
     // 使用Promise处理异步流程
     const loadConfigFromCloud = () => {
       return new Promise((resolve) => {
@@ -53,7 +56,7 @@ App({
               });
             }
             
-            if (res.result && res.result.code === 0 && res.result.data) {
+            if (res.result && res.result.code === 0 && res.result.data && res.result.data.length > 0) {
               const tabConfig = res.result.data;
               
               // 检查每个配置项是否具有必要的属性
@@ -82,10 +85,14 @@ App({
                   icon: 'none',
                   duration: 3000
                 });
-                resolve(null);
+                // 如果数据不合法，清空TabBar配置
+                this.globalData.tabConfig = [];
+                wx.setStorageSync('tabConfig', []);
+                this.updateCustomTabBar();
+                resolve([]);
               }
             } else {
-              console.error('云函数返回结果格式不正确:', res.result);
+              console.error('云函数返回结果格式不正确或数据为空:', res.result);
               // 显示具体的错误信息
               if (res.result && res.result.message) {
                 wx.showToast({
@@ -95,12 +102,16 @@ App({
                 });
               } else {
                 wx.showToast({
-                  title: '云函数返回数据格式有误',
+                  title: '云函数返回数据格式有误或为空',
                   icon: 'none',
                   duration: 3000
                 });
               }
-              resolve(null);
+              // 清空TabBar配置
+              this.globalData.tabConfig = [];
+              wx.setStorageSync('tabConfig', []);
+              this.updateCustomTabBar();
+              resolve([]);
             }
           },
           fail: err => {
@@ -110,7 +121,11 @@ App({
               icon: 'none',
               duration: 3000
             });
-            resolve(null);
+            // 失败时也清空TabBar配置
+            this.globalData.tabConfig = [];
+            wx.setStorageSync('tabConfig', []);
+            this.updateCustomTabBar();
+            resolve([]);
           }
         });
       });
@@ -118,15 +133,12 @@ App({
     
     // 直接从云端加载配置
     loadConfigFromCloud().then(tabConfig => {
-      if (!tabConfig) {
-        console.error('未能获取云数据库TabBar配置');
-        
-        // 显示错误提示，但不使用默认值以确保用户知道需要配置数据库
-        wx.showModal({
-          title: '配置加载失败',
-          content: '未能从云数据库加载TabBar配置。请检查云数据库中是否存在有效的配置记录，或联系管理员。',
-          showCancel: false
-        });
+      if (!tabConfig || tabConfig.length === 0) {
+        console.log('未能获取云数据库TabBar配置或配置为空数组');
+        // 不显示任何TabBar
+        this.globalData.tabConfig = [];
+        wx.setStorageSync('tabConfig', []);
+        this.updateCustomTabBar();
       }
     });
   },
@@ -144,7 +156,7 @@ App({
         if (tabBar) {
           tabBar.setData({
             tabConfig: this.globalData.tabConfig,
-            loaded: true
+            loaded: this.globalData.tabConfig && this.globalData.tabConfig.length > 0
           });
           tabBar.updateCurrentTab();
         }

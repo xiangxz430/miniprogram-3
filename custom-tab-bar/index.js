@@ -25,103 +25,75 @@ Component({
     // 加载TabBar配置
     loadTabConfig: function() {
       const app = getApp();
-      // 首次加载时使用全局配置或调用云函数获取
-      if (app.globalData.tabConfig && app.globalData.tabConfig.length > 0) {
-        console.log('自定义TabBar从全局加载配置:', JSON.stringify(app.globalData.tabConfig));
-        
-        // 检查是否包含MBTI功能
-        const hasMBTI = app.globalData.tabConfig.some(item => 
-          item.pagePath && item.pagePath.includes('mbti_personality')
-        );
-        console.log('自定义TabBar配置中是否包含MBTI测试功能:', hasMBTI);
-        
-        // 记录全部TabBar项
-        app.globalData.tabConfig.forEach((item, index) => {
-          console.log(`自定义TabBar项 ${index+1}: 路径=${item.pagePath}, 文本=${item.text}, 索引=${item.index}`);
-        });
-        
+      console.log('自定义TabBar从云函数加载配置');
+      
+      // 首先尝试获取本地缓存的配置
+      const cachedConfig = wx.getStorageSync('tabConfig');
+      if (cachedConfig && cachedConfig.length > 0) {
+        console.log('自定义TabBar从本地缓存加载配置:', JSON.stringify(cachedConfig));
+        // 使用缓存配置
+        app.globalData.tabConfig = cachedConfig;
         this.setData({
-          tabConfig: app.globalData.tabConfig,
-          loaded: true
+          tabConfig: cachedConfig,
+          loaded: cachedConfig.length > 0 // 仅当有效配置不为空数组时才显示TabBar
         });
       } else {
-        console.log('自定义TabBar从云函数加载配置');
-        wx.cloud.callFunction({
-          name: 'getTabConfig',
-          data: { timestamp: new Date().getTime() },
-          success: res => {
-            console.log('自定义TabBar获取配置结果:', JSON.stringify(res.result));
-            if (res.result && res.result.code === 0 && res.result.data) {
-              app.globalData.tabConfig = res.result.data;
-              this.setData({
-                tabConfig: res.result.data,
-                loaded: true
-              });
-            } else {
-              console.error('获取TabBar配置失败:', res.result);
-              // 设置默认配置
-              const defaultConfig = [
-                {
-                  index: 0,
-                  pagePath: 'pages/home/index',
-                  text: '首页',
-                  iconPath: 'images/icons/home.png',
-                  selectedIconPath: 'images/icons/home.png'
-                },
-                {
-                  index: 1,
-                  pagePath: 'pages/daily_hexagram/index',
-                  text: '每日一挂',
-                  iconPath: 'images/icons/hexagram.png',
-                  selectedIconPath: 'images/icons/hexagram.png'
-                },
-                {
-                  index: 2,
-                  pagePath: 'pages/user_profile/index',
-                  text: '我的',
-                  iconPath: 'images/icons/user.png',
-                  selectedIconPath: 'images/icons/user.png'
-                }
-              ];
-              this.setData({
-                tabConfig: defaultConfig,
-                loaded: true
-              });
-            }
-          },
-          fail: err => {
-            console.error('调用云函数失败:', err);
-            // 设置默认配置
-            const defaultConfig = [
-              {
-                index: 0,
-                pagePath: 'pages/home/index',
-                text: '首页',
-                iconPath: 'images/icons/home.png',
-                selectedIconPath: 'images/icons/home.png'
-              },
-              {
-                index: 1,
-                pagePath: 'pages/daily_hexagram/index',
-                text: '每日一挂',
-                iconPath: 'images/icons/hexagram.png',
-                selectedIconPath: 'images/icons/hexagram.png'
-              },
-              {
-                index: 2,
-                pagePath: 'pages/user_profile/index',
-                text: '我的',
-                iconPath: 'images/icons/user.png',
-                selectedIconPath: 'images/icons/user.png'
-              }
-            ];
-            this.setData({
-              tabConfig: defaultConfig,
-              loaded: true
-            });
-          }
+        // 如果没有缓存，确保不显示TabBar
+        this.setData({
+          tabConfig: [],
+          loaded: false
         });
       }
+      
+      // 无论是否有缓存，都调用云函数获取最新配置
+      wx.cloud.callFunction({
+        name: 'getTabConfig',
+        data: { timestamp: new Date().getTime() },
+        success: res => {
+          console.log('自定义TabBar获取配置结果:', JSON.stringify(res.result));
+          if (res.result && res.result.code === 0 && res.result.data && res.result.data.length > 0) {
+            app.globalData.tabConfig = res.result.data;
+            // 保存到本地缓存
+            wx.setStorageSync('tabConfig', res.result.data);
+            
+            this.setData({
+              tabConfig: res.result.data,
+              loaded: true // 设置为已加载
+            });
+            
+            // 更新当前选中的Tab
+            setTimeout(() => {
+              this.updateCurrentTab();
+            }, 100);
+          } else {
+            console.error('获取TabBar配置失败或配置为空:', res.result);
+            // 清空配置和缓存
+            app.globalData.tabConfig = [];
+            wx.setStorageSync('tabConfig', []);
+            this.setData({
+              tabConfig: [],
+              loaded: false // 设置为未加载，不显示TabBar
+            });
+          }
+        },
+        fail: err => {
+          console.error('调用云函数失败:', err);
+          // 调用失败时，清空配置和缓存
+          app.globalData.tabConfig = [];
+          wx.setStorageSync('tabConfig', []);
+          this.setData({
+            tabConfig: [],
+            loaded: false // 设置为未加载，不显示TabBar
+          });
+          
+          // 显示错误提示
+          wx.showToast({
+            title: '加载TabBar失败',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      });
     },
     // 更新当前选中的TabBar项
     updateCurrentTab: function() {
