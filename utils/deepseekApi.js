@@ -113,16 +113,15 @@ function buildMbtiPrompt(mbtiInfo, userInfo) {
   
   let promptText = `我的MBTI类型是${mbtiInfo.type}（${mbtiInfo.name}）。
 今天是${dateStr}，请你基于我的MBTI类型和个人信息，为我提供详细且高度个性化的建议。
-
+在每个内容中，请明确指出我的个人特征如何影响这些建议，回答格式例如："因为你是${userInfo.birthdate ? '出生于' + userInfo.birthdate + '的' : ''} ${userInfo.gender || ''}性，${userInfo.age ? userInfo.age + '岁' : ''}，${userInfo.zodiac || ''}星座，${userInfo.chineseZodiac ? userInfo.chineseZodiac + '年出生' : ''}，MBTI类型为${mbtiInfo.type}，所以......"
 请包含以下内容：
-1. 个性化发展建议：如何更好地发挥我的优势，克服潜在的盲点（150-200字）
+1. 个性化发展建议：如何更好地发挥我的优势，克服潜在的盲点（400-500字）
 2. 职业发展指导：适合我的职业方向和具体建议（100-150字）
 3. 人际关系与沟通：如何改善我的人际关系和沟通方式（100-150字）
 4. 压力管理策略：针对我的类型特点的减压方法（80-100字）
 5. 个人成长方向：我应该重点培养的3个能力或特质
 6. 应避免的3个常见误区或陷阱
 
-在回答中，请明确指出我的个人特征如何影响这些建议，例如："因为你是${userInfo.birthdate ? '出生于' + userInfo.birthdate + '的' : ''} ${userInfo.gender || ''}性，${userInfo.age ? userInfo.age + '岁' : ''}，${userInfo.zodiac || ''}星座，${userInfo.chineseZodiac ? userInfo.chineseZodiac + '年出生' : ''}，MBTI类型为${mbtiInfo.type}，所以......"
 
 请以JSON格式回复，包含以下字段：overallAdvice, careerAdvice, relationshipAdvice, stressManagement, growthAreas(数组), pitfalls(数组)
 `;

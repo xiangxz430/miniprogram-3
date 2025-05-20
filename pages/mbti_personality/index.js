@@ -197,15 +197,30 @@ Page({
     }
     
     // 如果切换到AI建议标签页，并且已有测试结果但未加载AI建议
-    if (index == 2 && this.data.testCompleted && !this.data.aiAdviceLoaded && !this.data.aiAdviceError) {
-      this.loadAiAdvice();
+    if (index == 2 && this.data.testCompleted) {
+      // 检查是否需要加载AI建议
+      const mbtiType = this.data.result.type;
+      const cachedAdvice = wx.getStorageSync('mbti_ai_advice_' + mbtiType);
+      
+      if (!cachedAdvice || !this.data.aiAdviceLoaded) {
+        this.loadAiAdvice();
+      }
     }
     
     this.setData({
-      activeTab: parseInt(index),
-      currentQuestion: 0,
-      selectedOption: ''
+      activeTab: parseInt(index)
     });
+    
+    // 如果切换到性格测试标签页，并且未完成测试，则恢复答题进度
+    if (index == 0 && !this.data.testCompleted) {
+      this.restoreTestProgress();
+    } else {
+      // 如果切换到其他标签页，重置问题状态
+      this.setData({
+        currentQuestion: 0,
+        selectedOption: ''
+      });
+    }
   },
 
   // 切换到测试标签页
@@ -239,6 +254,11 @@ Page({
 
   // 开始重新测试
   startRetest() {
+    // 获取当前MBTI类型并清除其AI建议缓存
+    if (this.data.result && this.data.result.type) {
+      wx.removeStorageSync('mbti_ai_advice_' + this.data.result.type);
+    }
+    
     // 清除之前的答题进度
     wx.removeStorageSync('mbti_progress');
     
@@ -248,7 +268,9 @@ Page({
       currentQuestion: 0,
       selectedOption: '',
       answers: new Array(this.data.questions.length).fill(null),
-      hasTestResult: false
+      hasTestResult: false,
+      aiAdviceLoaded: false,
+      aiAdviceError: false
     });
     
     console.log('开始重新测试，已清除之前的答题进度');
@@ -472,6 +494,20 @@ Page({
     
     console.log('MBTI测试结果:', result);
     
+    // 清除之前的AI建议缓存
+    const previousType = wx.getStorageSync('mbti_result')?.type;
+    if (previousType) {
+      wx.removeStorageSync('mbti_ai_advice_' + previousType);
+    }
+    // 清除新类型的AI建议缓存（如果存在）
+    wx.removeStorageSync('mbti_ai_advice_' + type);
+    // 重置AI建议相关状态
+    this.setData({
+      aiAdviceLoaded: false,
+      aiAdviceError: false,
+      aiAdviceErrorMsg: ''
+    });
+    
     // 保存测试结果
     try {
       wx.setStorageSync('mbti_result', result);
@@ -573,6 +609,11 @@ Page({
   
   // 重新测试
   restartTest() {
+    // 获取当前MBTI类型并清除其AI建议缓存
+    if (this.data.result && this.data.result.type) {
+      wx.removeStorageSync('mbti_ai_advice_' + this.data.result.type);
+    }
+    
     // 重置测试状态
     const answers = new Array(this.data.questions.length).fill(null);
     
@@ -581,7 +622,9 @@ Page({
       currentQuestion: 0,
       selectedOption: '',
       answers: answers,
-      result: null
+      result: null,
+      aiAdviceLoaded: false,
+      aiAdviceError: false
     });
     
     // 清除保存的答题进度
@@ -1483,6 +1526,42 @@ Page({
       }
     } catch (e) {
       console.error('加载答题进度失败:', e);
+    }
+  },
+
+  // 恢复测试进度（新增函数）
+  restoreTestProgress() {
+    try {
+      const progressData = wx.getStorageSync('mbti_progress');
+      
+      if (progressData && progressData.answers) {
+        console.log('找到保存的答题进度，恢复中...');
+        
+        // 检查进度数据是否过期（超过7天）
+        const now = new Date().getTime();
+        const progressAge = now - (progressData.lastUpdateTime || 0);
+        const maxAge = 7 * 24 * 60 * 60 * 1000; // 7天
+        
+        if (progressAge > maxAge) {
+          console.log('答题进度已过期，不进行恢复');
+          return;
+        }
+        
+        // 恢复答题进度
+        this.setData({
+          currentQuestion: progressData.currentQuestion,
+          answers: progressData.answers,
+          selectedOption: progressData.answers[progressData.currentQuestion] || '',
+          isTestActive: true,
+          currentStep: 'testing'
+        });
+        
+        console.log('答题进度已恢复，当前题目:', progressData.currentQuestion);
+      } else {
+        console.log('没有找到保存的答题进度');
+      }
+    } catch (e) {
+      console.error('恢复答题进度失败:', e);
     }
   }
 }) 
