@@ -108,8 +108,13 @@ function getMbtiAiAdvice(mbtiInfo, userInfo = {}) {
  * @returns {String} - 构建好的提示词
  */
 function buildMbtiPrompt(mbtiInfo, userInfo) {
+  const date = new Date();
+  const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+  
   let promptText = `我的MBTI类型是${mbtiInfo.type}（${mbtiInfo.name}）。
-请你基于这个MBTI类型和我的个人信息，为我提供以下内容：
+今天是${dateStr}，请你基于我的MBTI类型和个人信息，为我提供详细且高度个性化的建议。
+
+请包含以下内容：
 1. 个性化发展建议：如何更好地发挥我的优势，克服潜在的盲点（150-200字）
 2. 职业发展指导：适合我的职业方向和具体建议（100-150字）
 3. 人际关系与沟通：如何改善我的人际关系和沟通方式（100-150字）
@@ -117,19 +122,33 @@ function buildMbtiPrompt(mbtiInfo, userInfo) {
 5. 个人成长方向：我应该重点培养的3个能力或特质
 6. 应避免的3个常见误区或陷阱
 
+在回答中，请明确指出我的个人特征如何影响这些建议，例如："因为你是${userInfo.birthdate ? '出生于' + userInfo.birthdate + '的' : ''} ${userInfo.gender || ''}性，${userInfo.age ? userInfo.age + '岁' : ''}，${userInfo.zodiac || ''}星座，${userInfo.chineseZodiac ? userInfo.chineseZodiac + '年出生' : ''}，MBTI类型为${mbtiInfo.type}，所以......"
+
 请以JSON格式回复，包含以下字段：overallAdvice, careerAdvice, relationshipAdvice, stressManagement, growthAreas(数组), pitfalls(数组)
 `;
 
   // 如果有用户信息，加入个性化元素
   if (userInfo) {
-    let userInfoText = "\n我的个人情况：\n";
+    let userInfoText = "\n我的个人详细情况：\n";
     
     if (userInfo.gender) {
       userInfoText += `性别：${userInfo.gender}\n`;
     }
     
+    if (userInfo.birthdate) {
+      userInfoText += `出生日期：${userInfo.birthdate}\n`;
+    }
+    
     if (userInfo.age) {
-      userInfoText += `年龄：${userInfo.age}\n`;
+      userInfoText += `年龄：${userInfo.age}岁\n`;
+    }
+    
+    if (userInfo.zodiac) {
+      userInfoText += `星座：${userInfo.zodiac}\n`;
+    }
+    
+    if (userInfo.chineseZodiac) {
+      userInfoText += `生肖：${userInfo.chineseZodiac}\n`;
     }
     
     if (userInfo.occupation) {
@@ -140,13 +159,18 @@ function buildMbtiPrompt(mbtiInfo, userInfo) {
       userInfoText += `教育背景：${userInfo.education}\n`;
     }
     
-    if (userInfo.interests) {
-      userInfoText += `兴趣爱好：${userInfo.interests.join('、')}\n`;
+    if (userInfo.interests && userInfo.interests.length > 0) {
+      userInfoText += `兴趣爱好：${Array.isArray(userInfo.interests) ? userInfo.interests.join('、') : userInfo.interests}\n`;
     }
     
     if (userInfo.challenges) {
       userInfoText += `目前面临的挑战：${userInfo.challenges}\n`;
     }
+    
+    // 添加当前季节和节气信息
+    const seasons = ['冬', '春', '春', '春', '夏', '夏', '夏', '秋', '秋', '秋', '冬', '冬'];
+    const currentSeason = seasons[date.getMonth()];
+    userInfoText += `当前季节：${currentSeason}季\n`;
     
     promptText += userInfoText;
   }

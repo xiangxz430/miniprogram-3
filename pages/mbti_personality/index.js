@@ -1209,6 +1209,20 @@ Page({
       return;
     }
     
+    // 检查是否有缓存的AI建议
+    const mbtiType = this.data.result.type;
+    const cachedAdvice = wx.getStorageSync('mbti_ai_advice_' + mbtiType);
+    
+    if (cachedAdvice) {
+      console.log('找到缓存的AI建议，直接使用');
+      this.setData({
+        aiAdvice: cachedAdvice,
+        aiAdviceLoaded: true,
+        aiAdviceError: false
+      });
+      return;
+    }
+    
     // 设置加载状态
     this.setData({
       aiAdviceLoaded: false,
@@ -1218,7 +1232,7 @@ Page({
     
     // 准备MBTI信息
     const mbtiInfo = {
-      type: this.data.result.type,
+      type: mbtiType,
       name: this.data.result.name,
       description: this.data.result.description
     };
@@ -1228,19 +1242,18 @@ Page({
       gender: app.globalData.userSettings ? app.globalData.userSettings.gender : '',
       birthdate: app.globalData.userSettings ? app.globalData.userSettings.birthdate : '',
       occupation: app.globalData.userSettings ? app.globalData.userSettings.occupation : '',
-      interests: app.globalData.userSettings ? app.globalData.userSettings.interests : []
+      interests: app.globalData.userSettings ? app.globalData.userSettings.interests : [],
+      // 添加更多用户信息
+      age: app.globalData.userSettings && app.globalData.userSettings.birthdate ? this.calculateAge(app.globalData.userSettings.birthdate) : '',
+      zodiac: app.globalData.userSettings && app.globalData.userSettings.birthdate ? this.getZodiacSign(app.globalData.userSettings.birthdate) : '',
+      chineseZodiac: app.globalData.userSettings && app.globalData.userSettings.birthdate ? this.getChineseZodiac(app.globalData.userSettings.birthdate) : ''
     };
     
     console.log('正在请求AI建议...');
     console.log('MBTI信息:', mbtiInfo);
     console.log('用户信息:', userInfo);
     
-    // 调用API获取AI建议
-    wx.showLoading({
-      title: '生成AI建议中...',
-      mask: true
-    });
-    
+    // 调用API获取AI建议 - 不使用wx.showLoading，因为页面已有加载动画
     deepseekApi.getMbtiAiAdvice(mbtiInfo, userInfo)
       .then(result => {
         console.log('获取AI建议成功:', result);
@@ -1271,9 +1284,6 @@ Page({
           aiAdviceErrorMsg: '网络错误，请稍后再试',
           aiAdviceLoaded: false
         });
-      })
-      .finally(() => {
-        wx.hideLoading();
       });
   },
   
@@ -1286,5 +1296,94 @@ Page({
     
     // 重新加载AI建议
     this.loadAiAdvice();
+  },
+  
+  // 计算年龄
+  calculateAge(birthdate) {
+    if (!birthdate) return '';
+    
+    // 解析生日格式 (假设格式为 YYYY-MM-DD)
+    const parts = birthdate.split('-');
+    if (parts.length !== 3) return '';
+    
+    const birthYear = parseInt(parts[0]);
+    const birthMonth = parseInt(parts[1]);
+    const birthDay = parseInt(parts[2]);
+    
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+    const currentDay = today.getDate();
+    
+    let age = currentYear - birthYear;
+    
+    // 如果今年的生日还没到，年龄减1
+    if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
+      age--;
+    }
+    
+    return age;
+  },
+  
+  // 获取星座
+  getZodiacSign(birthdate) {
+    if (!birthdate) return '';
+    
+    // 解析生日格式
+    const parts = birthdate.split('-');
+    if (parts.length !== 3) return '';
+    
+    const month = parseInt(parts[1]);
+    const day = parseInt(parts[2]);
+    
+    // 星座日期范围
+    const signs = [
+      {name: '水瓶座', start: [1, 20], end: [2, 18]},
+      {name: '双鱼座', start: [2, 19], end: [3, 20]},
+      {name: '白羊座', start: [3, 21], end: [4, 19]},
+      {name: '金牛座', start: [4, 20], end: [5, 20]},
+      {name: '双子座', start: [5, 21], end: [6, 21]},
+      {name: '巨蟹座', start: [6, 22], end: [7, 22]},
+      {name: '狮子座', start: [7, 23], end: [8, 22]},
+      {name: '处女座', start: [8, 23], end: [9, 22]},
+      {name: '天秤座', start: [9, 23], end: [10, 23]},
+      {name: '天蝎座', start: [10, 24], end: [11, 22]},
+      {name: '射手座', start: [11, 23], end: [12, 21]},
+      {name: '摩羯座', start: [12, 22], end: [1, 19]}
+    ];
+    
+    for (let i = 0; i < signs.length; i++) {
+      const sign = signs[i];
+      
+      // 处理跨年的情况（摩羯座）
+      if (sign.name === '摩羯座') {
+        if ((month === 12 && day >= sign.start[1]) || (month === 1 && day <= sign.end[1])) {
+          return sign.name;
+        }
+      } 
+      // 处理其他星座
+      else if ((month === sign.start[0] && day >= sign.start[1]) || 
+               (month === sign.end[0] && day <= sign.end[1])) {
+        return sign.name;
+      }
+    }
+    
+    return '';
+  },
+  
+  // 获取生肖
+  getChineseZodiac(birthdate) {
+    if (!birthdate) return '';
+    
+    const parts = birthdate.split('-');
+    if (parts.length !== 3) return '';
+    
+    const year = parseInt(parts[0]);
+    
+    const animals = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+    
+    // 计算生肖，1900年是鼠年
+    const index = (year - 1900) % 12;
+    return animals[(index + 12) % 12];
   }
 }) 
