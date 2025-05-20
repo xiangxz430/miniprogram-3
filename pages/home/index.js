@@ -34,7 +34,7 @@ Page({
     // 添加页面加载动画效果
     this.addLoadingAnimation()
     
-    // 设置5秒后自动跳转
+    // 设置10秒后自动跳转
     this.setAutoClose()
   },
   
@@ -79,53 +79,8 @@ Page({
         // 倒计时结束，清除间隔定时器
         clearInterval(countDownInterval)
         
-        // 隐藏页面内容
-        this.setData({
-          pageHidden: true
-        })
-        
-        setTimeout(() => {
-          // 获取应用实例
-          const app = getApp()
-          // 检查是否有TabBar配置
-          if (app.globalData && app.globalData.tabConfig && app.globalData.tabConfig.length > 0) {
-            // 获取TabBar配置
-            const tabConfig = app.globalData.tabConfig
-            
-            // 寻找除了首页以外的第一个TabBar页面
-            const currentPagePath = 'pages/home/index'
-            let targetTab = null
-            
-            for (let tab of tabConfig) {
-              // 跳过当前页面(首页)
-              if (tab.pagePath !== currentPagePath) {
-                targetTab = tab
-                break
-              }
-            }
-            
-            // 如果找到了合适的目标页面
-            if (targetTab) {
-              console.log('关闭首页，跳转到:', targetTab.pagePath)
-              wx.switchTab({
-                url: '/' + targetTab.pagePath
-              })
-            } else {
-              // 如果没有其他TabBar页面，跳转到首页的下一级页面或者一个通用的页面
-              console.log('没有找到合适的TabBar页面，跳转到通用页面')
-              wx.navigateTo({
-                url: '/pages/mbti_personality/index'
-              })
-            }
-          } else {
-            // 如果没有TabBar配置，则跳转到默认页面
-            console.log('没有TabBar配置，跳转到默认页面')
-            // 考虑到你提到每日一挂可能不存在，这里使用MBTI测试页面作为默认备选
-            wx.navigateTo({
-              url: '/pages/mbti_personality/index'
-            })
-          }
-        }, 100)
+        // 执行页面跳转
+        this.navigateToNextPage()
       } else {
         // 更新倒计时
         this.setData({
@@ -138,6 +93,66 @@ Page({
     this.setData({
       autoCloseTimer: countDownInterval
     })
+  },
+  
+  // 关闭首页并跳转到下一个页面
+  closeHomePage: function() {
+    // 清除自动关闭定时器
+    this.clearAutoCloseTimer()
+    
+    // 隐藏页面内容
+    this.setData({
+      pageHidden: true
+    })
+    
+    // 执行页面跳转
+    setTimeout(() => {
+      this.navigateToNextPage()
+    }, 100)
+  },
+  
+  // 跳转到下一个页面
+  navigateToNextPage: function() {
+    // 获取应用实例
+    const app = getApp()
+    // 检查是否有TabBar配置
+    if (app.globalData && app.globalData.tabConfig && app.globalData.tabConfig.length > 0) {
+      // 获取TabBar配置
+      const tabConfig = app.globalData.tabConfig
+      
+      // 寻找除了首页以外的第一个TabBar页面
+      const currentPagePath = 'pages/home/index'
+      let targetTab = null
+      
+      for (let tab of tabConfig) {
+        // 跳过当前页面(首页)
+        if (tab.pagePath !== currentPagePath) {
+          targetTab = tab
+          break
+        }
+      }
+      
+      // 如果找到了合适的目标页面
+      if (targetTab) {
+        console.log('关闭首页，跳转到:', targetTab.pagePath)
+        wx.switchTab({
+          url: '/' + targetTab.pagePath
+        })
+      } else {
+        // 如果没有其他TabBar页面，跳转到首页的下一级页面或者一个通用的页面
+        console.log('没有找到合适的TabBar页面，跳转到通用页面')
+        wx.navigateTo({
+          url: '/pages/mbti_personality/index'
+        })
+      }
+    } else {
+      // 如果没有TabBar配置，则跳转到默认页面
+      console.log('没有TabBar配置，跳转到默认页面')
+      // 考虑到你提到每日一挂可能不存在，这里使用MBTI测试页面作为默认备选
+      wx.navigateTo({
+        url: '/pages/mbti_personality/index'
+      })
+    }
   },
   
   // 清除自动关闭定时器

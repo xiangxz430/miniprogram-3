@@ -7,8 +7,9 @@
   </view>
 
   <!-- 自动跳转提示 -->
-  <view class="auto-redirect-tip" wx:if="{{autoCloseTimer}}">
+  <view class="auto-redirect-tip">
     <text>{{countDown || 10}}秒后自动关闭</text>
+    <view class="close-button" bindtap="closeHomePage">×</view>
   </view>
   
   <!-- 功能导航区 -->
