@@ -110,6 +110,9 @@ Page({
     const answers = new Array(this.data.questions.length).fill(null);
     this.setData({ answers });
     
+    // 加载之前保存的答题进度
+    this.loadProgress();
+    
     // 加载保存的测试结果
     this.loadLatestResult();
     
@@ -214,28 +217,41 @@ Page({
 
   // 开始测试
   startTest() {
+    // 清除之前的答题进度
+    wx.removeStorageSync('mbti_progress');
+    
     this.setData({
       currentStep: 'testing',
       currentQuestionIndex: 0,
-      answers: {},
+      currentQuestion: 0,
+      answers: new Array(this.data.questions.length).fill(null),
+      selectedOption: '',
       scores: {
         EI: 0,
         SN: 0,
         TF: 0,
         JP: 0
       }
-    })
+    });
+    
+    console.log('开始新的测试，已清除之前的答题进度');
   },
 
   // 开始重新测试
   startRetest() {
+    // 清除之前的答题进度
+    wx.removeStorageSync('mbti_progress');
+    
     this.setData({
       isRetesting: true,
       isTestActive: true,
       currentQuestion: 0,
       selectedOption: '',
+      answers: new Array(this.data.questions.length).fill(null),
       hasTestResult: false
-    })
+    });
+    
+    console.log('开始重新测试，已清除之前的答题进度');
   },
 
   // 选择选项
@@ -247,9 +263,17 @@ Page({
     console.log('当前题目:', currentQuestion);
     console.log('选择选项:', value);
     
+    // 记录当前答案
+    const answers = this.data.answers;
+    answers[this.data.currentQuestion] = value;
+    
     this.setData({
-      selectedOption: value
+      selectedOption: value,
+      answers: answers
     });
+    
+    // 立即保存答题进度
+    this.saveProgress();
     
     // 短暂延迟后自动进入下一题（如果不是最后一题）
     if (this.data.currentQuestion < this.data.questions.length - 1) {
@@ -290,6 +314,9 @@ Page({
     
     console.log('记录答案:', this.data.currentQuestion, this.data.selectedOption);
     console.log('当前问题类型:', this.data.questions[this.data.currentQuestion].dimension);
+    
+    // 保存答题进度
+    this.saveProgress();
     
     // 如果是最后一题，则计算结果
     if (this.data.currentQuestion === this.data.questions.length - 1) {
@@ -556,6 +583,9 @@ Page({
       answers: answers,
       result: null
     });
+    
+    // 清除保存的答题进度
+    wx.removeStorageSync('mbti_progress');
     
     // 滚动到页面顶部
     wx.pageScrollTo({
@@ -1385,5 +1415,74 @@ Page({
     // 计算生肖，1900年是鼠年
     const index = (year - 1900) % 12;
     return animals[(index + 12) % 12];
+  },
+
+  // 保存答题进度
+  saveProgress() {
+    try {
+      const progressData = {
+        currentQuestion: this.data.currentQuestion,
+        answers: this.data.answers,
+        lastUpdateTime: new Date().getTime()
+      };
+      
+      wx.setStorageSync('mbti_progress', progressData);
+      console.log('答题进度已保存:', progressData);
+    } catch (e) {
+      console.error('保存答题进度失败:', e);
+    }
+  },
+  
+  // 加载答题进度
+  loadProgress() {
+    try {
+      const progressData = wx.getStorageSync('mbti_progress');
+      
+      if (progressData && progressData.answers) {
+        console.log('找到保存的答题进度:', progressData);
+        
+        // 检查是否已有测试结果，如果有则不恢复进度
+        if (this.data.testCompleted || this.data.result) {
+          console.log('已有测试结果，不恢复答题进度');
+          return;
+        }
+        
+        // 检查进度数据是否过期（超过7天）
+        const now = new Date().getTime();
+        const progressAge = now - (progressData.lastUpdateTime || 0);
+        const maxAge = 7 * 24 * 60 * 60 * 1000; // 7天
+        
+        if (progressAge > maxAge) {
+          console.log('答题进度已过期，不进行恢复');
+          wx.removeStorageSync('mbti_progress');
+          return;
+        }
+        
+        // 恢复答题进度
+        this.setData({
+          currentQuestion: progressData.currentQuestion,
+          answers: progressData.answers,
+          selectedOption: progressData.answers[progressData.currentQuestion] || '',
+          isTestActive: true,
+          currentStep: 'testing'
+        });
+        
+        // 计算已回答题目数量
+        const answeredCount = progressData.answers.filter(a => a !== null).length;
+        
+        // 显示提示
+        wx.showToast({
+          title: `已恢复答题进度(${answeredCount}/${this.data.questions.length})`,
+          icon: 'none',
+          duration: 2000
+        });
+        
+        console.log('答题进度已恢复，当前题目:', progressData.currentQuestion);
+      } else {
+        console.log('没有找到保存的答题进度');
+      }
+    } catch (e) {
+      console.error('加载答题进度失败:', e);
+    }
   }
 }) 
