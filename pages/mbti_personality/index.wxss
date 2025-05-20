@@ -80,8 +80,7 @@
   font-size: 30rpx;
   font-weight: 500;
   color: #64748b;
-  padding: 0 30rpx;
-  white-space: nowrap;
+  text-align: center;
   transition: all 0.3s;
 }
 
@@ -92,14 +91,13 @@
 
 .slider {
   position: absolute;
-  width: 50%;
-  height: 76rpx;
-  top: 6rpx;
-  left: 6rpx;
+  width: 33.333%;  /* 适合3个标签的宽度 */
+  height: 88rpx; /* 与tab-wrapper高度一致 */
+  top: 0;
   background: linear-gradient(135deg, #3b82f6, #4f46e5);
-  border-radius: 12rpx;
+  border-radius: 16rpx; /* 与tab-wrapper圆角一致 */
   z-index: 1;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.3);
 }
 
@@ -1355,4 +1353,232 @@
   font-size: 26rpx;
   color: #6b7280;
   line-height: 1.6;
+}
+
+/* 添加AI建议相关样式 */
+.ai-advice-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  margin: 30rpx;
+  background-color: #f8f9fa;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.placeholder-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.placeholder-text {
+  font-size: 32rpx;
+  color: #666;
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+
+.primary-btn {
+  background-color: #4a6fa5;
+  color: white;
+  border: none;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  padding: 16rpx 40rpx;
+  margin-top: 20rpx;
+}
+
+.ai-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 40rpx;
+  margin: 30rpx;
+}
+
+.loading-icon {
+  font-size: 60rpx;
+  margin-bottom: 20rpx;
+}
+
+.loading-text {
+  font-size: 30rpx;
+  color: #555;
+  margin-bottom: 40rpx;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid #f3f3f3;
+  border-top: 6rpx solid #4a6fa5;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.ai-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx;
+  margin: 30rpx;
+  background-color: #fff1f0;
+  border-radius: 12rpx;
+}
+
+.error-icon {
+  font-size: 60rpx;
+  color: #f5222d;
+  margin-bottom: 20rpx;
+}
+
+.error-text {
+  font-size: 30rpx;
+  color: #555;
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+
+.retry-btn {
+  background-color: #4a6fa5;
+  color: white;
+  border: none;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  padding: 12rpx 30rpx;
+}
+
+.ai-advice-container {
+  padding: 30rpx;
+}
+
+.ai-advice-header {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  margin-bottom: 30rpx;
+  background-color: #f0f5ff;
+  border-radius: 12rpx;
+}
+
+.ai-avatar {
+  font-size: 60rpx;
+  margin-right: 20rpx;
+}
+
+.ai-header-text {
+  flex: 1;
+}
+
+.ai-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 6rpx;
+}
+
+.ai-subtitle {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.advice-section {
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+  border-left: 6rpx solid #4a6fa5;
+  padding-left: 16rpx;
+}
+
+.advice-content {
+  font-size: 28rpx;
+  color: #555;
+  line-height: 1.6;
+}
+
+.advice-lists-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.advice-list {
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  padding: 20rpx;
+}
+
+.list-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+  border-left: 6rpx solid #4a6fa5;
+  padding-left: 16rpx;
+}
+
+.list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.list-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+.item-bullet {
+  margin-right: 12rpx;
+  font-size: 24rpx;
+  color: #4a6fa5;
+}
+
+.item-text {
+  font-size: 28rpx;
+  color: #555;
+  flex: 1;
+  line-height: 1.5;
+}
+
+.advice-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40rpx;
+  padding: 20rpx;
+}
+
+.refresh-hint {
+  font-size: 26rpx;
+  color: #888;
+  margin-bottom: 16rpx;
+}
+
+.refresh-btn {
+  background-color: #4a6fa5;
+  color: white;
+  border: none;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  padding: 12rpx 30rpx;
 } 

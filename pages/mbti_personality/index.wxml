@@ -15,7 +15,10 @@
       <view class="tab-item {{activeTab == 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">
         <view class="tab-text">人格模型</view>
       </view>
-      <view class="slider" style="transform: translateX({{activeTab * 100}}%)"></view>
+      <view class="tab-item {{activeTab == 2 ? 'active' : ''}}" bindtap="switchTab" data-index="2">
+        <view class="tab-text">AI建议</view>
+      </view>
+      <view class="slider" style="left: {{activeTab * (100/3)}}%"></view>
     </view>
   </view>
   
@@ -442,6 +445,89 @@
         <view class="prompt-title">请先完成MBTI测试</view>
         <view class="prompt-description">完成测试后，将根据您的人格类型为您提供量身定制的人格模型和职业建议</view>
         <button class="switch-to-test-btn" bindtap="switchToTestTab">去测试</button>
+      </view>
+    </block>
+  </view>
+
+  <!-- AI建议标签页 -->
+  <view class="tab-content" hidden="{{activeTab != 2}}">
+    <block wx:if="{{!testCompleted}}">
+      <view class="ai-advice-placeholder">
+        <view class="placeholder-icon">🤖</view>
+        <view class="placeholder-text">请先完成MBTI测试，才能获取个性化AI建议</view>
+        <button class="primary-btn" bindtap="switchToTestTab">开始测试</button>
+      </view>
+    </block>
+    <block wx:elif="{{!aiAdviceLoaded}}">
+      <view class="ai-loading">
+        <view class="loading-icon">⏳</view>
+        <view class="loading-text">正在生成您的个性化AI建议...</view>
+        <view class="loading-spinner"></view>
+      </view>
+    </block>
+    <block wx:elif="{{aiAdviceError}}">
+      <view class="ai-error">
+        <view class="error-icon">❌</view>
+        <view class="error-text">{{aiAdviceErrorMsg || '获取AI建议失败，请稍后再试'}}</view>
+        <button class="retry-btn" bindtap="loadAiAdvice">重试</button>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="ai-advice-container">
+        <view class="ai-advice-header">
+          <view class="ai-avatar">🤖</view>
+          <view class="ai-header-text">
+            <view class="ai-title">AI个性化建议</view>
+            <view class="ai-subtitle">基于{{result.type}} ({{result.name}})人格特质</view>
+          </view>
+        </view>
+        
+        <view class="advice-section">
+          <view class="section-title">个性化发展建议</view>
+          <view class="advice-content">{{aiAdvice.overallAdvice}}</view>
+        </view>
+        
+        <view class="advice-section">
+          <view class="section-title">职业发展指导</view>
+          <view class="advice-content">{{aiAdvice.careerAdvice}}</view>
+        </view>
+        
+        <view class="advice-section">
+          <view class="section-title">人际关系与沟通</view>
+          <view class="advice-content">{{aiAdvice.relationshipAdvice}}</view>
+        </view>
+        
+        <view class="advice-section">
+          <view class="section-title">压力管理策略</view>
+          <view class="advice-content">{{aiAdvice.stressManagement}}</view>
+        </view>
+        
+        <view class="advice-lists-container">
+          <view class="advice-list">
+            <view class="list-title">个人成长方向</view>
+            <view class="list-items">
+              <view class="list-item" wx:for="{{aiAdvice.growthAreas}}" wx:key="index">
+                <view class="item-bullet">✓</view>
+                <view class="item-text">{{item}}</view>
+              </view>
+            </view>
+          </view>
+          
+          <view class="advice-list">
+            <view class="list-title">需要避免的陷阱</view>
+            <view class="list-items">
+              <view class="list-item" wx:for="{{aiAdvice.pitfalls}}" wx:key="index">
+                <view class="item-bullet">⚠️</view>
+                <view class="item-text">{{item}}</view>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <view class="advice-footer">
+          <view class="refresh-hint">需要更新建议？</view>
+          <button class="refresh-btn" bindtap="refreshAiAdvice">刷新AI建议</button>
+        </view>
       </view>
     </block>
   </view>

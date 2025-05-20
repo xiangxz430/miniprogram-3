@@ -2,6 +2,7 @@ const app = getApp()
 const questions = require('./questions.js')
 const mbtiTypes = require('./mbti-types.js')
 const mbtiData = require('../../utils/mbtiFullDataMerged')
+const deepseekApi = require('../../utils/deepseekApi')
 
 console.log('加载MBTI页面相关资源...');
 console.log('questions数量:', mbtiData.questions.length);
@@ -9,7 +10,7 @@ console.log('types数量:', Object.keys(mbtiData.types).length);
 
 Page({
   data: {
-    activeTab: 0,           // 当前激活的标签页（0: 性格测试, 1: 玄学人格模型）
+    activeTab: 0,           // 当前激活的标签页（0: 性格测试, 1: 玄学人格模型, 2: AI建议）
     hasTestResult: false,   // 是否有测试结果
     isTestActive: false,    // 是否正在测试中
     isRetesting: false,     // 是否正在重新测试
@@ -70,7 +71,20 @@ Page({
       ],
       directionTip: '东南方向适合设立工作台，有助于提升思考能力和创造力。'
     },
-    tabNavClass: '' // 初始化标签导航类
+    tabNavClass: '', // 初始化标签导航类
+    
+    // AI建议相关数据
+    aiAdviceLoaded: false,  // AI建议是否已加载
+    aiAdviceError: false,   // 加载AI建议是否出错
+    aiAdviceErrorMsg: '',   // 错误信息
+    aiAdvice: {            // AI建议数据
+      overallAdvice: '',    // 整体发展建议
+      careerAdvice: '',     // 职业建议
+      relationshipAdvice: '', // 人际关系建议
+      stressManagement: '', // 压力管理
+      growthAreas: [],      // 成长方向
+      pitfalls: []          // 需避免的陷阱
+    }
   },
 
   onLoad() {
@@ -179,29 +193,22 @@ Page({
       this.updateModelData(this.data.result);
     }
     
+    // 如果切换到AI建议标签页，并且已有测试结果但未加载AI建议
+    if (index == 2 && this.data.testCompleted && !this.data.aiAdviceLoaded && !this.data.aiAdviceError) {
+      this.loadAiAdvice();
+    }
+    
     this.setData({
       activeTab: parseInt(index),
       currentQuestion: 0,
       selectedOption: ''
     });
-    
-    // 更新标签指示器位置
-    if (index == 1) {
-      this.setData({
-        tabNavClass: 'tab-2-active'
-      });
-    } else {
-      this.setData({
-        tabNavClass: ''
-      });
-    }
   },
 
   // 切换到测试标签页
   switchToTestTab() {
     this.setData({
-      activeTab: 0,
-      tabNavClass: ''
+      activeTab: 0
     });
   },
 
@@ -309,6 +316,11 @@ Page({
           result: result,
           selectedOption: ''
         });
+        
+        // 如果当前在AI建议标签页，自动加载AI建议
+        if (this.data.activeTab === 2) {
+          this.loadAiAdvice();
+        }
         
         // 隐藏加载提示
         wx.hideLoading();
@@ -454,6 +466,11 @@ Page({
       
     } catch (e) {
       console.error('保存测试结果失败:', e);
+    }
+    
+    // 如果当前在AI建议标签页，自动加载AI建议
+    if (this.data.activeTab === 2) {
+      this.loadAiAdvice();
     }
     
     return result;
@@ -1182,5 +1199,92 @@ Page({
     };
     
     return careerTraitsMap[mbtiType] || defaultTraits;
+  },
+
+  // 加载AI建议
+  loadAiAdvice() {
+    // 检查是否有测试结果
+    if (!this.data.testCompleted || !this.data.result) {
+      console.log('无法加载AI建议：尚未完成测试');
+      return;
+    }
+    
+    // 设置加载状态
+    this.setData({
+      aiAdviceLoaded: false,
+      aiAdviceError: false,
+      aiAdviceErrorMsg: ''
+    });
+    
+    // 准备MBTI信息
+    const mbtiInfo = {
+      type: this.data.result.type,
+      name: this.data.result.name,
+      description: this.data.result.description
+    };
+    
+    // 准备用户信息（从app.globalData获取）
+    const userInfo = {
+      gender: app.globalData.userSettings ? app.globalData.userSettings.gender : '',
+      birthdate: app.globalData.userSettings ? app.globalData.userSettings.birthdate : '',
+      occupation: app.globalData.userSettings ? app.globalData.userSettings.occupation : '',
+      interests: app.globalData.userSettings ? app.globalData.userSettings.interests : []
+    };
+    
+    console.log('正在请求AI建议...');
+    console.log('MBTI信息:', mbtiInfo);
+    console.log('用户信息:', userInfo);
+    
+    // 调用API获取AI建议
+    wx.showLoading({
+      title: '生成AI建议中...',
+      mask: true
+    });
+    
+    deepseekApi.getMbtiAiAdvice(mbtiInfo, userInfo)
+      .then(result => {
+        console.log('获取AI建议成功:', result);
+        
+        // 更新数据
+        if (result.aiAdvice && !result.aiAdvice.error) {
+          this.setData({
+            aiAdvice: result.aiAdvice,
+            aiAdviceLoaded: true,
+            aiAdviceError: false
+          });
+          
+          // 缓存AI建议结果
+          wx.setStorageSync('mbti_ai_advice_' + mbtiInfo.type, result.aiAdvice);
+        } else {
+          // 处理错误情况
+          this.setData({
+            aiAdviceError: true,
+            aiAdviceErrorMsg: result.aiAdvice && result.aiAdvice.message ? result.aiAdvice.message : '获取AI建议失败',
+            aiAdviceLoaded: false
+          });
+        }
+      })
+      .catch(err => {
+        console.error('获取AI建议失败:', err);
+        this.setData({
+          aiAdviceError: true,
+          aiAdviceErrorMsg: '网络错误，请稍后再试',
+          aiAdviceLoaded: false
+        });
+      })
+      .finally(() => {
+        wx.hideLoading();
+      });
+  },
+  
+  // 刷新AI建议
+  refreshAiAdvice() {
+    // 清除缓存的AI建议
+    if (this.data.result && this.data.result.type) {
+      wx.removeStorageSync('mbti_ai_advice_' + this.data.result.type);
+    }
+    
+    // 重新加载AI建议
+    this.loadAiAdvice();
   }
 }) 
