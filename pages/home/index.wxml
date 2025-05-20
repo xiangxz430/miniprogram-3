@@ -8,8 +8,10 @@
 
   <!-- 自动跳转提示 -->
   <view class="auto-redirect-tip">
-    <text>{{countDown || 10}}秒后自动关闭</text>
-    <view class="close-button" bindtap="closeHomePage">×</view>
+    <view class="tip-content">
+      <text>{{countDown || 10}}秒后自动关闭</text>
+      <view class="close-button" bindtap="closeHomePage">×</view>
+    </view>
   </view>
   
   <!-- 功能导航区 -->
@@ -29,13 +31,6 @@
         <view class="coming-soon-tag">Soon</view>
       </view>
     </view>
-  </view>
-  
-  <!-- 每日一言 -->
-  <view class="daily-quote-card">
-    <view class="quote-icon">『</view>
-    <view class="quote-content">{{dailyQuote.content || '人生如棋，落子无悔。把握当下，静观未来。'}}</view>
-    <view class="quote-author">{{dailyQuote.author || '古谚语'}}</view>
   </view>
   
   <!-- 用户隐私数据声明 -->
