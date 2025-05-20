@@ -354,6 +354,71 @@
             </text>
           </view>
         </view>
+        
+        <!-- 关系匹配部分 -->
+        <view class="relationship-match-section">
+          <view class="section-title">关系匹配</view>
+          
+          <view class="relationship-header">
+            <view class="icon icon-heart">💖</view>
+            <view class="relationship-title">适合的人格匹配</view>
+          </view>
+          
+          <view class="relationship-description">基于MBTI特质和人格互补原则，以下人格类型与你最为匹配：</view>
+          
+          <view class="relationship-categories">
+            <view class="relationship-category">
+              <view class="category-header">
+                <view class="category-icon">🤝</view>
+                <view class="category-title">理想朋友</view>
+              </view>
+              
+              <view class="relationship-items">
+                <view class="relationship-item" wx:for="{{modelData.relationships.friends}}" wx:key="type">
+                  <view class="relationship-type">
+                    <text class="type-code">{{item.type}}</text>
+                    <text class="type-name">{{item.typeName || ''}}</text>
+                  </view>
+                  <view class="relationship-score">
+                    <view class="score-bar">
+                      <view class="score-value" style="width: {{item.score}}%;"></view>
+                    </view>
+                    <view class="score-text">{{item.score}}%</view>
+                  </view>
+                  <view class="relationship-reason">{{item.reason}}</view>
+                </view>
+              </view>
+            </view>
+            
+            <view class="relationship-category">
+              <view class="category-header">
+                <view class="category-icon">❤️</view>
+                <view class="category-title">理想伴侣</view>
+              </view>
+              
+              <view class="relationship-items">
+                <view class="relationship-item" wx:for="{{modelData.relationships.partners}}" wx:key="type">
+                  <view class="relationship-type">
+                    <text class="type-code">{{item.type}}</text>
+                    <text class="type-name">{{item.typeName || ''}}</text>
+                  </view>
+                  <view class="relationship-score">
+                    <view class="score-bar">
+                      <view class="score-value" style="width: {{item.score}}%;"></view>
+                    </view>
+                    <view class="score-text">{{item.score}}%</view>
+                  </view>
+                  <view class="relationship-reason">{{item.reason}}</view>
+                </view>
+              </view>
+            </view>
+          </view>
+          
+          <view class="relationship-tip">
+            <view class="tip-icon">ℹ️</view>
+            <text class="tip-text">人格类型仅作为参考，真实关系中还受到个人成长、价值观和生活经历等多种因素影响。</text>
+          </view>
+        </view>
       </view>
       
       <view class="career-section">

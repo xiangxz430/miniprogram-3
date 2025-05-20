@@ -767,6 +767,9 @@ Page({
     // 获取职业特质分析
     const careerTraits = this.getCareerTraits(mbtiType);
     
+    // 计算适合的朋友和恋人
+    const relationships = this.calculateRelationships(mbtiType);
+    
     // 更新modelData
     this.setData({
       modelData: {
@@ -780,7 +783,8 @@ Page({
         directions: directions,
         directionTip: this.getDirectionTip(mbtiType),
         radarData: radarData,
-        careerTraits: careerTraits
+        careerTraits: careerTraits,
+        relationships: relationships // 添加关系匹配数据
       }
     });
     
@@ -1563,5 +1567,328 @@ Page({
     } catch (e) {
       console.error('恢复答题进度失败:', e);
     }
+  },
+
+  // 计算适合的朋友和恋人类型
+  calculateRelationships(mbtiType) {
+    if (!mbtiType || mbtiType.length !== 4) {
+      return {
+        friends: [],
+        partners: []
+      };
+    }
+    
+    // 适合的朋友和恋人匹配规则
+    // 基于MBTI的认知功能和性格互补原则
+    
+    // 1. 定义匹配数据结构
+    const relationships = {
+      friends: [], // 适合的朋友类型
+      partners: [] // 适合的恋人类型
+    };
+    
+    // 2. 根据MBTI类型分类
+    // NT: 分析家族 - INTJ, INTP, ENTJ, ENTP
+    // NF: 外交家族 - INFJ, INFP, ENFJ, ENFP
+    // SJ: 守卫家族 - ISTJ, ISFJ, ESTJ, ESFJ
+    // SP: 探险家族 - ISTP, ISFP, ESTP, ESFP
+    
+    // 3. 计算匹配度的基本规则
+    // - 相似的N/S偏好通常能更好地理解对方的思维方式
+    // - 互补的E/I偏好可以平衡社交能量
+    // - T/F互补可以提供不同视角
+    // - 相似的J/P偏好在生活习惯上更协调
+    
+    // 获取当前类型的特性
+    const isExtrovert = mbtiType.charAt(0) === 'E';
+    const isIntuitive = mbtiType.charAt(1) === 'N';
+    const isThinking = mbtiType.charAt(2) === 'T';
+    const isJudging = mbtiType.charAt(3) === 'J';
+    
+    // 朋友匹配规则
+    const friendMatchRules = {
+      // 分析家族 NT
+      'INTJ': [
+        { type: 'ENTP', score: 90, reason: '思维互补，ENTP的创新思维能启发INTJ的系统思考' },
+        { type: 'INFJ', score: 85, reason: '共享直觉思维，能深度理解彼此的想法和价值观' },
+        { type: 'INTP', score: 80, reason: '共享对知识的追求，享受深度理性讨论' }
+      ],
+      'INTP': [
+        { type: 'INTJ', score: 85, reason: '思维模式相似，都喜欢逻辑和理论探索' },
+        { type: 'ENTP', score: 90, reason: 'ENTP的外向性平衡INTP的内向，共享创新思维' },
+        { type: 'INFJ', score: 80, reason: 'INFJ的感性思维补充INTP的逻辑分析' }
+      ],
+      'ENTJ': [
+        { type: 'INTP', score: 85, reason: 'INTP的深度思考能够丰富ENTJ的战略视野' },
+        { type: 'ENFP', score: 80, reason: 'ENFP的创造力与ENTJ的执行力形成良好互补' },
+        { type: 'INTJ', score: 90, reason: '思维方式相似，INTJ的深度分析能强化ENTJ的决策' }
+      ],
+      'ENTP': [
+        { type: 'INTJ', score: 90, reason: 'INTJ的战略思维能帮助ENTP实现创意' },
+        { type: 'INTP', score: 85, reason: '共享思维模式，INTP的深度思考启发ENTP' },
+        { type: 'ENFJ', score: 80, reason: 'ENFJ的人际敏感性与ENTP的创新思维互补' }
+      ],
+      
+      // 外交家族 NF
+      'INFJ': [
+        { type: 'ENTP', score: 85, reason: 'ENTP的创新与INFJ的洞察力形成良好互动' },
+        { type: 'ENFP', score: 90, reason: '共享理想主义和创造力，能相互激励' },
+        { type: 'INTJ', score: 80, reason: '思维方式相似，都有强大的内在世界' }
+      ],
+      'INFP': [
+        { type: 'ENFJ', score: 90, reason: 'ENFJ的外向和组织能力与INFP的创意和理想互补' },
+        { type: 'INFJ', score: 85, reason: '价值观相似，能理解彼此的理想主义倾向' },
+        { type: 'ENTP', score: 80, reason: 'ENTP的逻辑思维能帮助INFP实现想法' }
+      ],
+      'ENFJ': [
+        { type: 'INFP', score: 90, reason: '能深入理解INFP的内心世界，提供支持和指导' },
+        { type: 'ENTP', score: 85, reason: 'ENTP的创新思维与ENFJ的人际关怀形成互补' },
+        { type: 'INTJ', score: 80, reason: 'INTJ的战略思维能够平衡ENFJ的情感决策' }
+      ],
+      'ENFP': [
+        { type: 'INFJ', score: 90, reason: 'INFJ的深度思考和稳定能平衡ENFP的活跃能量' },
+        { type: 'INTJ', score: 85, reason: 'INTJ的结构化思维能帮助ENFP实现创意' },
+        { type: 'ENFJ', score: 80, reason: '共享价值观和热情，都关注他人的发展' }
+      ],
+      
+      // 守卫家族 SJ
+      'ISTJ': [
+        { type: 'ESTP', score: 85, reason: 'ESTP的活力能活跃ISTJ的严谨风格' },
+        { type: 'ISFJ', score: 90, reason: '共享责任感和组织能力，相互理解和支持' },
+        { type: 'ESFJ', score: 80, reason: 'ESFJ的社交能力平衡ISTJ的内敛' }
+      ],
+      'ISFJ': [
+        { type: 'ESFP', score: 85, reason: 'ESFP的活力能够活跃ISFJ的日常' },
+        { type: 'ISTJ', score: 90, reason: '相似的价值观和责任感，能相互理解' },
+        { type: 'ENFP', score: 80, reason: 'ENFP的创造力能拓展ISFJ的视野' }
+      ],
+      'ESTJ': [
+        { type: 'ISTP', score: 85, reason: 'ISTP的灵活性能平衡ESTJ的结构化思维' },
+        { type: 'ISTJ', score: 90, reason: '共享逻辑思维和责任感，能高效协作' },
+        { type: 'ESFP', score: 80, reason: 'ESFP的轻松态度能放松ESTJ的严肃风格' }
+      ],
+      'ESFJ': [
+        { type: 'ISFP', score: 85, reason: 'ISFP的艺术才能能丰富ESFJ的生活' },
+        { type: 'ISTJ', score: 80, reason: 'ISTJ的结构化思维能支持ESFJ的组织能力' },
+        { type: 'ENFP', score: 90, reason: '共享人际关怀，ENFP的创造力能启发ESFJ' }
+      ],
+      
+      // 探险家族 SP
+      'ISTP': [
+        { type: 'ESTP', score: 90, reason: '共享实用主义和灵活性，ESTP的社交能力互补' },
+        { type: 'ISFP', score: 85, reason: '相似的灵活态度，ISFP的感性能平衡ISTP的理性' },
+        { type: 'ENTJ', score: 80, reason: 'ENTJ的目标导向能给ISTP提供发展方向' }
+      ],
+      'ISFP': [
+        { type: 'ESFP', score: 90, reason: '共享感性和审美，ESFP的外向性互补' },
+        { type: 'ISTP', score: 85, reason: '相似的内在自由精神，相互理解' },
+        { type: 'ENFJ', score: 80, reason: 'ENFJ的组织能力能帮助ISFP实现潜能' }
+      ],
+      'ESTP': [
+        { type: 'ISTP', score: 90, reason: '思维方式相似，共享对自由和冒险的热爱' },
+        { type: 'ESFP', score: 85, reason: '共享对当下体验的重视，能一起享受生活' },
+        { type: 'ISFJ', score: 80, reason: 'ISFJ的稳定性能平衡ESTP的冒险精神' }
+      ],
+      'ESFP': [
+        { type: 'ISFP', score: 90, reason: '共享感性和审美，能一起享受生活的乐趣' },
+        { type: 'ESTP', score: 85, reason: '相似的外向和冒险精神，共享体验' },
+        { type: 'ISTJ', score: 80, reason: 'ISTJ的组织能力能给ESFP的生活带来结构' }
+      ]
+    };
+    
+    // 恋人匹配规则 - 更倾向于心理函数的互补
+    const partnerMatchRules = {
+      // 分析家族 NT
+      'INTJ': [
+        { type: 'ENFP', score: 95, reason: 'ENFP的热情和创造力能平衡INTJ的理性与内敛，互相吸引' },
+        { type: 'ENTP', score: 90, reason: '共享思考深度，ENTP的活力能活跃INTJ的严谨' },
+        { type: 'INFJ', score: 85, reason: '思维方式相似且互补，深度连接与理解' }
+      ],
+      'INTP': [
+        { type: 'ENFJ', score: 95, reason: 'ENFJ的情感表达和组织能力与INTP的逻辑思维高度互补' },
+        { type: 'ENTJ', score: 90, reason: 'ENTJ的决断力能帮助INTP将想法转为行动' },
+        { type: 'INFJ', score: 85, reason: '深度思考的共鸣，INFJ的感性平衡INTP的理性' }
+      ],
+      'ENTJ': [
+        { type: 'INFP', score: 95, reason: 'INFP的理想主义和内在情感与ENTJ的目标导向高度互补' },
+        { type: 'INTP', score: 90, reason: 'INTP的深度思考能丰富ENTJ的决策过程' },
+        { type: 'ENFP', score: 85, reason: '共享创新思维，ENFP的感性平衡ENTJ的理性' }
+      ],
+      'ENTP': [
+        { type: 'INFJ', score: 95, reason: 'INFJ的深度和洞察力与ENTP的创新思维完美互补' },
+        { type: 'INTJ', score: 90, reason: '思维模式互补，INTJ的专注能帮助ENTP实现目标' },
+        { type: 'ENFJ', score: 85, reason: '共享外向特质，ENFJ的情感深度平衡ENTP的逻辑' }
+      ],
+      
+      // 外交家族 NF
+      'INFJ': [
+        { type: 'ENTP', score: 95, reason: 'ENTP的创新与活力能激发INFJ的深度与洞察' },
+        { type: 'ENFP', score: 90, reason: '共享理想主义，ENFP的外向性平衡INFJ的内敛' },
+        { type: 'INTJ', score: 85, reason: '思维深度相似，能彼此理解内心世界' }
+      ],
+      'INFP': [
+        { type: 'ENTJ', score: 95, reason: 'ENTJ的结构和目标导向能实现INFP的理想和创意' },
+        { type: 'ENFJ', score: 90, reason: 'ENFJ的关怀和组织能力支持INFP的价值实现' },
+        { type: 'INTJ', score: 85, reason: '共享深度思考，互相理解内心独立性' }
+      ],
+      'ENFJ': [
+        { type: 'INTP', score: 95, reason: 'INTP的逻辑与深度思考能平衡ENFJ的感性决策' },
+        { type: 'ISFP', score: 90, reason: 'ISFP的创意与真实性能启发ENFJ的关怀特质' },
+        { type: 'INFP', score: 85, reason: '共享价值导向，能深度理解彼此的理想' }
+      ],
+      'ENFP': [
+        { type: 'INTJ', score: 95, reason: 'INTJ的深度和结构能给ENFP的创意提供方向' },
+        { type: 'INFJ', score: 90, reason: '共享理想主义，INFJ的深度平衡ENFP的广度' },
+        { type: 'ISTJ', score: 85, reason: 'ISTJ的务实能力能帮助ENFP实现想法' }
+      ],
+      
+      // 守卫家族 SJ
+      'ISTJ': [
+        { type: 'ESFP', score: 95, reason: 'ESFP的自发性和乐观能平衡ISTJ的严谨和责任感' },
+        { type: 'ENFP', score: 90, reason: 'ENFP的创意和热情能活跃ISTJ的务实风格' },
+        { type: 'ESTP', score: 85, reason: 'ESTP的冒险精神与ISTJ的稳定性形成有趣的对比' }
+      ],
+      'ISFJ': [
+        { type: 'ESTP', score: 95, reason: 'ESTP的活力和冒险精神能活跃ISFJ的关怀特质' },
+        { type: 'ENTP', score: 90, reason: 'ENTP的创新思维能拓展ISFJ的传统观念' },
+        { type: 'ESFP', score: 85, reason: '共享感性，ESFP的外向性平衡ISFJ的内敛' }
+      ],
+      'ESTJ': [
+        { type: 'ISFP', score: 95, reason: 'ISFP的艺术性和灵活度能软化ESTJ的结构化风格' },
+        { type: 'INFP', score: 90, reason: 'INFP的理想主义能拓展ESTJ的实用主义视野' },
+        { type: 'ISTP', score: 85, reason: 'ISTP的灵活性能平衡ESTJ的计划性' }
+      ],
+      'ESFJ': [
+        { type: 'ISTP', score: 95, reason: 'ISTP的独立性和实用技能能平衡ESFJ的人际关注' },
+        { type: 'INFP', score: 90, reason: 'INFP的深度和创意能丰富ESFJ的生活' },
+        { type: 'ISFP', score: 85, reason: 'ISFP的艺术感能与ESFJ的社交能力互补' }
+      ],
+      
+      // 探险家族 SP
+      'ISTP': [
+        { type: 'ESFJ', score: 95, reason: 'ESFJ的情感表达和社交能力与ISTP的实用技能互补' },
+        { type: 'ESTJ', score: 90, reason: 'ESTJ的组织能力能给ISTP的技能提供发展方向' },
+        { type: 'ENFJ', score: 85, reason: 'ENFJ的人际关怀能平衡ISTP的独立性' }
+      ],
+      'ISFP': [
+        { type: 'ESTJ', score: 95, reason: 'ESTJ的结构和组织能力能帮助ISFP实现创意' },
+        { type: 'ENTJ', score: 90, reason: 'ENTJ的目标导向能给ISFP的艺术才能提供方向' },
+        { type: 'ESFJ', score: 85, reason: '共享感性，ESFJ的社交能力平衡ISFP的内敛' }
+      ],
+      'ESTP': [
+        { type: 'ISFJ', score: 95, reason: 'ISFJ的责任感和关怀能平衡ESTP的冒险精神' },
+        { type: 'ISTJ', score: 90, reason: 'ISTJ的计划性能给ESTP的行动力提供方向' },
+        { type: 'INFJ', score: 85, reason: 'INFJ的深度思考能丰富ESTP的体验导向' }
+      ],
+      'ESFP': [
+        { type: 'ISTJ', score: 95, reason: 'ISTJ的责任感和组织能力能平衡ESFP的即兴特质' },
+        { type: 'ISFJ', score: 90, reason: 'ISFJ的关怀和稳定能补充ESFP的活力' },
+        { type: 'INTJ', score: 85, reason: 'INTJ的战略思维能给ESFP的创意提供结构' }
+      ]
+    };
+    
+    // 获取当前类型的匹配配置
+    const friendMatches = friendMatchRules[mbtiType] || [];
+    const partnerMatches = partnerMatchRules[mbtiType] || [];
+    
+    // 如果没有预设的匹配配置，使用通用规则生成匹配
+    if (friendMatches.length === 0) {
+      // 所有16种MBTI类型
+      const allTypes = [
+        'INTJ', 'INTP', 'ENTJ', 'ENTP',
+        'INFJ', 'INFP', 'ENFJ', 'ENFP',
+        'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ',
+        'ISTP', 'ISFP', 'ESTP', 'ESFP'
+      ];
+      
+      // 为每种类型计算一个基础匹配分数
+      allTypes.forEach(type => {
+        if (type !== mbtiType) {
+          const otherIsExtrovert = type.charAt(0) === 'E';
+          const otherIsIntuitive = type.charAt(1) === 'N';
+          const otherIsThinking = type.charAt(2) === 'T';
+          const otherIsJudging = type.charAt(3) === 'J';
+          
+          // 计算基础得分
+          let score = 60; // 基础分
+          
+          // 相同的N/S偏好加分
+          if ((isIntuitive && otherIsIntuitive) || (!isIntuitive && !otherIsIntuitive)) {
+            score += 10;
+          }
+          
+          // 互补的E/I偏好加分
+          if (isExtrovert !== otherIsExtrovert) {
+            score += 8;
+          }
+          
+          // 互补的T/F偏好轻微加分
+          if (isThinking !== otherIsThinking) {
+            score += 5;
+          }
+          
+          // 相同的J/P偏好轻微加分
+          if (isJudging === otherIsJudging) {
+            score += 7;
+          }
+          
+          // 生成匹配原因
+          let reason = '基于性格特质互补原则';
+          
+          // 获取类型名称
+          const typeInfo = this.getTypeInfo(type);
+          const typeName = typeInfo ? typeInfo.name : type;
+          
+          // 根据得分高低，分配到朋友或恋人类别
+          if (score >= 75) {
+            relationships.friends.push({
+              type: type,
+              typeName: typeName,
+              score: score,
+              reason: reason
+            });
+          }
+          
+          // 恋人匹配可以有不同的评分标准
+          const romanticScore = score + (isThinking !== otherIsThinking ? 10 : 0);
+          
+          if (romanticScore >= 80) {
+            relationships.partners.push({
+              type: type,
+              typeName: typeName,
+              score: romanticScore,
+              reason: reason + '，适合发展浪漫关系'
+            });
+          }
+        }
+      });
+    } else {
+      // 使用预设的匹配配置，为每个配置添加类型名称
+      relationships.friends = friendMatches.map(match => {
+        const typeInfo = this.getTypeInfo(match.type);
+        return {
+          ...match,
+          typeName: typeInfo ? typeInfo.name : match.type
+        };
+      });
+      
+      relationships.partners = partnerMatches.map(match => {
+        const typeInfo = this.getTypeInfo(match.type);
+        return {
+          ...match,
+          typeName: typeInfo ? typeInfo.name : match.type
+        };
+      });
+    }
+    
+    // 按匹配分数排序
+    relationships.friends.sort((a, b) => b.score - a.score);
+    relationships.partners.sort((a, b) => b.score - a.score);
+    
+    // 只保留前3个最佳匹配
+    relationships.friends = relationships.friends.slice(0, 3);
+    relationships.partners = relationships.partners.slice(0, 3);
+    
+    return relationships;
   }
 }) 

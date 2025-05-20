@@ -1693,4 +1693,160 @@
   100% {
     opacity: 0.6;
   }
+}
+
+/* 关系匹配部分样式 */
+.relationship-match-section {
+  margin: 40rpx 0;
+}
+
+.relationship-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.icon-heart {
+  color: #ec4899;
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.relationship-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #ec4899;
+}
+
+.relationship-description {
+  font-size: 26rpx;
+  color: #6b7280;
+  margin-bottom: 24rpx;
+}
+
+.relationship-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+  margin-bottom: 24rpx;
+}
+
+.relationship-category {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 2rpx solid #f3f4f6;
+}
+
+.category-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.category-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #374151;
+}
+
+.relationship-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.relationship-item {
+  padding: 16rpx;
+  background-color: #f9fafb;
+  border-radius: 12rpx;
+}
+
+.relationship-type {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.type-code {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #4f46e5;
+  margin-right: 12rpx;
+}
+
+.type-name {
+  font-size: 28rpx;
+  color: #4b5563;
+}
+
+.relationship-score {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.score-bar {
+  flex: 1;
+  height: 12rpx;
+  background-color: #e5e7eb;
+  border-radius: 6rpx;
+  overflow: hidden;
+  margin-right: 16rpx;
+}
+
+.score-value {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 6rpx;
+}
+
+.relationship-category:first-child .score-value {
+  background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+}
+
+.relationship-category:last-child .score-value {
+  background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%);
+}
+
+.score-text {
+  font-size: 24rpx;
+  color: #6b7280;
+  min-width: 60rpx;
+  text-align: right;
+}
+
+.relationship-reason {
+  font-size: 26rpx;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.relationship-tip {
+  display: flex;
+  align-items: flex-start;
+  background-color: #f3f4f6;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  margin-top: 16rpx;
+}
+
+.tip-icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+  margin-top: 2rpx;
+}
+
+.relationship-tip .tip-text {
+  font-size: 24rpx;
+  color: #6b7280;
+  line-height: 1.5;
+  flex: 1;
 } 
