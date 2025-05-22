@@ -24,8 +24,36 @@
   
   <!-- 测试内容标签页 -->
   <view class="tab-content" hidden="{{activeTab != 0}}">
+    <!-- 测试模式选择界面 -->
+    <block wx:if="{{showTestModeSelection}}">
+      <view class="test-mode-selection">
+        <view class="test-mode-title">选择测试模式</view>
+        <view class="test-mode-subtitle">根据您的时间和需求选择测试的详细程度</view>
+        
+        <view class="test-mode-options">
+          <view class="test-mode-card" bindtap="selectTestMode" data-mode="short">
+            <view class="mode-icon">⚡</view>
+            <view class="mode-title">简化版</view>
+            <view class="mode-detail">59题 · 约5-10分钟</view>
+            <view class="mode-description">适合时间有限的用户，提供基本准确的MBTI分析</view>
+            <button class="mode-btn">开始测试</button>
+          </view>
+          
+          <view class="test-mode-card" bindtap="selectTestMode" data-mode="standard">
+            <view class="mode-icon">🔍</view>
+            <view class="mode-title">标准版</view>
+            <view class="mode-detail">137题 · 约15-25分钟</view>
+            <view class="mode-description">全面深入的人格测试，提供高精度MBTI分析结果</view>
+            <button class="mode-btn">开始测试</button>
+          </view>
+        </view>
+        
+        <view class="test-mode-tip">测试过程中的答题进度会自动保存，您可以随时退出并继续</view>
+      </view>
+    </block>
+    
     <!-- 测试未完成时显示题目 -->
-    <block wx:if="{{!testCompleted}}">
+    <block wx:elif="{{!testCompleted}}">
       <view class="progress-container">
         <view class="progress-text">问题 {{currentQuestion + 1}}/{{questions.length}}</view>
         <view class="progress-bar">
@@ -56,6 +84,7 @@
       <view class="test-tips">
         <text class="tip-text">请根据您的第一反应选择最符合的选项</text>
         <text class="tip-text">答案没有对错之分，选择最适合您的选项即可</text>
+        <text class="tip-text">当前测试模式: {{testMode === 'short' ? '简化版(59题)' : '标准版(137题)'}}</text>
       </view>
     </block>
     

@@ -1,11 +1,13 @@
 const app = getApp()
 const questions = require('./questions.js')
+const shortQuestions = require('./short_questions.js')
 const mbtiTypes = require('./mbti-types.js')
 const mbtiData = require('../../utils/mbtiFullDataMerged')
 const deepseekApi = require('../../utils/deepseekApi')
 
 console.log('加载MBTI页面相关资源...');
-console.log('questions数量:', mbtiData.questions.length);
+console.log('完整题库数量:', mbtiData.questions.length);
+console.log('简化题库数量:', shortQuestions.length);
 console.log('types数量:', Object.keys(mbtiData.types).length);
 
 Page({
@@ -17,6 +19,8 @@ Page({
     currentQuestion: 0,     // 当前题目索引
     selectedOption: '',     // 当前选中的选项
     questions: mbtiData.questions,
+    testMode: 'standard',   // 测试模式：'standard'(137题完整版) 或 'short'(59题简化版)
+    showTestModeSelection: true, // 是否显示测试模式选择界面
     mbtiResult: {          // MBTI测试结果
       code: '',            // MBTI类型代码
       name: '',            // MBTI类型名称
@@ -90,21 +94,11 @@ Page({
   onLoad() {
     console.log('MBTI页面加载...');
     
-    // 从mbtiData加载问题
+    // 默认设置为选择测试模式界面
     this.setData({
-      questions: mbtiData.questions,
-      activeTab: 0  // 确保默认选中"性格测试"标签页
+      activeTab: 0,  // 确保默认选中"性格测试"标签页
+      showTestModeSelection: true
     });
-    
-    // 打印问题数据，检查是否正确加载
-    console.log('加载问题数量:', this.data.questions.length);
-    console.log('第一个问题样例:', this.data.questions[0]);
-    console.log('维度统计:', 
-      this.data.questions.filter(q => q.dimension === 'EI').length, 
-      this.data.questions.filter(q => q.dimension === 'SN').length,
-      this.data.questions.filter(q => q.dimension === 'TF').length,
-      this.data.questions.filter(q => q.dimension === 'JP').length
-    );
     
     // 初始化答案数组
     const answers = new Array(this.data.questions.length).fill(null);
@@ -146,6 +140,34 @@ Page({
     });
   },
 
+  // 选择测试模式
+  selectTestMode(e) {
+    const mode = e.currentTarget.dataset.mode;
+    console.log('选择测试模式:', mode);
+    
+    let questionSet = mode === 'short' ? shortQuestions : mbtiData.questions;
+    
+    // 更新状态并加载相应题库
+    this.setData({
+      testMode: mode,
+      questions: questionSet,
+      showTestModeSelection: false,
+      answers: new Array(questionSet.length).fill(null)
+    });
+    
+    // 开始测试
+    this.startTest();
+  },
+
+  // 显示测试模式选择界面
+  showModeSelection() {
+    this.setData({
+      showTestModeSelection: true,
+      isTestActive: false,
+      currentStep: 'welcome'
+    });
+  },
+
   onShow() {
     // 设置TabBar选中项（如果使用自定义TabBar）
     if (typeof this.getTabBar === 'function') {
@@ -160,30 +182,9 @@ Page({
 
   // 加载题目
   loadQuestions() {
-    // TODO: 从云数据库或本地加载MBTI题目
-    const questions = require('./questions.js')
-    this.setData({ questions: questions.default })
-  },
-
-  // 检查是否有已存在的测试结果
-  async checkExistingResult() {
-    try {
-      const db = wx.cloud.database()
-      const userInfo = await db.collection('users').where({
-        _openid: app.globalData.openid
-      }).field({
-        mbtiResult: true
-      }).get()
-
-      if (userInfo.data.length > 0 && userInfo.data[0].mbtiResult) {
-        this.setData({
-          hasTestResult: true,
-          mbtiResult: userInfo.data[0].mbtiResult
-        })
-      }
-    } catch (error) {
-      console.error('检查测试结果失败：', error)
-    }
+    // 根据测试模式加载题目
+    const questionSet = this.data.testMode === 'short' ? shortQuestions : mbtiData.questions;
+    this.setData({ questions: questionSet });
   },
 
   // 切换标签页
@@ -239,14 +240,15 @@ Page({
       currentStep: 'testing',
       currentQuestionIndex: 0,
       currentQuestion: 0,
-      answers: new Array(this.data.questions.length).fill(null),
       selectedOption: '',
       scores: {
         EI: 0,
         SN: 0,
         TF: 0,
         JP: 0
-      }
+      },
+      isTestActive: true,
+      showTestModeSelection: false
     });
     
     console.log('开始新的测试，已清除之前的答题进度');
@@ -270,7 +272,8 @@ Page({
       answers: new Array(this.data.questions.length).fill(null),
       hasTestResult: false,
       aiAdviceLoaded: false,
-      aiAdviceError: false
+      aiAdviceError: false,
+      showTestModeSelection: true
     });
     
     console.log('开始重新测试，已清除之前的答题进度');
@@ -615,16 +618,14 @@ Page({
     }
     
     // 重置测试状态
-    const answers = new Array(this.data.questions.length).fill(null);
-    
     this.setData({
       testCompleted: false,
       currentQuestion: 0,
       selectedOption: '',
-      answers: answers,
       result: null,
       aiAdviceLoaded: false,
-      aiAdviceError: false
+      aiAdviceError: false,
+      showTestModeSelection: true
     });
     
     // 清除保存的答题进度
@@ -1470,6 +1471,7 @@ Page({
       const progressData = {
         currentQuestion: this.data.currentQuestion,
         answers: this.data.answers,
+        testMode: this.data.testMode, // 保存测试模式
         lastUpdateTime: new Date().getTime()
       };
       
@@ -1505,13 +1507,20 @@ Page({
           return;
         }
         
+        // 加载对应的测试模式和题库
+        const testMode = progressData.testMode || 'standard';
+        const questions = testMode === 'short' ? shortQuestions : mbtiData.questions;
+        
         // 恢复答题进度
         this.setData({
+          testMode: testMode,
+          questions: questions,
           currentQuestion: progressData.currentQuestion,
           answers: progressData.answers,
           selectedOption: progressData.answers[progressData.currentQuestion] || '',
           isTestActive: true,
-          currentStep: 'testing'
+          currentStep: 'testing',
+          showTestModeSelection: false
         });
         
         // 计算已回答题目数量
@@ -1533,7 +1542,7 @@ Page({
     }
   },
 
-  // 恢复测试进度（新增函数）
+  // 恢复测试进度
   restoreTestProgress() {
     try {
       const progressData = wx.getStorageSync('mbti_progress');
@@ -1551,13 +1560,20 @@ Page({
           return;
         }
         
+        // 加载对应的测试模式和题库
+        const testMode = progressData.testMode || 'standard';
+        const questions = testMode === 'short' ? shortQuestions : mbtiData.questions;
+        
         // 恢复答题进度
         this.setData({
+          testMode: testMode,
+          questions: questions,
           currentQuestion: progressData.currentQuestion,
           answers: progressData.answers,
           selectedOption: progressData.answers[progressData.currentQuestion] || '',
           isTestActive: true,
-          currentStep: 'testing'
+          currentStep: 'testing',
+          showTestModeSelection: false
         });
         
         console.log('答题进度已恢复，当前题目:', progressData.currentQuestion);
