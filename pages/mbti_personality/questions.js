@@ -1141,4 +1141,5 @@ questions.forEach((q, index) => {
   q.id = index + 1
 })
 
-export default questions 
+// export default questions
+module.exports = questions 

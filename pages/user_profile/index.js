@@ -121,6 +121,22 @@ Page({
       activeTab: 0
     });
     
+    // 如果没有位置信息，尝试获取一次位置（仅在首次加载时）
+    const userSettings = wx.getStorageSync('userSettings') || {};
+    if (!userSettings.currentLocation) {
+      console.log('首次加载页面，尝试获取位置');
+      // 设置一个延时，等页面完全加载后再请求位置
+      setTimeout(() => {
+        this.getLocation();
+      }, 1000);
+    } else {
+      // 已有位置信息，直接使用
+      this.setData({
+        'userInfo.currentLocation': userSettings.currentLocation
+      });
+      console.log('使用已保存的位置信息:', userSettings.currentLocation);
+    }
+    
     logger.log('页面访问', {
       页面: '用户档案',
       时间: new Date().toLocaleString()
@@ -128,9 +144,9 @@ Page({
   },
 
   onShow: function() {
-    // 页面显示时，刷新数据和位置
+    // 页面显示时，仅刷新数据，不自动获取位置
     this.refreshDailyData();
-    this.getLocation();
+    // 不再自动调用 this.getLocation()，改为只在用户点击按钮时获取
     
     // 输出当前标签状态，用于调试
     console.log('页面显示 - 当前activeTab:', this.data.activeTab);
@@ -427,47 +443,37 @@ Page({
 
   // 获取当前位置
   getLocation: function() {
+    // 添加标记防止重复调用
+    if (this.isGettingLocation) {
+      console.log('正在获取位置，请勿重复操作');
+      return;
+    }
+    
+    this.isGettingLocation = true;
+    
     wx.showLoading({
       title: '定位中...'
     });
 
+    // 检查是否有获取位置权限
     wx.getSetting({
       success: (res) => {
         if (res.authSetting['scope.userLocation']) {
-          // 已授权，直接获取
-          wx.getLocation({
-            type: 'gcj02',
-            success: (res) => {
-              this.reverseGeocoding(res.latitude, res.longitude);
-            },
-            fail: (err) => {
-              wx.hideLoading();
-              wx.showToast({ title: '获取位置失败', icon: 'none' });
-              console.error('获取位置失败', err);
-            }
-          });
+          // 已授权，直接打开位置选择器
+          this.openLocationChooser();
         } else {
-          // 未授权，主动申请
+          // 未授权，申请权限
           wx.authorize({
             scope: 'scope.userLocation',
             success: () => {
-              wx.getLocation({
-                type: 'gcj02',
-                success: (res) => {
-                  this.reverseGeocoding(res.latitude, res.longitude);
-                },
-                fail: (err) => {
-                  wx.hideLoading();
-                  wx.showToast({ title: '获取位置失败', icon: 'none' });
-                  console.error('获取位置失败', err);
-                }
-              });
+              this.openLocationChooser();
             },
             fail: () => {
               wx.hideLoading();
+              this.isGettingLocation = false;
               wx.showModal({
                 title: '需要授权',
-                content: '请在小程序设置中授权地理位置权限，否则无法获取当前位置。',
+                content: '请授权地理位置权限，以便选择您的位置',
                 confirmText: '去设置',
                 success: (modalRes) => {
                   if (modalRes.confirm) {
@@ -478,28 +484,101 @@ Page({
             }
           });
         }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        this.isGettingLocation = false;
+        console.error('获取设置失败:', err);
+        wx.showToast({
+          title: '获取位置权限失败',
+          icon: 'none'
+        });
       }
     });
   },
-
-  // 逆地理编码
-  reverseGeocoding: function(latitude, longitude) {
-    // 实际项目中应使用微信地图API或其他服务
-    // 这里使用模拟数据
-    setTimeout(() => {
-      wx.hideLoading();
-      
-      const location = '北京市海淀区';
-      this.setData({
-        'userInfo.currentLocation': location
-      });
-      
-      logger.log('位置更新', {
-        地点: location,
-        经度: longitude,
-        纬度: latitude
-      });
-    }, 1000);
+  
+  // 打开位置选择器
+  openLocationChooser: function() {
+    // 使用微信内置的位置选择器
+    wx.chooseLocation({
+      success: (res) => {
+        wx.hideLoading();
+        this.isGettingLocation = false;
+        
+        // 获取详细地址
+        const name = res.name || '';
+        const address = res.address || '';
+        let fullAddress = address;
+        
+        // 如果有地点名称，添加到地址前面
+        if (name && !address.includes(name)) {
+          fullAddress = name + (address ? '，' + address : '');
+        }
+        
+        // 只有当地址不为空时才更新
+        if (fullAddress) {
+          try {
+            // 更新UI
+            this.setData({
+              'userInfo.currentLocation': fullAddress
+            });
+            
+            // 保存到用户设置
+            const userSettings = wx.getStorageSync('userSettings') || {};
+            userSettings.currentLocation = fullAddress;
+            wx.setStorageSync('userSettings', userSettings);
+            
+            console.log('位置更新成功:', fullAddress);
+            logger.log('位置更新', {
+              地点: fullAddress,
+              详细地址: address,
+              名称: name,
+              经度: res.longitude,
+              纬度: res.latitude
+            });
+            
+            wx.showToast({
+              title: '位置已更新',
+              icon: 'success'
+            });
+          } catch (error) {
+            console.error('保存位置信息失败:', error);
+            wx.showToast({
+              title: '保存位置失败',
+              icon: 'none'
+            });
+          }
+        } else {
+          wx.showToast({
+            title: '未获取到地址信息',
+            icon: 'none'
+          });
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        this.isGettingLocation = false;
+        console.error('选择位置失败:', err);
+        
+        if (err.errMsg && err.errMsg.indexOf('cancel') > -1) {
+          wx.showToast({
+            title: '您取消了位置选择',
+            icon: 'none'
+          });
+        } else {
+          wx.showToast({
+            title: '无法获取位置',
+            icon: 'none'
+          });
+        }
+      },
+      complete: () => {
+        // 确保在所有情况下都重置标志
+        setTimeout(() => {
+          this.isGettingLocation = false;
+        }, 1000);
+      }
+    });
   },
 
   // 切换标签页

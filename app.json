@@ -88,5 +88,6 @@
     },
     "bundle": false
   },
-  "libVersion": "2.17.0"
+  "libVersion": "2.17.0",
+  "navigateToMiniProgramAppIdList": []
 } 

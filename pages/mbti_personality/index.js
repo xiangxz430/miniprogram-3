@@ -1,11 +1,13 @@
 const app = getApp()
 const questions = require('./questions.js')
+const shortQuestions = require('./short_questions.js')
 const mbtiTypes = require('./mbti-types.js')
 const mbtiData = require('../../utils/mbtiFullDataMerged')
 const deepseekApi = require('../../utils/deepseekApi')
 
 console.log('加载MBTI页面相关资源...');
-console.log('questions数量:', mbtiData.questions.length);
+console.log('完整版题目数量:', questions.length);
+console.log('简化版题目数量:', shortQuestions.length);
 console.log('types数量:', Object.keys(mbtiData.types).length);
 
 Page({
@@ -16,27 +18,9 @@ Page({
     isRetesting: false,     // 是否正在重新测试
     currentQuestion: 0,     // 当前题目索引
     selectedOption: '',     // 当前选中的选项
-    questions: mbtiData.questions,
-    mbtiResult: {          // MBTI测试结果
-      code: '',            // MBTI类型代码
-      name: '',            // MBTI类型名称
-      percent: 0,          // 该类型的人群占比
-      description: '',     // 类型描述
-      scores: {           // 各维度得分
-        I: 0, E: 0,
-        N: 0, S: 0,
-        T: 0, F: 0,
-        J: 0, P: 0
-      },
-      functions: [],      // 认知功能栈
-      socialMask: {       // 社会面具
-        code: '',
-        name: ''
-      },
-      careers: [],        // 适合的职业
-      directions: []      // 工作方位
-    },
-    answers: {},
+    questions: [],          // 当前测试的题目集
+    testMode: '',           // 测试模式：'standard'(标准版) 或 'short'(简化版)
+    showTestModeSelection: false, // 是否显示测试模式选择界面
     currentStep: 'welcome', // welcome, testing, result
     currentQuestionIndex: 0,
     scores: {
@@ -90,25 +74,18 @@ Page({
   onLoad() {
     console.log('MBTI页面加载...');
     
-    // 从mbtiData加载问题
-    this.setData({
-      questions: mbtiData.questions,
-      activeTab: 0  // 确保默认选中"性格测试"标签页
-    });
-    
-    // 打印问题数据，检查是否正确加载
-    console.log('加载问题数量:', this.data.questions.length);
-    console.log('第一个问题样例:', this.data.questions[0]);
-    console.log('维度统计:', 
-      this.data.questions.filter(q => q.dimension === 'EI').length, 
-      this.data.questions.filter(q => q.dimension === 'SN').length,
-      this.data.questions.filter(q => q.dimension === 'TF').length,
-      this.data.questions.filter(q => q.dimension === 'JP').length
-    );
+    // 初始化默认题库为完整版
+    const defaultQuestions = questions || [];
+    console.log('初始化默认题库，题目数量:', defaultQuestions.length);
     
     // 初始化答案数组
-    const answers = new Array(this.data.questions.length).fill(null);
-    this.setData({ answers });
+    const answers = new Array(defaultQuestions.length).fill(null);
+    
+    this.setData({ 
+      questions: defaultQuestions,
+      testMode: 'standard', // 默认使用标准版
+      answers: answers 
+    });
     
     // 加载之前保存的答题进度
     this.loadProgress();
@@ -120,7 +97,7 @@ Page({
     this.loadTestHistory();
     this.loadTypeDistribution();
     
-    // 初始化模型数据
+    // 初始化模型数据（保持不变）
     this.setData({
       modelData: {
         nativeType: 'INTJ',
@@ -158,32 +135,122 @@ Page({
     }
   },
 
-  // 加载题目
-  loadQuestions() {
-    // TODO: 从云数据库或本地加载MBTI题目
-    const questions = require('./questions.js')
-    this.setData({ questions: questions.default })
+  // 选择测试模式
+  selectTestMode(e) {
+    const mode = e.currentTarget.dataset.mode;
+    console.log('选择测试模式:', mode);
+    
+    let questionSet = [];
+    
+    if (mode === 'short') {
+      // 加载简化版题库
+      if (shortQuestions && Array.isArray(shortQuestions) && shortQuestions.length > 0) {
+        questionSet = shortQuestions;
+        console.log('加载简化版题库，题目数量:', questionSet.length);
+      } else {
+        console.error('简化版题库加载失败或为空');
+        wx.showToast({
+          title: '题库加载失败，请重试',
+          icon: 'none'
+        });
+        return;
+      }
+    } else {
+      // 加载标准版题库
+      if (questions && Array.isArray(questions) && questions.length > 0) {
+        questionSet = questions;
+        console.log('加载标准版题库，题目数量:', questionSet.length);
+      } else {
+        console.error('标准版题库加载失败或为空');
+        wx.showToast({
+          title: '题库加载失败，请重试',
+          icon: 'none'
+        });
+        return;
+      }
+    }
+    
+    // 确保题库非空
+    if (questionSet.length === 0) {
+      console.error('选择的题库为空');
+      wx.showToast({
+        title: '题库为空，请重试',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 检查题库格式是否正确
+    const sampleQuestion = questionSet[0];
+    if (!sampleQuestion || !sampleQuestion.dimension) {
+      console.error('题库格式不正确，缺少必要的dimension属性');
+      wx.showToast({
+        title: '题库格式错误，请重试',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 清除之前的测试结果和AI建议缓存
+    if (this.data.result && this.data.result.type) {
+      wx.removeStorageSync('mbti_ai_advice_' + this.data.result.type);
+    }
+    wx.removeStorageSync('mbti_result');
+    
+    // 初始化新的答案数组
+    const newAnswers = new Array(questionSet.length).fill(null);
+    
+    // 初始化测试状态
+    this.setData({
+      questions: questionSet,
+      testMode: mode,
+      currentQuestion: 0,
+      selectedOption: '',
+      answers: newAnswers,
+      isTestActive: true,
+      showTestModeSelection: false,
+      currentStep: 'testing',
+      testCompleted: false,
+      hasTestResult: false,
+      result: null
+    });
+    
+    console.log('已初始化测试，模式:', mode, '题目数量:', questionSet.length);
+    
+    // 保存当前进度
+    this.saveProgress();
   },
 
-  // 检查是否有已存在的测试结果
-  async checkExistingResult() {
-    try {
-      const db = wx.cloud.database()
-      const userInfo = await db.collection('users').where({
-        _openid: app.globalData.openid
-      }).field({
-        mbtiResult: true
-      }).get()
-
-      if (userInfo.data.length > 0 && userInfo.data[0].mbtiResult) {
-        this.setData({
-          hasTestResult: true,
-          mbtiResult: userInfo.data[0].mbtiResult
-        })
-      }
-    } catch (error) {
-      console.error('检查测试结果失败：', error)
+  // 开始测试 - 修改为显示测试模式选择
+  startTest() {
+    console.log('显示测试模式选择界面');
+    
+    // 如果已有测试结果，标记为重新测试并清除缓存
+    const isRetesting = this.data.hasTestResult || this.data.testCompleted;
+    if (isRetesting && this.data.result && this.data.result.type) {
+      wx.removeStorageSync('mbti_ai_advice_' + this.data.result.type);
     }
+    
+    // 清除已保存的进度和结果
+    wx.removeStorageSync('mbti_progress');
+    if (isRetesting) {
+      wx.removeStorageSync('mbti_result');
+    }
+    
+    this.setData({
+      showTestModeSelection: true,
+      isTestActive: false,
+      isRetesting: isRetesting,
+      testCompleted: false,
+      hasTestResult: false,
+      currentStep: 'mode_selection',
+      result: null,
+      currentQuestion: 0,
+      selectedOption: '',
+      answers: []
+    });
+    
+    console.log('准备开始测试，已清除之前的数据');
   },
 
   // 切换标签页
@@ -230,56 +297,20 @@ Page({
     });
   },
 
-  // 开始测试
-  startTest() {
-    // 清除之前的答题进度
-    wx.removeStorageSync('mbti_progress');
-    
-    this.setData({
-      currentStep: 'testing',
-      currentQuestionIndex: 0,
-      currentQuestion: 0,
-      answers: new Array(this.data.questions.length).fill(null),
-      selectedOption: '',
-      scores: {
-        EI: 0,
-        SN: 0,
-        TF: 0,
-        JP: 0
-      }
-    });
-    
-    console.log('开始新的测试，已清除之前的答题进度');
-  },
-
-  // 开始重新测试
-  startRetest() {
-    // 获取当前MBTI类型并清除其AI建议缓存
-    if (this.data.result && this.data.result.type) {
-      wx.removeStorageSync('mbti_ai_advice_' + this.data.result.type);
-    }
-    
-    // 清除之前的答题进度
-    wx.removeStorageSync('mbti_progress');
-    
-    this.setData({
-      isRetesting: true,
-      isTestActive: true,
-      currentQuestion: 0,
-      selectedOption: '',
-      answers: new Array(this.data.questions.length).fill(null),
-      hasTestResult: false,
-      aiAdviceLoaded: false,
-      aiAdviceError: false
-    });
-    
-    console.log('开始重新测试，已清除之前的答题进度');
-  },
-
   // 选择选项
   selectOption(e) {
     const value = e.currentTarget.dataset.value;
+    
+    // 安全检查：确保当前问题对象存在
     const currentQuestion = this.data.questions[this.data.currentQuestion];
+    if (!currentQuestion) {
+      console.error('错误：当前问题对象不存在', this.data.currentQuestion);
+      wx.showToast({
+        title: '加载题目失败，请重试',
+        icon: 'none'
+      });
+      return;
+    }
     
     // 打印当前题目和选项信息
     console.log('当前题目:', currentQuestion);
@@ -308,14 +339,27 @@ Page({
   // 上一题
   prevQuestion() {
     if (this.data.currentQuestion > 0) {
-      const prevQuestion = this.data.currentQuestion - 1
+      const prevQuestion = this.data.currentQuestion - 1;
+      
+      // 安全检查：确保上一题存在
+      if (!this.data.questions || !this.data.questions[prevQuestion]) {
+        console.error('错误：上一题对象不存在', prevQuestion);
+        wx.showToast({
+          title: '加载题目失败，请重试',
+          icon: 'none'
+        });
+        return;
+      }
+      
       // 恢复之前的选择
-      const prevAnswer = this.data.answers[prevQuestion]
+      const prevAnswer = this.data.answers[prevQuestion];
       
       this.setData({
         currentQuestion: prevQuestion,
         selectedOption: prevAnswer || ''
-      })
+      });
+      
+      console.log('返回上一题:', prevQuestion);
     }
   },
 
@@ -334,8 +378,20 @@ Page({
     const answers = this.data.answers;
     answers[this.data.currentQuestion] = this.data.selectedOption;
     
-    console.log('记录答案:', this.data.currentQuestion, this.data.selectedOption);
-    console.log('当前问题类型:', this.data.questions[this.data.currentQuestion].dimension);
+    // 安全检查：确保当前问题对象存在
+    const currentQuestion = this.data.questions[this.data.currentQuestion];
+    if (currentQuestion) {
+      console.log('记录答案:', this.data.currentQuestion, this.data.selectedOption);
+      console.log('当前问题类型:', currentQuestion.dimension || '未知');
+    } else {
+      console.error('错误：当前问题对象不存在', this.data.currentQuestion);
+      // 如果问题对象不存在，可能是题库未正确加载
+      wx.showToast({
+        title: '加载题目失败，请重试',
+        icon: 'none'
+      });
+      return;
+    }
     
     // 保存答题进度
     this.saveProgress();
@@ -397,32 +453,95 @@ Page({
       'T': 0, 'F': 0,
       'J': 0, 'P': 0
     };
+    
+    console.log('开始计算测试结果...');
+    console.log('题目数量:', this.data.questions ? this.data.questions.length : 0);
+    console.log('答案数量:', answers ? Object.keys(answers).filter(k => answers[k]).length : 0);
+    console.log('测试模式:', this.data.testMode);
 
+    // 检查题库和答案是否有效
+    if (!this.data.questions || !Array.isArray(this.data.questions) || this.data.questions.length === 0) {
+      console.error('题库无效，无法计算结果');
+      wx.showToast({
+        title: '题库加载失败，请重试',
+        icon: 'none'
+      });
+      return null;
+    }
+
+    // 统计各维度得分并记录详细日志
+    let dimensionQuestions = {
+      'EI': 0, 'SN': 0, 'TF': 0, 'JP': 0
+    };
+    
     // 统计各维度得分
     for (let i = 0; i < this.data.questions.length; i++) {
       const question = this.data.questions[i];
       const answer = answers[i];
       
-      if (!answer) continue;  // 跳过未答题目
+      // 安全检查：确保问题对象和答案都存在
+      if (!question || !answer) {
+        console.log('跳过无效题目或未答题目:', i);
+        continue;  // 跳过无效题目或未答题目
+      }
+      
+      // 安全检查：确保dimension属性存在
+      const dimension = question.dimension;
+      if (!dimension) {
+        console.error('题目缺少dimension属性:', i, question);
+        continue;
+      }
+      
+      // 增加维度题目计数
+      dimensionQuestions[dimension] = (dimensionQuestions[dimension] || 0) + 1;
       
       // 根据题目类型和答案增加相应维度得分
-      if (question.dimension === 'EI') {
-        answer === 'A' ? scores.E++ : scores.I++;
-      } else if (question.dimension === 'SN') {
-        answer === 'A' ? scores.S++ : scores.N++;
-      } else if (question.dimension === 'TF') {
-        answer === 'A' ? scores.T++ : scores.F++;
-      } else if (question.dimension === 'JP') {
-        answer === 'A' ? scores.J++ : scores.P++;
+      if (dimension === 'EI') {
+        if (answer === 'A') {
+          scores.E++;
+          console.log(`问题 ${i+1}: 选择A, E+1 (${scores.E})`);
+        } else {
+          scores.I++;
+          console.log(`问题 ${i+1}: 选择B, I+1 (${scores.I})`);
+        }
+      } else if (dimension === 'SN') {
+        if (answer === 'A') {
+          scores.S++;
+          console.log(`问题 ${i+1}: 选择A, S+1 (${scores.S})`);
+        } else {
+          scores.N++;
+          console.log(`问题 ${i+1}: 选择B, N+1 (${scores.N})`);
+        }
+      } else if (dimension === 'TF') {
+        if (answer === 'A') {
+          scores.T++;
+          console.log(`问题 ${i+1}: 选择A, T+1 (${scores.T})`);
+        } else {
+          scores.F++;
+          console.log(`问题 ${i+1}: 选择B, F+1 (${scores.F})`);
+        }
+      } else if (dimension === 'JP') {
+        if (answer === 'A') {
+          scores.J++;
+          console.log(`问题 ${i+1}: 选择A, J+1 (${scores.J})`);
+        } else {
+          scores.P++;
+          console.log(`问题 ${i+1}: 选择B, P+1 (${scores.P})`);
+        }
+      } else {
+        console.warn('未知的维度类型:', dimension);
       }
     }
     
+    // 打印各维度题目分布
+    console.log('各维度题目数量分布:', dimensionQuestions);
+    
     // 打印各维度得分情况，便于调试
     console.log('MBTI维度得分情况：', scores);
-    console.log('E vs I:', scores.E, '/', scores.I);
-    console.log('S vs N:', scores.S, '/', scores.N);
-    console.log('T vs F:', scores.T, '/', scores.F);
-    console.log('J vs P:', scores.J, '/', scores.P);
+    console.log('E vs I:', scores.E, '/', scores.I, `(${Math.round((scores.E / (scores.E + scores.I || 1)) * 100)}% : ${Math.round((scores.I / (scores.E + scores.I || 1)) * 100)}%)`);
+    console.log('S vs N:', scores.S, '/', scores.N, `(${Math.round((scores.S / (scores.S + scores.N || 1)) * 100)}% : ${Math.round((scores.N / (scores.S + scores.N || 1)) * 100)}%)`);
+    console.log('T vs F:', scores.T, '/', scores.F, `(${Math.round((scores.T / (scores.T + scores.F || 1)) * 100)}% : ${Math.round((scores.F / (scores.T + scores.F || 1)) * 100)}%)`);
+    console.log('J vs P:', scores.J, '/', scores.P, `(${Math.round((scores.J / (scores.J + scores.P || 1)) * 100)}% : ${Math.round((scores.P / (scores.J + scores.P || 1)) * 100)}%)`);
     
     // 确定各维度的倾向性
     const type = [
@@ -432,13 +551,39 @@ Page({
       scores.J > scores.P ? 'J' : 'P'
     ].join('');
     
+    // 验证生成的类型是否有效
+    if (!type || type.length !== 4) {
+      console.error('无法生成有效的MBTI类型');
+      wx.showToast({
+        title: '计算结果失败，请重试',
+        icon: 'none'
+      });
+      return null;
+    }
+    
+    console.log('测试结果类型:', type);
+    
     // 计算百分比得分
     const totalQuestions = {
-      'EI': answers.filter((_, i) => this.data.questions[i].dimension === 'EI').length,
-      'SN': answers.filter((_, i) => this.data.questions[i].dimension === 'SN').length,
-      'TF': answers.filter((_, i) => this.data.questions[i].dimension === 'TF').length,
-      'JP': answers.filter((_, i) => this.data.questions[i].dimension === 'JP').length
+      'EI': answers.filter((_, i) => {
+        const q = this.data.questions[i];
+        return q && q.dimension === 'EI';
+      }).length,
+      'SN': answers.filter((_, i) => {
+        const q = this.data.questions[i];
+        return q && q.dimension === 'SN';
+      }).length,
+      'TF': answers.filter((_, i) => {
+        const q = this.data.questions[i];
+        return q && q.dimension === 'TF';
+      }).length,
+      'JP': answers.filter((_, i) => {
+        const q = this.data.questions[i];
+        return q && q.dimension === 'JP';
+      }).length
     };
+    
+    console.log('各维度题目数量:', totalQuestions);
     
     // 计算各维度的百分比
     const IPercent = Math.round((scores.I / (scores.I + scores.E || 1)) * 100);
@@ -449,6 +594,15 @@ Page({
     // 获取类型信息
     const typeInfo = this.getTypeInfo(type);
     console.log('获取到的typeInfo:', typeInfo);
+    
+    if (!typeInfo) {
+      console.error('无法获取类型信息:', type);
+      wx.showToast({
+        title: '类型数据加载失败',
+        icon: 'none'
+      });
+      return null;
+    }
     
     // 构建结果对象
     const now = new Date();
@@ -619,16 +773,19 @@ Page({
     
     this.setData({
       testCompleted: false,
+      hasTestResult: false,
       currentQuestion: 0,
       selectedOption: '',
       answers: answers,
       result: null,
       aiAdviceLoaded: false,
-      aiAdviceError: false
+      aiAdviceError: false,
+      currentStep: 'welcome'  // 回到欢迎页面
     });
     
-    // 清除保存的答题进度
+    // 清除保存的答题进度和结果
     wx.removeStorageSync('mbti_progress');
+    wx.removeStorageSync('mbti_result');
     
     // 滚动到页面顶部
     wx.pageScrollTo({
@@ -636,7 +793,7 @@ Page({
       duration: 300
     });
     
-    console.log('重新开始测试');
+    console.log('重新开始测试，已清除测试结果');
   },
   
   // 添加测试历史
@@ -667,10 +824,16 @@ Page({
         
         this.setData({
           testCompleted: true,
-          result: savedResult
+          hasTestResult: true,
+          result: savedResult,
+          currentStep: 'result' // 设置当前步骤为结果展示
         });
       } else {
         console.log('没有找到保存的测试结果');
+        this.setData({
+          hasTestResult: false,
+          currentStep: 'welcome' // 设置当前步骤为欢迎页
+        });
       }
     } catch (e) {
       console.error('加载测试结果失败:', e);
@@ -1466,106 +1629,126 @@ Page({
 
   // 保存答题进度
   saveProgress() {
-    try {
-      const progressData = {
-        currentQuestion: this.data.currentQuestion,
-        answers: this.data.answers,
-        lastUpdateTime: new Date().getTime()
-      };
-      
-      wx.setStorageSync('mbti_progress', progressData);
-      console.log('答题进度已保存:', progressData);
-    } catch (e) {
-      console.error('保存答题进度失败:', e);
-    }
+    const progress = {
+      testMode: this.data.testMode,
+      currentQuestion: this.data.currentQuestion,
+      answers: this.data.answers,
+      questions: this.data.questions
+    };
+    
+    wx.setStorageSync('mbti_progress', progress);
+    console.log('已保存答题进度:', this.data.currentQuestion + 1, '/', this.data.questions.length);
   },
   
   // 加载答题进度
   loadProgress() {
     try {
-      const progressData = wx.getStorageSync('mbti_progress');
+      const progress = wx.getStorageSync('mbti_progress');
       
-      if (progressData && progressData.answers) {
-        console.log('找到保存的答题进度:', progressData);
+      if (progress && progress.currentQuestion > 0) {
+        console.log('发现未完成的测试:', progress.testMode);
+        console.log('上次答题进度:', progress.currentQuestion + 1, '/', progress.questions.length);
         
-        // 检查是否已有测试结果，如果有则不恢复进度
-        if (this.data.testCompleted || this.data.result) {
-          console.log('已有测试结果，不恢复答题进度');
-          return;
-        }
-        
-        // 检查进度数据是否过期（超过7天）
-        const now = new Date().getTime();
-        const progressAge = now - (progressData.lastUpdateTime || 0);
-        const maxAge = 7 * 24 * 60 * 60 * 1000; // 7天
-        
-        if (progressAge > maxAge) {
-          console.log('答题进度已过期，不进行恢复');
-          wx.removeStorageSync('mbti_progress');
-          return;
-        }
-        
-        // 恢复答题进度
-        this.setData({
-          currentQuestion: progressData.currentQuestion,
-          answers: progressData.answers,
-          selectedOption: progressData.answers[progressData.currentQuestion] || '',
-          isTestActive: true,
-          currentStep: 'testing'
+        // 弹窗询问是否继续上次的测试
+        wx.showModal({
+          title: '继续测试',
+          content: '发现未完成的测试，是否继续？',
+          success: (res) => {
+            if (res.confirm) {
+              this.restoreTestProgress(progress);
+            } else {
+              // 清除进度，准备重新测试
+              wx.removeStorageSync('mbti_progress');
+            }
+          }
         });
-        
-        // 计算已回答题目数量
-        const answeredCount = progressData.answers.filter(a => a !== null).length;
-        
-        // 显示提示
-        wx.showToast({
-          title: `已恢复答题进度(${answeredCount}/${this.data.questions.length})`,
-          icon: 'none',
-          duration: 2000
-        });
-        
-        console.log('答题进度已恢复，当前题目:', progressData.currentQuestion);
-      } else {
-        console.log('没有找到保存的答题进度');
       }
-    } catch (e) {
-      console.error('加载答题进度失败:', e);
+    } catch (error) {
+      console.error('加载答题进度失败:', error);
     }
   },
-
-  // 恢复测试进度（新增函数）
-  restoreTestProgress() {
+  
+  // 恢复测试进度
+  restoreTestProgress(progress) {
+    if (!progress) return;
+    
     try {
-      const progressData = wx.getStorageSync('mbti_progress');
-      
-      if (progressData && progressData.answers) {
-        console.log('找到保存的答题进度，恢复中...');
-        
-        // 检查进度数据是否过期（超过7天）
-        const now = new Date().getTime();
-        const progressAge = now - (progressData.lastUpdateTime || 0);
-        const maxAge = 7 * 24 * 60 * 60 * 1000; // 7天
-        
-        if (progressAge > maxAge) {
-          console.log('答题进度已过期，不进行恢复');
-          return;
+      // 根据测试模式加载对应题库
+      let questionSet = [];
+      if (progress.testMode === 'short') {
+        if (shortQuestions && Array.isArray(shortQuestions) && shortQuestions.length > 0) {
+          questionSet = shortQuestions;
+          console.log('恢复简化版题库，题目数量:', questionSet.length);
+        } else {
+          console.error('简化版题库加载失败或为空，无法恢复进度');
+          throw new Error('简化版题库加载失败');
         }
+      } else {
+        if (questions && Array.isArray(questions) && questions.length > 0) {
+          questionSet = questions;
+          console.log('恢复标准版题库，题目数量:', questionSet.length);
+        } else {
+          console.error('标准版题库加载失败或为空，无法恢复进度');
+          throw new Error('标准版题库加载失败');
+        }
+      }
+      
+      // 检查题库的有效性
+      if (questionSet.length === 0) {
+        console.error('恢复的题库为空');
+        throw new Error('题库为空');
+      }
+      
+      // 检查题库格式是否正确
+      const sampleQuestion = questionSet[0];
+      if (!sampleQuestion || !sampleQuestion.dimension) {
+        console.error('题库格式不正确，缺少必要的dimension属性');
+        throw new Error('题库格式错误');
+      }
+      
+      // 如果题库与保存的不一致，使用当前题库
+      if (questionSet.length !== progress.questions.length) {
+        console.log('题库变更，使用当前题库');
+        // 重置答案数组
+        const answers = new Array(questionSet.length).fill(null);
         
-        // 恢复答题进度
         this.setData({
-          currentQuestion: progressData.currentQuestion,
-          answers: progressData.answers,
-          selectedOption: progressData.answers[progressData.currentQuestion] || '',
+          testMode: progress.testMode,
+          questions: questionSet,
+          currentQuestion: 0,
+          selectedOption: '',
+          answers: answers,
           isTestActive: true,
+          showTestModeSelection: false,
           currentStep: 'testing'
         });
-        
-        console.log('答题进度已恢复，当前题目:', progressData.currentQuestion);
       } else {
-        console.log('没有找到保存的答题进度');
+        // 恢复保存的进度
+        // 安全检查：确保currentQuestion在有效范围内
+        const currentQuestion = Math.min(progress.currentQuestion, questionSet.length - 1);
+        
+        this.setData({
+          testMode: progress.testMode,
+          questions: questionSet,
+          currentQuestion: currentQuestion,
+          answers: progress.answers,
+          selectedOption: progress.answers[currentQuestion] || '',
+          isTestActive: true,
+          showTestModeSelection: false,
+          currentStep: 'testing'
+        });
       }
-    } catch (e) {
-      console.error('恢复答题进度失败:', e);
+      
+      console.log('已恢复测试进度:', this.data.currentQuestion + 1, '/', this.data.questions.length);
+    } catch (error) {
+      console.error('恢复测试进度失败:', error);
+      // 出错时重新开始测试
+      wx.showToast({
+        title: '恢复测试失败，请重新开始',
+        icon: 'none',
+        duration: 2000
+      });
+      this.startTest();
     }
   },
 
@@ -1890,5 +2073,34 @@ Page({
     relationships.partners = relationships.partners.slice(0, 3);
     
     return relationships;
+  },
+
+  // 开始重新测试
+  startRetest() {
+    // 获取当前MBTI类型并清除其AI建议缓存
+    if (this.data.result && this.data.result.type) {
+      wx.removeStorageSync('mbti_ai_advice_' + this.data.result.type);
+    }
+    
+    // 清除之前的答题进度
+    wx.removeStorageSync('mbti_progress');
+    
+    // 完全重置测试状态和结果
+    this.setData({
+      isRetesting: true,
+      isTestActive: false,
+      showTestModeSelection: true,
+      currentStep: 'mode_selection',
+      hasTestResult: false,
+      testCompleted: false,
+      result: null,
+      aiAdviceLoaded: false,
+      aiAdviceError: false,
+      answers: [],
+      currentQuestion: 0,
+      selectedOption: ''
+    });
+    
+    console.log('准备重新测试，已清除之前的测试结果和答题进度');
   }
 }) 

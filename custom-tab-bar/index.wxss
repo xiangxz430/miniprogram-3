@@ -65,6 +65,145 @@
   transition: all 0.3s ease;
 }
 
+/* 自定义CSS图标实现 */
+.icon-mbti {
+  width: 50rpx;
+  height: 50rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.icon-mbti:before, .icon-mbti:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background-color: #94a3b8;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.icon-mbti:after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.icon-mbti .square {
+  width: 50%;
+  height: 50%;
+  box-sizing: border-box;
+}
+
+.icon-mbti .square:nth-child(1) {
+  border-top: 3px solid #94a3b8;
+  border-left: 3px solid #94a3b8;
+}
+
+.icon-mbti .square:nth-child(2) {
+  border-top: 3px solid #94a3b8;
+  border-right: 3px solid #94a3b8;
+}
+
+.icon-mbti .square:nth-child(3) {
+  border-bottom: 3px solid #94a3b8;
+  border-left: 3px solid #94a3b8;
+}
+
+.icon-mbti .square:nth-child(4) {
+  border-bottom: 3px solid #94a3b8;
+  border-right: 3px solid #94a3b8;
+}
+
+.icon-mbti-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 50rpx;
+  height: 50rpx;
+  position: relative;
+}
+
+.icon-mbti-wrapper:before, .icon-mbti-wrapper:after {
+  content: '';
+  position: absolute;
+  background-color: #94a3b8;
+  z-index: 1;
+}
+
+.icon-mbti-wrapper:before {
+  width: 100%;
+  height: 2px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.icon-mbti-wrapper:after {
+  width: 2px;
+  height: 100%;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.icon-mbti-wrapper .square {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.icon-mbti-wrapper .square:nth-child(1) {
+  border-top: 3px solid #94a3b8;
+  border-left: 3px solid #94a3b8;
+}
+
+.icon-mbti-wrapper .square:nth-child(2) {
+  border-top: 3px solid #94a3b8;
+  border-right: 3px solid #94a3b8;
+}
+
+.icon-mbti-wrapper .square:nth-child(3) {
+  border-bottom: 3px solid #94a3b8;
+  border-left: 3px solid #94a3b8;
+}
+
+.icon-mbti-wrapper .square:nth-child(4) {
+  border-bottom: 3px solid #94a3b8;
+  border-right: 3px solid #94a3b8;
+}
+
+/* 激活状态下的MBTI图标 */
+.tab-bar-item.active .icon-mbti-wrapper:before, 
+.tab-bar-item.active .icon-mbti-wrapper:after {
+  background-color: #3b82f6;
+}
+
+.tab-bar-item.active .icon-mbti-wrapper .square:nth-child(1) {
+  border-top: 3px solid #3b82f6;
+  border-left: 3px solid #3b82f6;
+}
+
+.tab-bar-item.active .icon-mbti-wrapper .square:nth-child(2) {
+  border-top: 3px solid #3b82f6;
+  border-right: 3px solid #3b82f6;
+}
+
+.tab-bar-item.active .icon-mbti-wrapper .square:nth-child(3) {
+  border-bottom: 3px solid #3b82f6;
+  border-left: 3px solid #3b82f6;
+}
+
+.tab-bar-item.active .icon-mbti-wrapper .square:nth-child(4) {
+  border-bottom: 3px solid #3b82f6;
+  border-right: 3px solid #3b82f6;
+}
+
+.tab-bar-item.active .icon-mbti-wrapper {
+  transform: scale(1.15);
+}
+
 .tab-bar-item.active .tab-bar-item-icon {
   transform: scale(1.15);
 }

@@ -689,4 +689,4 @@ const mbtiTypes = {
   }
 }
 
-export default mbtiTypes 
+module.exports = mbtiTypes 
