@@ -13,6 +13,7 @@ console.log('types数量:', Object.keys(mbtiData.types).length);
 Page({
   data: {
     activeTab: 0,           // 当前激活的标签页（0: 性格测试, 1: 玄学人格模型, 2: AI建议）
+    tabItems: [], // 标签页配置
     hasTestResult: false,   // 是否有测试结果
     isTestActive: false,    // 是否正在测试中
     isRetesting: false,     // 是否正在重新测试
@@ -71,8 +72,10 @@ Page({
     }
   },
 
-  onLoad() {
+  onLoad(options) {
     console.log('MBTI页面加载...');
+    
+    this.loadTabConfig();
     
     // 初始化默认题库为完整版
     const defaultQuestions = questions || [];
@@ -2102,5 +2105,41 @@ Page({
     });
     
     console.log('准备重新测试，已清除之前的测试结果和答题进度');
+  },
+
+  // 加载标签页配置
+  loadTabConfig: function() {
+    wx.cloud.callFunction({
+      name: 'getMbtiTabConfig',
+      success: res => {
+        console.log('获取标签配置成功:', res);
+        if (res.result.code === 0 && res.result.data) {
+          this.setData({
+            tabItems: res.result.data
+          });
+        } else {
+          console.error('获取标签配置失败:', res.result.message);
+          // 使用默认配置
+          this.setData({
+            tabItems: [
+              { index: 0, text: '性格测试', key: 'test' },
+              { index: 1, text: '人格模型', key: 'model' },
+              { index: 2, text: 'AI建议', key: 'ai' }
+            ]
+          });
+        }
+      },
+      fail: err => {
+        console.error('调用云函数失败:', err);
+        // 使用默认配置
+        this.setData({
+          tabItems: [
+            { index: 0, text: '性格测试', key: 'test' },
+            { index: 1, text: '人格模型', key: 'model' },
+            { index: 2, text: 'AI建议', key: 'ai' }
+          ]
+        });
+      }
+    });
   }
 }) 

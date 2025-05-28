@@ -1,0 +1,14 @@
+{
+  "name": "getMbtiTabConfig",
+  "version": "1.0.0",
+  "description": "获取MBTI标签页配置",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+} 

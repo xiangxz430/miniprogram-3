@@ -6,19 +6,19 @@
     <text class="subtitle">探索你的人格特质与潜能</text>
   </view>
   
-  <!-- 标签页导航 - 优化版 -->
+  <!-- 标签页导航 - 配置化版本 -->
   <view class="tab-nav">
     <view class="tab-wrapper">
-      <view class="tab-item {{activeTab == 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0">
-        <view class="tab-text">性格测试</view>
+      <view 
+        wx:for="{{tabItems}}" 
+        wx:key="index"
+        class="tab-item {{activeTab == index ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-index="{{index}}"
+      >
+        <view class="tab-text">{{item.text}}</view>
       </view>
-      <view class="tab-item {{activeTab == 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">
-        <view class="tab-text">人格模型</view>
-      </view>
-      <view class="tab-item {{activeTab == 2 ? 'active' : ''}}" bindtap="switchTab" data-index="2">
-        <view class="tab-text">AI建议</view>
-      </view>
-      <view class="slider" style="left: {{activeTab * (100/3)}}%"></view>
+      <view class="slider" style="left: {{activeTab * (100/tabItems.length)}}%; width: {{100/tabItems.length}}%"></view>
     </view>
   </view>
   
