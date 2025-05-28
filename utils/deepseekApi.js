@@ -450,6 +450,66 @@ function callDeepseek(messages, model = 'deepseek-chat') {
   });
 }
 
+// 获取天气预报和穿衣建议
+export const getWeatherAndAdvice = async (location, userInfo) => {
+  const prompt = `基于以下信息生成天气预报和穿衣建议:
+  地点: ${location.city}
+  用户星座: ${userInfo.zodiac || '未知'}
+  请提供:
+  1. 当前天气详情(温度、天气状况、湿度、风速、空气质量)
+  2. 24小时天气预报
+  3. 基于天气和星座的穿衣建议
+  4. 运势提示
+  
+  请以JSON格式返回，包含以下字段：
+  {
+    "weather": {
+      "currentTemp": "当前温度",
+      "maxTemp": "最高温度",
+      "minTemp": "最低温度",
+      "condition": "天气状况",
+      "humidity": "湿度",
+      "windSpeed": "风速",
+      "airQuality": "空气质量",
+      "hourlyForecast": [
+        {
+          "time": "时间点",
+          "temp": "温度",
+          "rainProb": "降水概率"
+        }
+      ]
+    },
+    "clothingAdvice": {
+      "index": "穿衣指数",
+      "recommendation": "推荐搭配",
+      "tips": "特别提示",
+      "zodiacAdvice": "星座运势提示"
+    }
+  }`;
+  
+  return await callDeepSeekAPI(prompt);
+};
+
+// 字测分析
+export const getCharacterAnalysis = async (character, userQuestion) => {
+  const prompt = `用户心中想着"${userQuestion}"，输入了"${character}"字。
+  请按照以下步骤分析:
+  1. 拆解该字的结构(偏旁部首、笔画数等)
+  2. 根据焦氏易林原理进行卦象分析
+  3. 关联用户心中所想的事
+  4. 给出运势建议和行动指南
+  
+  请以JSON格式返回，包含以下字段：
+  {
+    "structure": "字形结构分析",
+    "hexagram": "卦象解析",
+    "interpretation": "关联解读",
+    "advice": "运势建议"
+  }`;
+  
+  return await callDeepSeekAPI(prompt);
+};
+
 module.exports = {
   getHexagramInterpretation,
   getMbtiAiAdvice,

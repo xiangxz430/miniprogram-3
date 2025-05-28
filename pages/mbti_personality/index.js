@@ -13,7 +13,12 @@ console.log('types数量:', Object.keys(mbtiData.types).length);
 Page({
   data: {
     activeTab: 0,           // 当前激活的标签页（0: 性格测试, 1: 玄学人格模型, 2: AI建议）
-    tabItems: [], // 标签页配置
+    tabItems: [
+      { text: '测试' },
+      { text: '模型' },
+      { text: 'AI建议' },
+      { text: '每日分析' }
+    ],
     hasTestResult: false,   // 是否有测试结果
     isTestActive: false,    // 是否正在测试中
     isRetesting: false,     // 是否正在重新测试
@@ -69,7 +74,30 @@ Page({
       stressManagement: '', // 压力管理
       growthAreas: [],      // 成长方向
       pitfalls: []          // 需避免的陷阱
-    }
+    },
+    // 天气相关数据
+    weatherData: {
+      city: '',
+      currentTemp: '--',
+      maxTemp: '--',
+      minTemp: '--',
+      condition: '--',
+      humidity: '--',
+      windSpeed: '--',
+      airQuality: '--',
+      hourlyForecast: []
+    },
+    currentTime: '',
+    // 穿衣建议
+    clothingAdvice: {
+      index: '--',
+      recommendation: '',
+      tips: '',
+      zodiacAdvice: ''
+    },
+    // 字测相关
+    inputCharacter: '',
+    characterResult: null
   },
 
   onLoad(options) {
@@ -124,6 +152,9 @@ Page({
         directionTip: '东南方向适合设立工作台，有助于提升思考能力和创造力。'
       }
     });
+    
+    this.updateCurrentTime();
+    this.loadWeatherData();
   },
 
   onShow() {
@@ -135,6 +166,17 @@ Page({
           selected: 3 // 更新为3，因为首页是0，每日一挂是1，八字总运是2
         })
       }
+    }
+    
+    // 每分钟更新一次时间
+    this.timeInterval = setInterval(() => {
+      this.updateCurrentTime();
+    }, 60000);
+  },
+
+  onHide() {
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
     }
   },
 
@@ -2141,5 +2183,97 @@ Page({
         });
       }
     });
+  },
+
+  // 更新当前时间
+  updateCurrentTime() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    this.setData({
+      currentTime: `${hours}:${minutes}`
+    });
+  },
+
+  // 加载天气数据
+  async loadWeatherData() {
+    try {
+      // 从本地存储获取位置和用户信息
+      const location = wx.getStorageSync('userLocation') || { city: '北京' };
+      const userInfo = wx.getStorageSync('userInfo') || {};
+      
+      // 检查是否有当天的缓存数据
+      const today = new Date().toDateString();
+      const cachedData = wx.getStorageSync('weatherData');
+      if (cachedData && cachedData.date === today) {
+        this.setData({
+          weatherData: cachedData.data,
+          clothingAdvice: cachedData.clothingAdvice
+        });
+        return;
+      }
+      
+      // 调用API获取新数据
+      const { weather, clothingAdvice } = await getWeatherAndAdvice(location, userInfo);
+      
+      // 更新数据
+      this.setData({
+        weatherData: weather,
+        clothingAdvice
+      });
+      
+      // 缓存数据
+      wx.setStorageSync('weatherData', {
+        date: today,
+        data: weather,
+        clothingAdvice
+      });
+    } catch (error) {
+      console.error('加载天气数据失败:', error);
+      wx.showToast({
+        title: '获取天气信息失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 字符输入处理
+  onCharacterInput(e) {
+    this.setData({
+      inputCharacter: e.detail.value
+    });
+  },
+
+  // 提交字测分析
+  async submitCharacter() {
+    const { inputCharacter } = this.data;
+    if (!inputCharacter) {
+      wx.showToast({
+        title: '请输入一个汉字',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    try {
+      wx.showLoading({
+        title: '正在解析...'
+      });
+      
+      const result = await getCharacterAnalysis(inputCharacter, '用户未指定问题');
+      
+      this.setData({
+        characterResult: result
+      });
+      
+      wx.hideLoading();
+    } catch (error) {
+      console.error('字测分析失败:', error);
+      wx.hideLoading();
+      wx.showToast({
+        title: '解析失败，请重试',
+        icon: 'none'
+      });
+    }
   }
 }) 

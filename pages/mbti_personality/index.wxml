@@ -6,7 +6,7 @@
     <text class="subtitle">探索你的人格特质与潜能</text>
   </view>
   
-  <!-- 标签页导航 - 配置化版本 -->
+  <!-- 标签页导航 -->
   <view class="tab-nav">
     <view class="tab-wrapper">
       <view 
@@ -685,5 +685,119 @@
         </view>
       </view>
     </block>
+  </view>
+
+  <!-- 每日分析标签页 -->
+  <view class="tab-content" hidden="{{activeTab != 3}}">
+    <!-- 天气卡片 -->
+    <view class="weather-card">
+      <view class="location-info">
+        <text class="city-name">{{weatherData.city}}</text>
+        <text class="current-time">{{currentTime}}</text>
+      </view>
+      
+      <view class="weather-info">
+        <view class="current-weather">
+          <text class="temperature">{{weatherData.currentTemp}}°</text>
+          <view class="temp-range">
+            <text>最高 {{weatherData.maxTemp}}°</text>
+            <text>最低 {{weatherData.minTemp}}°</text>
+          </view>
+        </view>
+        
+        <view class="weather-details">
+          <view class="detail-item">
+            <text class="label">天气</text>
+            <text class="value">{{weatherData.condition}}</text>
+          </view>
+          <view class="detail-item">
+            <text class="label">湿度</text>
+            <text class="value">{{weatherData.humidity}}%</text>
+          </view>
+          <view class="detail-item">
+            <text class="label">风速</text>
+            <text class="value">{{weatherData.windSpeed}}</text>
+          </view>
+          <view class="detail-item">
+            <text class="label">空气质量</text>
+            <text class="value">{{weatherData.airQuality}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 24小时天气预报 -->
+      <view class="hourly-forecast">
+        <scroll-view scroll-x="true" class="forecast-scroll">
+          <view class="forecast-item" wx:for="{{weatherData.hourlyForecast}}" wx:key="time">
+            <text class="time">{{item.time}}</text>
+            <text class="temp">{{item.temp}}°</text>
+            <text class="rain-prob" wx:if="{{item.rainProb}}">{{item.rainProb}}%</text>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+    
+    <!-- AI穿衣建议 -->
+    <view class="clothing-advice">
+      <view class="advice-header">
+        <text class="title">今日穿衣建议</text>
+        <text class="index">指数：{{clothingAdvice.index}}</text>
+      </view>
+      
+      <view class="advice-content">
+        <view class="recommended-clothes">
+          <text class="subtitle">推荐搭配</text>
+          <text class="content">{{clothingAdvice.recommendation}}</text>
+        </view>
+        
+        <view class="special-tips">
+          <text class="subtitle">特别提示</text>
+          <text class="content">{{clothingAdvice.tips}}</text>
+        </view>
+        
+        <view class="zodiac-tips">
+          <text class="subtitle">星座运势提示</text>
+          <text class="content">{{clothingAdvice.zodiacAdvice}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 字测部分 -->
+    <view class="character-test">
+      <view class="test-input">
+        <text class="input-tip">心中默念一件事，输入一个字</text>
+        <input class="character-input" 
+               type="text" 
+               maxlength="1" 
+               placeholder="请输入一个汉字" 
+               value="{{inputCharacter}}"
+               bindinput="onCharacterInput" />
+        <button class="submit-btn" bindtap="submitCharacter">解析</button>
+      </view>
+      
+      <view class="test-result" wx:if="{{characterResult}}">
+        <view class="input-character">{{inputCharacter}}</view>
+        
+        <view class="analysis-section">
+          <text class="section-title">字形结构</text>
+          <text class="section-content">{{characterResult.structure}}</text>
+        </view>
+        
+        <view class="analysis-section">
+          <text class="section-title">卦象解析</text>
+          <text class="section-content">{{characterResult.hexagram}}</text>
+        </view>
+        
+        <view class="analysis-section">
+          <text class="section-title">关联解读</text>
+          <text class="section-content">{{characterResult.interpretation}}</text>
+        </view>
+        
+        <view class="analysis-section">
+          <text class="section-title">运势建议</text>
+          <text class="section-content">{{characterResult.advice}}</text>
+        </view>
+      </view>
+    </view>
   </view>
 </view> 

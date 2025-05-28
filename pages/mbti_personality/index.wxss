@@ -1849,4 +1849,240 @@
   color: #6b7280;
   line-height: 1.5;
   flex: 1;
+}
+
+/* 天气卡片样式 */
+.weather-card {
+  background: linear-gradient(135deg, #4f46e5, #2563eb);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  color: #ffffff;
+  margin: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(37, 99, 235, 0.2);
+}
+
+.location-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.city-name {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.current-time {
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+.weather-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.current-weather {
+  flex: 1;
+}
+
+.temperature {
+  font-size: 72rpx;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.temp-range {
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+.temp-range text {
+  margin-right: 20rpx;
+}
+
+.weather-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+}
+
+.detail-item {
+  text-align: center;
+}
+
+.detail-item .label {
+  font-size: 24rpx;
+  opacity: 0.8;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.detail-item .value {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.hourly-forecast {
+  margin-top: 20rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.2);
+  padding-top: 20rpx;
+}
+
+.forecast-scroll {
+  white-space: nowrap;
+}
+
+.forecast-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20rpx;
+}
+
+.forecast-item .time {
+  font-size: 24rpx;
+  opacity: 0.8;
+  margin-bottom: 8rpx;
+}
+
+.forecast-item .temp {
+  font-size: 28rpx;
+  font-weight: 500;
+  margin-bottom: 4rpx;
+}
+
+.forecast-item .rain-prob {
+  font-size: 22rpx;
+  opacity: 0.8;
+}
+
+/* AI穿衣建议样式 */
+.clothing-advice {
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.advice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.advice-header .title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.advice-header .index {
+  font-size: 28rpx;
+  color: #4f46e5;
+}
+
+.advice-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.recommended-clothes,
+.special-tips,
+.zodiac-tips {
+  padding: 16rpx 0;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #4b5563;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.content {
+  font-size: 26rpx;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* 字测部分样式 */
+.character-test {
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.test-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.input-tip {
+  font-size: 28rpx;
+  color: #4b5563;
+  text-align: center;
+}
+
+.character-input {
+  width: 120rpx;
+  height: 120rpx;
+  border: 2rpx solid #e5e7eb;
+  border-radius: 12rpx;
+  font-size: 64rpx;
+  text-align: center;
+  background: #f9fafb;
+}
+
+.submit-btn {
+  background: #4f46e5;
+  color: #ffffff;
+  border-radius: 8rpx;
+  padding: 16rpx 40rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+.test-result {
+  margin-top: 30rpx;
+}
+
+.input-character {
+  font-size: 96rpx;
+  text-align: center;
+  margin-bottom: 30rpx;
+  color: #1f2937;
+}
+
+.analysis-section {
+  margin-bottom: 24rpx;
+  padding: 16rpx;
+  background: #f9fafb;
+  border-radius: 12rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #4b5563;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.section-content {
+  font-size: 26rpx;
+  color: #6b7280;
+  line-height: 1.6;
 } 
