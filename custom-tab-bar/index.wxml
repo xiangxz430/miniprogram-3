@@ -17,6 +17,12 @@
               <view class="square"></view>
             </view>
           </block>
+          <block wx:elif="{{item.iconPath.includes('user')}}">
+            <view class="icon-user-wrapper {{selected === index ? 'active' : ''}}">
+              <view class="icon-user-head"></view>
+              <view class="icon-user-body"></view>
+            </view>
+          </block>
           <block wx:else>
             <image class="tab-bar-item-icon" src="{{selected === index ? item.selectedIconPath : item.iconPath}}"></image>
           </block>

@@ -487,7 +487,82 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
     }
   }`;
   
-  return await callDeepSeekAPI(prompt);
+  const messages = [
+    {
+      role: 'system',
+      content: '你是一位专业的天气预报和穿衣搭配顾问。请始终以JSON格式返回数据，不要包含任何其他文本。确保返回的JSON格式完全符合要求的结构。'
+    },
+    {
+      role: 'user',
+      content: prompt
+    }
+  ];
+
+  try {
+    const response = await callDeepseek(messages);
+    
+    // 从响应中提取JSON字符串
+    const jsonContent = response.match(/```json\n([\s\S]*?)\n```/);
+    if (!jsonContent || !jsonContent[1]) {
+      console.error('无法从响应中提取JSON内容');
+      throw new Error('无法从响应中提取JSON内容');
+    }
+
+    try {
+      const result = JSON.parse(jsonContent[1]);
+      
+      // 验证返回的数据结构
+      if (!result.weather || !result.clothingAdvice) {
+        throw new Error('返回的数据结构不完整');
+      }
+
+      // 确保返回默认值
+      return {
+        weather: {
+          city: location.city,
+          currentTemp: result.weather.currentTemp || '--',
+          maxTemp: result.weather.maxTemp || '--',
+          minTemp: result.weather.minTemp || '--',
+          condition: result.weather.condition || '未知',
+          humidity: result.weather.humidity || '--',
+          windSpeed: result.weather.windSpeed || '--',
+          airQuality: result.weather.airQuality || '--',
+          hourlyForecast: result.weather.hourlyForecast || []
+        },
+        clothingAdvice: {
+          index: result.clothingAdvice.index || '舒适',
+          recommendation: result.clothingAdvice.recommendation || '暂无建议',
+          tips: result.clothingAdvice.tips || '暂无提示',
+          zodiacAdvice: result.clothingAdvice.zodiacAdvice || '暂无星座建议'
+        }
+      };
+    } catch (parseError) {
+      console.error('JSON解析失败:', parseError);
+      throw new Error('JSON解析失败');
+    }
+  } catch (error) {
+    console.error('获取天气数据失败:', error);
+    // 返回默认数据而不是抛出错误
+    return {
+      weather: {
+        city: location.city,
+        currentTemp: '--',
+        maxTemp: '--',
+        minTemp: '--',
+        condition: '未知',
+        humidity: '--',
+        windSpeed: '--',
+        airQuality: '--',
+        hourlyForecast: []
+      },
+      clothingAdvice: {
+        index: '舒适',
+        recommendation: '暂无建议',
+        tips: '获取数据失败，请稍后再试',
+        zodiacAdvice: '暂无星座建议'
+      }
+    };
+  }
 };
 
 // 字测分析
@@ -501,17 +576,107 @@ export const getCharacterAnalysis = async (character, userQuestion) => {
   
   请以JSON格式返回，包含以下字段：
   {
-    "structure": "字形结构分析",
-    "hexagram": "卦象解析",
+    "structure": {
+      "character": "输入的汉字",
+      "radical": "偏旁部首",
+      "strokes": "笔画数",
+      "components": ["组成部件"]
+    },
+    "hexagram": {
+      "primary": "主卦",
+      "secondary": "变卦",
+      "interpretation": "卦象解释"
+    },
     "interpretation": "关联解读",
-    "advice": "运势建议"
+    "advice": {
+      "general": "总体建议",
+      "action": ["具体行动建议"],
+      "caution": "需要注意的事项"
+    }
   }`;
-  
-  return await callDeepSeekAPI(prompt);
+
+  const messages = [
+    {
+      role: 'system',
+      content: '你是一位精通汉字结构和易经卦象的专家。请始终以JSON格式返回数据，不要包含任何其他文本。确保返回的JSON格式完全符合要求的结构。'
+    },
+    {
+      role: 'user',
+      content: prompt
+    }
+  ];
+
+  try {
+    const response = await callDeepseek(messages);
+    
+    // 从响应中提取JSON字符串
+    const jsonContent = response.match(/```json\n([\s\S]*?)\n```/);
+    if (!jsonContent || !jsonContent[1]) {
+      console.error('无法从响应中提取JSON内容');
+      throw new Error('无法从响应中提取JSON内容');
+    }
+
+    try {
+      const result = JSON.parse(jsonContent[1]);
+      
+      // 验证返回的数据结构
+      if (!result.structure || !result.hexagram || !result.interpretation || !result.advice) {
+        throw new Error('返回的数据结构不完整');
+      }
+
+      // 格式化返回数据
+      return {
+        structure: {
+          character: result.structure.character || character,
+          radical: result.structure.radical || '未知',
+          strokes: result.structure.strokes || 0,
+          components: result.structure.components || []
+        },
+        hexagram: {
+          primary: result.hexagram.primary || '未知',
+          secondary: result.hexagram.secondary || '未知',
+          interpretation: result.hexagram.interpretation || '暂无解析'
+        },
+        interpretation: result.interpretation || '暂无解读',
+        advice: {
+          general: result.advice.general || '暂无建议',
+          action: Array.isArray(result.advice.action) ? result.advice.action : ['暂无具体建议'],
+          caution: result.advice.caution || '暂无注意事项'
+        }
+      };
+    } catch (parseError) {
+      console.error('JSON解析失败:', parseError);
+      throw new Error('JSON解析失败');
+    }
+  } catch (error) {
+    console.error('字测分析失败:', error);
+    // 返回默认数据而不是抛出错误
+    return {
+      structure: {
+        character: character,
+        radical: '未知',
+        strokes: 0,
+        components: []
+      },
+      hexagram: {
+        primary: '未知',
+        secondary: '未知',
+        interpretation: '分析失败，请稍后再试'
+      },
+      interpretation: '暂无解读',
+      advice: {
+        general: '暂无建议',
+        action: ['请稍后再试'],
+        caution: '暂无注意事项'
+      }
+    };
+  }
 };
 
 module.exports = {
   getHexagramInterpretation,
   getMbtiAiAdvice,
-  callDeepseek
+  callDeepseek,
+  getWeatherAndAdvice,
+  getCharacterAnalysis
 }; 

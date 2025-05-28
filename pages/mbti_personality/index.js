@@ -4,6 +4,7 @@ const shortQuestions = require('./short_questions.js')
 const mbtiTypes = require('./mbti-types.js')
 const mbtiData = require('../../utils/mbtiFullDataMerged')
 const deepseekApi = require('../../utils/deepseekApi')
+const { getWeatherAndAdvice, getCharacterAnalysis } = deepseekApi
 
 console.log('加载MBTI页面相关资源...');
 console.log('完整版题目数量:', questions.length);
@@ -97,7 +98,25 @@ Page({
     },
     // 字测相关
     inputCharacter: '',
-    characterResult: null
+    characterResult: {
+      structure: {
+        character: '',
+        radical: '',
+        strokes: 0,
+        components: []
+      },
+      hexagram: {
+        primary: '',
+        secondary: '',
+        interpretation: ''
+      },
+      interpretation: '',
+      advice: {
+        general: '',
+        action: [],
+        caution: ''
+      }
+    }
   },
 
   onLoad(options) {

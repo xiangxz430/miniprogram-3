@@ -763,39 +763,63 @@
     </view>
     
     <!-- 字测部分 -->
-    <view class="character-test">
-      <view class="test-input">
-        <text class="input-tip">心中默念一件事，输入一个字</text>
-        <input class="character-input" 
-               type="text" 
-               maxlength="1" 
-               placeholder="请输入一个汉字" 
-               value="{{inputCharacter}}"
-               bindinput="onCharacterInput" />
-        <button class="submit-btn" bindtap="submitCharacter">解析</button>
+    <view class="character-analysis">
+      <view class="input-section">
+        <view class="input-header">
+          <text class="input-title">字测分析</text>
+          <text class="input-desc">心中默念一件事，输入一个字进行分析</text>
+        </view>
+        <view class="input-box">
+          <input class="character-input" 
+                 type="text" 
+                 value="{{inputCharacter}}" 
+                 bindinput="onCharacterInput" 
+                 placeholder="请输入一个汉字" 
+                 maxlength="1" />
+        </view>
+        <button class="submit-btn" bindtap="submitCharacter">开始分析</button>
       </view>
-      
-      <view class="test-result" wx:if="{{characterResult}}">
-        <view class="input-character">{{inputCharacter}}</view>
-        
-        <view class="analysis-section">
-          <text class="section-title">字形结构</text>
-          <text class="section-content">{{characterResult.structure}}</text>
+
+      <view class="analysis-result" wx:if="{{characterResult.structure.character}}">
+        <view class="section structure-section">
+          <view class="section-title">字形结构</view>
+          <view class="structure-content">
+            <view class="structure-item">汉字：{{characterResult.structure.character}}</view>
+            <view class="structure-item">部首：{{characterResult.structure.radical}}</view>
+            <view class="structure-item">笔画：{{characterResult.structure.strokes}}</view>
+            <view class="structure-item">组成部件：{{characterResult.structure.components.join('、')}}</view>
+          </view>
         </view>
-        
-        <view class="analysis-section">
-          <text class="section-title">卦象解析</text>
-          <text class="section-content">{{characterResult.hexagram}}</text>
+
+        <view class="section hexagram-section">
+          <view class="section-title">卦象分析</view>
+          <view class="hexagram-content">
+            <view class="hexagram-item">主卦：{{characterResult.hexagram.primary}}</view>
+            <view class="hexagram-item">变卦：{{characterResult.hexagram.secondary}}</view>
+            <view class="hexagram-item">卦象解释：{{characterResult.hexagram.interpretation}}</view>
+          </view>
         </view>
-        
-        <view class="analysis-section">
-          <text class="section-title">关联解读</text>
-          <text class="section-content">{{characterResult.interpretation}}</text>
+
+        <view class="section interpretation-section">
+          <view class="section-title">关联解读</view>
+          <view class="interpretation-content">{{characterResult.interpretation}}</view>
         </view>
-        
-        <view class="analysis-section">
-          <text class="section-title">运势建议</text>
-          <text class="section-content">{{characterResult.advice}}</text>
+
+        <view class="section advice-section">
+          <view class="section-title">运势建议</view>
+          <view class="advice-content">
+            <view class="advice-general">{{characterResult.advice.general}}</view>
+            <view class="advice-actions">
+              <view class="action-title">具体行动建议：</view>
+              <view class="action-item" wx:for="{{characterResult.advice.action}}" wx:key="index">
+                {{index + 1}}. {{item}}
+              </view>
+            </view>
+            <view class="advice-caution">
+              <view class="caution-title">注意事项：</view>
+              <view class="caution-content">{{characterResult.advice.caution}}</view>
+            </view>
+          </view>
         </view>
       </view>
     </view>
