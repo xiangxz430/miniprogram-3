@@ -2217,9 +2217,11 @@ Page({
   // 加载天气数据
   async loadWeatherData() {
     try {
-      // 从本地存储获取位置和用户信息
-      const location = wx.getStorageSync('userLocation') || { city: '北京' };
-      const userInfo = wx.getStorageSync('userInfo') || {};
+      // 从用户设置中获取位置信息
+      const userSettings = wx.getStorageSync('userSettings') || {杭州};
+      const location = {
+        city: userSettings.currentLocation ? userSettings.currentLocation.split('，')[0] : '杭州'
+      };
       
       // 检查是否有当天的缓存数据
       const today = new Date().toDateString();
@@ -2233,7 +2235,7 @@ Page({
       }
       
       // 调用API获取新数据
-      const { weather, clothingAdvice } = await getWeatherAndAdvice(location, userInfo);
+      const { weather, clothingAdvice } = await getWeatherAndAdvice(location, userSettings);
       
       // 更新数据
       this.setData({

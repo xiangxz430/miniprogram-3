@@ -774,7 +774,7 @@
                  type="text" 
                  value="{{inputCharacter}}" 
                  bindinput="onCharacterInput" 
-                 placeholder="请输入一个汉字" 
+                 placeholder="" 
                  maxlength="1" />
         </view>
         <button class="submit-btn" bindtap="submitCharacter">开始分析</button>
