@@ -24,8 +24,30 @@
   
   <!-- 测试内容标签页 -->
   <view class="tab-content" hidden="{{activeTab != 0}}">
+    <!-- 测试模式选择界面 -->
+    <block wx:if="{{showTestModeSelection}}">
+      <view class="mode-selection">
+        <view class="mode-title">选择测试版本</view>
+        <view class="mode-description">请选择适合您的测试版本</view>
+        
+        <view class="mode-options">
+          <view class="mode-option" bindtap="selectTestMode" data-mode="standard">
+            <view class="mode-icon">📝</view>
+            <view class="mode-name">标准版</view>
+            <view class="mode-detail">141题完整测试，约需15-20分钟</view>
+          </view>
+          
+          <view class="mode-option" bindtap="selectTestMode" data-mode="short">
+            <view class="mode-icon">⚡️</view>
+            <view class="mode-name">简化版</view>
+            <view class="mode-detail">31题精简测试，约需5-8分钟</view>
+          </view>
+        </view>
+      </view>
+    </block>
+    
     <!-- 测试未完成时显示题目 -->
-    <block wx:if="{{!testCompleted}}">
+    <block wx:elif="{{!testCompleted}}">
       <view class="progress-container">
         <view class="progress-text">问题 {{currentQuestion + 1}}/{{questions.length}}</view>
         <view class="progress-bar">
@@ -48,9 +70,13 @@
         </view>
       </view>
       
+      <!-- 导航按钮 -->
       <view class="navigation-buttons">
-        <button class="prev-btn" bindtap="prevQuestion" disabled="{{currentQuestion === 0}}">上一题</button>
-        <button class="next-btn" bindtap="nextQuestion" disabled="{{!selectedOption}}">{{currentQuestion === questions.length - 1 ? '完成测试' : '下一题'}}</button>
+        <view class="question-nav">
+          <button class="prev-btn" bindtap="prevQuestion" disabled="{{currentQuestion === 0}}">上一题</button>
+          <button class="next-btn" bindtap="nextQuestion" disabled="{{!selectedOption}}">{{currentQuestion === questions.length - 1 ? '完成测试' : '下一题'}}</button>
+        </view>
+        <button class="back-to-mode-btn" bindtap="backToTestMode">返回选择测试版本</button>
       </view>
       
       <view class="test-tips">
@@ -762,11 +788,11 @@
       </view>
     </view>
     
-    <!-- 字测部分 -->
+    <!-- 测字部分 -->
     <view class="character-analysis">
       <view class="input-section">
         <view class="input-header">
-          <text class="input-title">字测分析</text>
+          <text class="input-title">测字</text>
           <text class="input-desc">心中默念一件事，输入一个字进行分析</text>
         </view>
         <view class="input-box">

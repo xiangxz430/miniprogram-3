@@ -210,12 +210,19 @@
 /* 导航按钮 */
 .navigation-buttons {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 20rpx;
   margin-top: 30rpx;
 }
 
+.question-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
 .prev-btn, .next-btn {
+  flex: 1;
   padding: 16rpx 32rpx;
   border-radius: 16rpx;
   font-size: 28rpx;
@@ -241,6 +248,21 @@
 .next-btn[disabled] {
   opacity: 0.5;
   background-color: #93c5fd;
+}
+
+.back-to-mode-btn {
+  width: 100%;
+  padding: 16rpx 32rpx;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1rpx solid #d1d5db;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  margin-top: 10rpx;
+}
+
+.back-to-mode-btn:active {
+  background-color: #e5e7eb;
 }
 
 /* 测试提示 */
@@ -2298,4 +2320,63 @@
   background: #fef2f2;
   border-radius: 12rpx;
   border-left: 4rpx solid #dc2626;
+}
+
+/* 测试模式选择界面 */
+.mode-selection {
+  padding: 30rpx;
+  text-align: center;
+}
+
+.mode-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.mode-description {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 40rpx;
+}
+
+.mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+  padding: 20rpx;
+}
+
+.mode-option {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.mode-option:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.mode-icon {
+  font-size: 48rpx;
+  margin-bottom: 20rpx;
+}
+
+.mode-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.mode-detail {
+  font-size: 24rpx;
+  color: #666;
 } 

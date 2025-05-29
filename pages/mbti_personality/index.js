@@ -320,7 +320,14 @@ Page({
   // 切换标签页
   switchTab(e) {
     const index = e.currentTarget.dataset.index;
-    console.log('切换到标签页:', index);
+    const currentIndex = this.data.activeTab;
+    console.log('从标签页', currentIndex, '切换到标签页:', index);
+    
+    // 如果当前在测试标签页，且正在测试中，保存进度
+    if (currentIndex === 0 && this.data.isTestActive && !this.data.testCompleted) {
+      this.saveProgress();
+      console.log('保存当前答题进度');
+    }
     
     // 如果切换到人格模型标签页，确保模型数据已更新
     if (index == 1 && this.data.result) {
@@ -338,20 +345,21 @@ Page({
       }
     }
     
+    // 如果切换到测试标签页，检查是否有未完成的测试
+    if (index == 0) {
+      // 如果正在测试中且有保存的进度，恢复进度
+      if (this.data.isTestActive && !this.data.testCompleted) {
+        const progress = wx.getStorageSync('mbti_progress');
+        if (progress) {
+          this.restoreTestProgress(progress);
+          console.log('恢复答题进度');
+        }
+      }
+    }
+    
     this.setData({
       activeTab: parseInt(index)
     });
-    
-    // 如果切换到性格测试标签页，并且未完成测试，则恢复答题进度
-    if (index == 0 && !this.data.testCompleted) {
-      this.restoreTestProgress();
-    } else {
-      // 如果切换到其他标签页，重置问题状态
-      this.setData({
-        currentQuestion: 0,
-        selectedOption: ''
-      });
-    }
   },
 
   // 切换到测试标签页
@@ -827,37 +835,8 @@ Page({
   
   // 重新测试
   restartTest() {
-    // 获取当前MBTI类型并清除其AI建议缓存
-    if (this.data.result && this.data.result.type) {
-      wx.removeStorageSync('mbti_ai_advice_' + this.data.result.type);
-    }
-    
-    // 重置测试状态
-    const answers = new Array(this.data.questions.length).fill(null);
-    
-    this.setData({
-      testCompleted: false,
-      hasTestResult: false,
-      currentQuestion: 0,
-      selectedOption: '',
-      answers: answers,
-      result: null,
-      aiAdviceLoaded: false,
-      aiAdviceError: false,
-      currentStep: 'welcome'  // 回到欢迎页面
-    });
-    
-    // 清除保存的答题进度和结果
-    wx.removeStorageSync('mbti_progress');
-    wx.removeStorageSync('mbti_result');
-    
-    // 滚动到页面顶部
-    wx.pageScrollTo({
-      scrollTop: 0,
-      duration: 300
-    });
-    
-    console.log('重新开始测试，已清除测试结果');
+    // 直接调用startTest方法来显示测试模式选择界面
+    this.startTest();
   },
   
   // 添加测试历史
@@ -2296,5 +2275,15 @@ Page({
         icon: 'none'
       });
     }
+  },
+
+  // 返回测试模式选择
+  backToTestMode() {
+    this.setData({
+      showTestModeSelection: true,
+      currentQuestion: 0,
+      selectedOption: '',
+      answers: new Array(this.data.questions.length).fill(null)
+    });
   }
 }) 
