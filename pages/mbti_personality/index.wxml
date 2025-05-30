@@ -788,62 +788,116 @@
       </view>
     </view>
     
-    <!-- 测字部分 -->
-    <view class="character-analysis">
+    <!-- 测事部分 -->
+    <view class="divination-analysis">
       <view class="input-section">
         <view class="input-header">
-          <text class="input-title">测字</text>
-          <text class="input-desc">心中默念一件事，输入一个字进行分析</text>
+          <text class="input-title">测事问卦</text>
+          <text class="input-desc">请输入你想测的事情，我们将为你进行周易分析</text>
         </view>
         <view class="input-box">
-          <input class="character-input" 
-                 type="text" 
-                 value="{{inputCharacter}}" 
-                 bindinput="onCharacterInput" 
-                 placeholder="" 
-                 maxlength="1" />
+          <textarea class="matter-input" 
+                    value="{{inputText}}" 
+                    bindinput="onTextInput" 
+                    placeholder="例如：我最近的工作变动是否顺利？" 
+                    maxlength="100" />
+          <text class="input-limit">{{inputText.length}}/100</text>
         </view>
-        <button class="submit-btn" bindtap="submitCharacter">开始分析</button>
+        <button class="submit-btn" bindtap="submitDivination">开始分析</button>
       </view>
 
-      <view class="analysis-result" wx:if="{{characterResult.structure.character}}">
-        <view class="section structure-section">
-          <view class="section-title">字形结构</view>
-          <view class="structure-content">
-            <view class="structure-item">汉字：{{characterResult.structure.character}}</view>
-            <view class="structure-item">部首：{{characterResult.structure.radical}}</view>
-            <view class="structure-item">笔画：{{characterResult.structure.strokes}}</view>
-            <view class="structure-item">组成部件：{{characterResult.structure.components.join('、')}}</view>
-          </view>
-        </view>
-
+      <view class="analysis-result" wx:if="{{divinationResult.hexagram.name}}">
         <view class="section hexagram-section">
           <view class="section-title">卦象分析</view>
           <view class="hexagram-content">
-            <view class="hexagram-item">主卦：{{characterResult.hexagram.primary}}</view>
-            <view class="hexagram-item">变卦：{{characterResult.hexagram.secondary}}</view>
-            <view class="hexagram-item">卦象解释：{{characterResult.hexagram.interpretation}}</view>
+            <view class="hexagram-item">本卦：{{divinationResult.hexagram.name}}</view>
+            <view class="hexagram-desc">{{divinationResult.hexagram.description}}</view>
+            <view class="hexagram-analysis">{{divinationResult.hexagram.analysis}}</view>
           </view>
         </view>
 
-        <view class="section interpretation-section">
-          <view class="section-title">关联解读</view>
-          <view class="interpretation-content">{{characterResult.interpretation}}</view>
+        <view class="section trend-section">
+          <view class="section-title">事态发展</view>
+          <view class="trend-content">
+            <view class="trend-item">
+              <text class="trend-label">当前形势：</text>
+              <text class="trend-text">{{divinationResult.trend.current}}</text>
+            </view>
+            <view class="trend-item">
+              <text class="trend-label">发展趋势：</text>
+              <text class="trend-text">{{divinationResult.trend.future}}</text>
+            </view>
+            <view class="trend-item">
+              <text class="trend-label">时机分析：</text>
+              <text class="trend-text">{{divinationResult.trend.timing}}</text>
+            </view>
+          </view>
         </view>
 
-        <view class="section advice-section">
-          <view class="section-title">运势建议</view>
-          <view class="advice-content">
-            <view class="advice-general">{{characterResult.advice.general}}</view>
-            <view class="advice-actions">
-              <view class="action-title">具体行动建议：</view>
-              <view class="action-item" wx:for="{{characterResult.advice.action}}" wx:key="index">
-                {{index + 1}}. {{item}}
+        <view class="section guidance-section">
+          <view class="section-title">趋吉避凶</view>
+          <view class="guidance-content">
+            <view class="guidance-group">
+              <text class="guidance-label">有利因素：</text>
+              <view class="guidance-items">
+                <text class="guidance-item" wx:for="{{divinationResult.guidance.favorable}}" wx:key="index">{{item}}</text>
               </view>
             </view>
-            <view class="advice-caution">
-              <view class="caution-title">注意事项：</view>
-              <view class="caution-content">{{characterResult.advice.caution}}</view>
+            <view class="guidance-group">
+              <text class="guidance-label">不利因素：</text>
+              <view class="guidance-items">
+                <text class="guidance-item" wx:for="{{divinationResult.guidance.unfavorable}}" wx:key="index">{{item}}</text>
+              </view>
+            </view>
+            <view class="guidance-group">
+              <text class="guidance-label">注意事项：</text>
+              <view class="guidance-items">
+                <text class="guidance-item" wx:for="{{divinationResult.guidance.precautions}}" wx:key="index">{{item}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="section recommendations-section">
+          <view class="section-title">开运建议</view>
+          <view class="recommendations-content">
+            <view class="recommendation-item">
+              <text class="recommendation-label">最佳时机：</text>
+              <text class="recommendation-text">{{divinationResult.recommendations.timing}}</text>
+            </view>
+            <view class="recommendation-item">
+              <text class="recommendation-label">有利方位：</text>
+              <text class="recommendation-text">{{divinationResult.recommendations.direction}}</text>
+            </view>
+            <view class="recommendation-item">
+              <text class="recommendation-label">有利颜色：</text>
+              <view class="color-tags">
+                <text class="color-tag" wx:for="{{divinationResult.recommendations.colors}}" wx:key="index">{{item}}</text>
+              </view>
+            </view>
+            <view class="recommendation-item">
+              <text class="recommendation-label">建议行动：</text>
+              <view class="action-list">
+                <text class="action-item" wx:for="{{divinationResult.recommendations.actions}}" wx:key="index">{{index + 1}}. {{item}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="section resolution-section">
+          <view class="section-title">化解方案</view>
+          <view class="resolution-content">
+            <view class="challenges">
+              <text class="resolution-label">潜在挑战：</text>
+              <view class="challenge-list">
+                <text class="challenge-item" wx:for="{{divinationResult.resolution.challenges}}" wx:key="index">{{index + 1}}. {{item}}</text>
+              </view>
+            </view>
+            <view class="solutions">
+              <text class="resolution-label">化解方案：</text>
+              <view class="solution-list">
+                <text class="solution-item" wx:for="{{divinationResult.resolution.solutions}}" wx:key="index">{{index + 1}}. {{item}}</text>
+              </view>
             </view>
           </view>
         </view>

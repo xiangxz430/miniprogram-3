@@ -15,8 +15,8 @@ Page({
   data: {
     activeTab: 0,           // 当前激活的标签页（0: 性格测试, 1: 玄学人格模型, 2: AI建议）
     tabItems: [
-      { text: '测试' },
-      { text: '模型' },
+      { text: 'mbti测试' },
+      { text: '人格模型' },
       { text: 'AI建议' },
       { text: '每日分析' }
     ],
@@ -115,6 +115,33 @@ Page({
         general: '',
         action: [],
         caution: ''
+      }
+    },
+    divinationResult: {
+      hexagram: {
+        name: '',
+        description: '',
+        analysis: ''
+      },
+      trend: {
+        current: '',
+        future: '',
+        timing: ''
+      },
+      guidance: {
+        favorable: [],
+        unfavorable: [],
+        precautions: []
+      },
+      recommendations: {
+        timing: '',
+        direction: '',
+        colors: [],
+        actions: []
+      },
+      resolution: {
+        challenges: [],
+        solutions: []
       }
     }
   },
@@ -2197,21 +2224,29 @@ Page({
   async loadWeatherData() {
     try {
       // 从用户设置中获取位置信息
-      const userSettings = wx.getStorageSync('userSettings') || {杭州};
+      const userSettings = wx.getStorageSync('userSettings') || {};
       const location = {
         city: userSettings.currentLocation ? userSettings.currentLocation.split('，')[0] : '杭州'
       };
       
-      // 检查是否有当天的缓存数据
+      // 检查是否有当天的缓存数据，且位置未变更
       const today = new Date().toDateString();
       const cachedData = wx.getStorageSync('weatherData');
-      if (cachedData && cachedData.date === today) {
+      const isSameLocation = cachedData && cachedData.location === location.city;
+      
+      if (cachedData && cachedData.date === today && isSameLocation) {
         this.setData({
           weatherData: cachedData.data,
           clothingAdvice: cachedData.clothingAdvice
         });
         return;
       }
+      
+      // 显示加载提示
+      wx.showLoading({
+        title: '更新天气中...',
+        mask: true
+      });
       
       // 调用API获取新数据
       const { weather, clothingAdvice } = await getWeatherAndAdvice(location, userSettings);
@@ -2225,11 +2260,15 @@ Page({
       // 缓存数据
       wx.setStorageSync('weatherData', {
         date: today,
+        location: location.city,
         data: weather,
         clothingAdvice
       });
+      
+      wx.hideLoading();
     } catch (error) {
       console.error('加载天气数据失败:', error);
+      wx.hideLoading();
       wx.showToast({
         title: '获取天气信息失败',
         icon: 'none'
@@ -2245,11 +2284,11 @@ Page({
   },
 
   // 提交字测分析
-  async submitCharacter() {
-    const { inputCharacter } = this.data;
-    if (!inputCharacter) {
+  async submitDivination() {
+    const { inputText } = this.data;
+    if (!inputText) {
       wx.showToast({
-        title: '请输入一个汉字',
+        title: '请输入想测的事情',
         icon: 'none'
       });
       return;
@@ -2259,21 +2298,123 @@ Page({
       wx.showLoading({
         title: '正在解析...'
       });
+
+      // 获取用户设置中的个人信息
+      const userSettings = wx.getStorageSync('userSettings') || {};
       
-      const result = await getCharacterAnalysis(inputCharacter, '用户未指定问题');
+      // 构建用户信息对象，使用正确的字段
+      const userInfo = {
+        nickname: userSettings.nickname,
+        birthdate: userSettings.birthdate,
+        birthtime: userSettings.birthtime,
+        mbti: userSettings.mbti,
+        birthplace: userSettings.birthplace,
+        birthplaceArray: userSettings.birthplaceArray,
+        currentLocation: userSettings.currentLocation
+      };
+      
+      // 调用新的测事API
+      const result = await this.getDivination(inputText, userInfo);
       
       this.setData({
-        characterResult: result
+        divinationResult: result
       });
       
       wx.hideLoading();
     } catch (error) {
-      console.error('字测分析失败:', error);
+      console.error('测事分析失败:', error);
       wx.hideLoading();
       wx.showToast({
         title: '解析失败，请重试',
         icon: 'none'
       });
+    }
+  },
+
+  // 文本输入处理
+  onTextInput(e) {
+    this.setData({
+      inputText: e.detail.value
+    });
+  },
+
+  // 新增测事API调用方法
+  async getDivination(text, userInfo) {
+    const prompt = `用户想测的事情是："${text}"
+
+用户基本信息：
+出生日期：${userInfo.birthdate || '未知'}
+出生时间：${userInfo.birthtime || '未知'}
+出生地点：${userInfo.birthplace || '未知'}
+当前位置：${userInfo.currentLocation || '未知'}
+MBTI类型：${userInfo.mbti || '未知'}
+
+请基于周易八卦和五行理论，结合用户的生辰信息，对此事进行分析：
+
+1. 此事的卦象分析（200字）
+2. 事情发展趋势（200字）
+3. 时机选择建议（100字）
+4. 趋吉避凶指导（150字）
+5. 开运建议：
+   - 有利时间
+   - 有利方位
+   - 有利颜色
+   - 注意事项
+6. 化解方案（如果有不利因素）
+
+请以JSON格式返回，包含以下字段：
+{
+  "hexagram": {
+    "name": "卦名",
+    "description": "卦象描述",
+    "analysis": "详细分析"
+  },
+  "trend": {
+    "current": "当前形势",
+    "future": "发展趋势",
+    "timing": "时机分析"
+  },
+  "guidance": {
+    "favorable": ["有利因素"],
+    "unfavorable": ["不利因素"],
+    "precautions": ["注意事项"]
+  },
+  "recommendations": {
+    "timing": "最佳时机",
+    "direction": "有利方位",
+    "colors": ["有利颜色"],
+    "actions": ["建议行动"]
+  },
+  "resolution": {
+    "challenges": ["潜在挑战"],
+    "solutions": ["化解方案"]
+  }
+}`;
+
+    const messages = [
+      {
+        role: 'system',
+        content: '你是一位精通周易八卦、五行和命理的大师。请基于用户的生辰信息和所问之事，进行专业的分析和指导。请始终以JSON格式返回数据，确保完全符合要求的结构。'
+      },
+      {
+        role: 'user',
+        content: prompt
+      }
+    ];
+
+    try {
+      const response = await deepseekApi.callDeepseek(messages);
+      const jsonContent = response.match(/```json\n([\s\S]*?)\n```/);
+      
+      if (!jsonContent || !jsonContent[1]) {
+        throw new Error('无法从响应中提取JSON内容');
+      }
+
+      const result = JSON.parse(jsonContent[1]);
+      return result;
+    } catch (error) {
+      console.error('测事分析API调用失败:', error);
+      throw error;
     }
   },
 

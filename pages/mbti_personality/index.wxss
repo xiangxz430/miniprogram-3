@@ -2156,20 +2156,27 @@
 }
 
 .input-box {
-  display: flex;
-  justify-content: center;
+  position: relative;
   margin: 20rpx 0;
 }
 
-.character-input {
-  width: 120rpx;
-  height: 120rpx;
+.matter-input {
+  width: 100%;
+  height: 200rpx;
+  padding: 20rpx;
   border: 2rpx solid #e5e7eb;
   border-radius: 16rpx;
-  font-size: 64rpx;
-  text-align: center;
+  font-size: 28rpx;
   background: #ffffff;
   box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.05);
+}
+
+.input-limit {
+  position: absolute;
+  bottom: 10rpx;
+  right: 20rpx;
+  font-size: 24rpx;
+  color: #9ca3af;
 }
 
 .submit-btn {
@@ -2192,23 +2199,16 @@
   box-shadow: 0 2rpx 6rpx rgba(79, 70, 229, 0.1);
 }
 
-/* 分析结果样式优化 */
 .analysis-result {
   margin-top: 30rpx;
-  border-radius: 20rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
-  border: 1rpx solid #e5e7eb;
 }
 
 .section {
-  padding: 30rpx;
-  border-bottom: 1rpx solid #f3f4f6;
   background: #ffffff;
-}
-
-.section:last-child {
-  border-bottom: none;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
 .section-title {
@@ -2218,165 +2218,475 @@
   margin-bottom: 24rpx;
   padding-left: 16rpx;
   border-left: 6rpx solid #4f46e5;
-  display: flex;
-  align-items: center;
 }
 
-.structure-content,
+/* 卦象分析部分 */
 .hexagram-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
   padding: 20rpx;
   background: #f8fafc;
   border-radius: 12rpx;
 }
 
-.structure-item,
 .hexagram-item {
-  font-size: 28rpx;
-  color: #4b5563;
-  line-height: 1.6;
-  padding: 8rpx 0;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 16rpx;
 }
 
-.interpretation-content {
+.hexagram-desc {
   font-size: 28rpx;
   color: #4b5563;
+  margin-bottom: 16rpx;
+  line-height: 1.6;
+}
+
+.hexagram-analysis {
+  font-size: 28rpx;
+  color: #6b7280;
   line-height: 1.8;
   text-align: justify;
-  padding: 20rpx;
+}
+
+/* 事态发展部分 */
+.trend-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.trend-item {
   background: #f8fafc;
+  padding: 16rpx;
   border-radius: 12rpx;
 }
 
-.advice-content {
+.trend-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #4b5563;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.trend-text {
+  font-size: 28rpx;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* 趋吉避凶部分 */
+.guidance-content {
   display: flex;
   flex-direction: column;
   gap: 24rpx;
 }
 
-.advice-general {
-  font-size: 28rpx;
-  color: #1f2937;
-  line-height: 1.8;
-  padding: 24rpx;
+.guidance-group {
   background: #f8fafc;
+  padding: 16rpx;
   border-radius: 12rpx;
-  border-left: 4rpx solid #4f46e5;
 }
 
-.advice-actions {
-  margin-top: 16rpx;
-}
-
-.action-title,
-.caution-title {
-  font-size: 30rpx;
-  color: #1f2937;
+.guidance-label {
+  font-size: 28rpx;
   font-weight: 500;
-  margin-bottom: 16rpx;
-  display: flex;
-  align-items: center;
+  color: #4b5563;
+  display: block;
+  margin-bottom: 12rpx;
 }
 
-.action-title::before,
-.caution-title::before {
-  content: "";
-  display: inline-block;
-  width: 8rpx;
-  height: 28rpx;
-  background: #4f46e5;
-  margin-right: 12rpx;
-  border-radius: 4rpx;
+.guidance-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.guidance-item {
+  font-size: 26rpx;
+  color: #6b7280;
+  background: #ffffff;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  border: 1rpx solid #e5e7eb;
+}
+
+/* 开运建议部分 */
+.recommendations-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.recommendation-item {
+  background: #f8fafc;
+  padding: 16rpx;
+  border-radius: 12rpx;
+}
+
+.recommendation-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #4b5563;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.recommendation-text {
+  font-size: 28rpx;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.color-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 8rpx;
+}
+
+.color-tag {
+  font-size: 26rpx;
+  color: #6b7280;
+  background: #ffffff;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid #e5e7eb;
+}
+
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-top: 8rpx;
 }
 
 .action-item {
-  font-size: 28rpx;
-  color: #4b5563;
+  font-size: 26rpx;
+  color: #6b7280;
   line-height: 1.6;
-  padding: 12rpx 0;
-  padding-left: 24rpx;
-  position: relative;
 }
 
-.action-item::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: #6366f1;
-  font-weight: bold;
+/* 化解方案部分 */
+.resolution-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
 }
 
-.advice-caution {
-  margin-top: 16rpx;
-}
-
-.caution-content {
-  font-size: 28rpx;
-  color: #991b1b;
-  line-height: 1.6;
-  padding: 24rpx;
-  background: #fef2f2;
+.challenges,
+.solutions {
+  background: #f8fafc;
+  padding: 16rpx;
   border-radius: 12rpx;
-  border-left: 4rpx solid #dc2626;
 }
 
-/* 测试模式选择界面 */
-.mode-selection {
+.resolution-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #4b5563;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.challenge-list,
+.solution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.challenge-item,
+.solution-item {
+  font-size: 26rpx;
+  color: #6b7280;
+  line-height: 1.6;
+  padding: 8rpx 0;
+}
+
+/* 测事分析样式 */
+.divination-analysis {
   padding: 30rpx;
-  text-align: center;
+  background: #ffffff;
+  border-radius: 20rpx;
+  margin: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
-.mode-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-bottom: 30rpx;
+  padding: 24rpx;
+  background: #f8fafc;
+  border-radius: 16rpx;
+}
+
+.input-header {
+  text-align: center;
   margin-bottom: 20rpx;
 }
 
-.mode-description {
+.input-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #1f2937;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.input-desc {
   font-size: 28rpx;
-  color: #666;
-  margin-bottom: 40rpx;
+  color: #64748b;
+  display: block;
 }
 
-.mode-options {
-  display: flex;
-  flex-direction: column;
-  gap: 30rpx;
+.input-box {
+  position: relative;
+  margin: 20rpx 0;
+}
+
+.matter-input {
+  width: 100%;
+  height: 200rpx;
   padding: 20rpx;
+  border: 2rpx solid #e5e7eb;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.05);
 }
 
-.mode-option {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.input-limit {
+  position: absolute;
+  bottom: 10rpx;
+  right: 20rpx;
+  font-size: 24rpx;
+  color: #9ca3af;
+}
+
+.submit-btn {
+  width: 80%;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #ffffff;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  margin: 0 auto;
+  box-shadow: 0 4rpx 12rpx rgba(79, 70, 229, 0.2);
   transition: all 0.3s ease;
 }
 
-.mode-option:active {
+.submit-btn:active {
   transform: scale(0.98);
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2rpx 6rpx rgba(79, 70, 229, 0.1);
 }
 
-.mode-icon {
-  font-size: 48rpx;
+.analysis-result {
+  margin-top: 30rpx;
+}
+
+.section {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
   margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
-.mode-name {
+.section-title {
   font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 24rpx;
+  padding-left: 16rpx;
+  border-left: 6rpx solid #4f46e5;
 }
 
-.mode-detail {
-  font-size: 24rpx;
-  color: #666;
+/* 卦象分析部分 */
+.hexagram-content {
+  padding: 20rpx;
+  background: #f8fafc;
+  border-radius: 12rpx;
+}
+
+.hexagram-item {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 16rpx;
+}
+
+.hexagram-desc {
+  font-size: 28rpx;
+  color: #4b5563;
+  margin-bottom: 16rpx;
+  line-height: 1.6;
+}
+
+.hexagram-analysis {
+  font-size: 28rpx;
+  color: #6b7280;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+/* 事态发展部分 */
+.trend-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.trend-item {
+  background: #f8fafc;
+  padding: 16rpx;
+  border-radius: 12rpx;
+}
+
+.trend-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #4b5563;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.trend-text {
+  font-size: 28rpx;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* 趋吉避凶部分 */
+.guidance-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.guidance-group {
+  background: #f8fafc;
+  padding: 16rpx;
+  border-radius: 12rpx;
+}
+
+.guidance-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #4b5563;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.guidance-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.guidance-item {
+  font-size: 26rpx;
+  color: #6b7280;
+  background: #ffffff;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  border: 1rpx solid #e5e7eb;
+}
+
+/* 开运建议部分 */
+.recommendations-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.recommendation-item {
+  background: #f8fafc;
+  padding: 16rpx;
+  border-radius: 12rpx;
+}
+
+.recommendation-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #4b5563;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.recommendation-text {
+  font-size: 28rpx;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.color-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 8rpx;
+}
+
+.color-tag {
+  font-size: 26rpx;
+  color: #6b7280;
+  background: #ffffff;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid #e5e7eb;
+}
+
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-top: 8rpx;
+}
+
+.action-item {
+  font-size: 26rpx;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* 化解方案部分 */
+.resolution-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.challenges,
+.solutions {
+  background: #f8fafc;
+  padding: 16rpx;
+  border-radius: 12rpx;
+}
+
+.resolution-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #4b5563;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.challenge-list,
+.solution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.challenge-item,
+.solution-item {
+  font-size: 26rpx;
+  color: #6b7280;
+  line-height: 1.6;
+  padding: 8rpx 0;
 } 

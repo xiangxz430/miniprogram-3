@@ -528,6 +528,14 @@ Page({
             userSettings.currentLocation = fullAddress;
             wx.setStorageSync('userSettings', userSettings);
             
+            // 发送自定义事件，通知其他页面更新天气数据
+            const pages = getCurrentPages();
+            pages.forEach(page => {
+              if (page && page.loadWeatherData) {
+                page.loadWeatherData();
+              }
+            });
+            
             console.log('位置更新成功:', fullAddress);
             logger.log('位置更新', {
               地点: fullAddress,

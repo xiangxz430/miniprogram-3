@@ -452,14 +452,25 @@ function callDeepseek(messages, model = 'deepseek-chat') {
 
 // 获取天气预报和穿衣建议
 export const getWeatherAndAdvice = async (location, userInfo) => {
+
+
+  console.log('开始获取天气预报和穿衣建议:', {
+    location,
+    userInfo: {
+      ...userInfo,
+      zodiac: userInfo.zodiac || '未知'
+    }
+  });
+
   const prompt = `基于以下信息生成天气预报和穿衣建议:
   地点: ${location.city}
-  用户星座: ${userInfo.zodiac || '未知'}
+  请明确指出我的个人特征如何影响这些建议，个人信息包括："${userInfo.birthdate ? '出生于' + userInfo.birthdate + '的' : ''} ${userInfo.gender || ''}性，${userInfo.age ? userInfo.age + '岁' : ''}，${userInfo.zodiac || ''}星座，${userInfo.chineseZodiac ? userInfo.chineseZodiac + '年出生' : ''}，MBTI类型为${mbtiInfo.type}，所以......"
+  请包含以下内容：
   请提供:
   1. 当前天气详情(温度、天气状况、湿度、风速、空气质量)
   2. 24小时天气预报
-  3. 基于天气和星座的穿衣建议
-  4. 运势提示
+  3. 基于个人信息结合天气给的穿衣建议200字
+  4. 运势提示 300字
   
   请以JSON格式返回，包含以下字段：
   {
@@ -499,7 +510,9 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
   ];
 
   try {
+    console.log('正在调用AI接口获取天气建议...');
     const response = await callDeepseek(messages);
+    console.log('成功获取AI响应');
     
     // 从响应中提取JSON字符串
     const jsonContent = response.match(/```json\n([\s\S]*?)\n```/);
@@ -509,15 +522,17 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
     }
 
     try {
+      console.log('正在解析JSON响应...');
       const result = JSON.parse(jsonContent[1]);
       
       // 验证返回的数据结构
       if (!result.weather || !result.clothingAdvice) {
+        console.error('返回的数据结构不完整:', result);
         throw new Error('返回的数据结构不完整');
       }
 
       // 确保返回默认值
-      return {
+      const formattedResult = {
         weather: {
           city: location.city,
           currentTemp: result.weather.currentTemp || '--',
@@ -536,6 +551,15 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
           zodiacAdvice: result.clothingAdvice.zodiacAdvice || '暂无星座建议'
         }
       };
+
+      console.log('成功格式化天气数据:', {
+        city: formattedResult.weather.city,
+        currentTemp: formattedResult.weather.currentTemp,
+        condition: formattedResult.weather.condition,
+        clothingIndex: formattedResult.clothingAdvice.index
+      });
+
+      return formattedResult;
     } catch (parseError) {
       console.error('JSON解析失败:', parseError);
       throw new Error('JSON解析失败');
@@ -543,7 +567,7 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
   } catch (error) {
     console.error('获取天气数据失败:', error);
     // 返回默认数据而不是抛出错误
-    return {
+    const defaultResult = {
       weather: {
         city: location.city,
         currentTemp: '--',
@@ -562,43 +586,87 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
         zodiacAdvice: '暂无星座建议'
       }
     };
+    console.log('返回默认天气数据:', defaultResult);
+    return defaultResult;
   }
 };
 
 // 字测分析
-export const getCharacterAnalysis = async (character, userQuestion) => {
-  const prompt = `用户心中想着"${userQuestion}"，输入了"${character}"字。
-  请按照以下步骤分析:
-  1. 拆解该字的结构(偏旁部首、笔画数等)
-  2. 根据焦氏易林原理进行卦象分析
-  3. 关联用户心中所想的事
-  4. 给出运势建议和行动指南
-  
-  请以JSON格式返回，包含以下字段：
-  {
-    "structure": {
-      "character": "输入的汉字",
-      "radical": "偏旁部首",
-      "strokes": "笔画数",
-      "components": ["组成部件"]
-    },
-    "hexagram": {
-      "primary": "主卦",
-      "secondary": "变卦",
-      "interpretation": "卦象解释"
-    },
-    "interpretation": "关联解读",
-    "advice": {
-      "general": "总体建议",
-      "action": ["具体行动建议"],
-      "caution": "需要注意的事项"
+export const getCharacterAnalysis = async (character, userInfo) => {
+  console.log('开始字测分析:', {
+    character,
+    userInfo: {
+      ...userInfo,
+      birthdate: userInfo.birthdate || '未知',
+      gender: userInfo.gender || '未知',
+      zodiac: userInfo.zodiac || '未知',
+      chineseZodiac: userInfo.chineseZodiac || '未知',
+      bazi: userInfo.bazi || '未知'
     }
-  }`;
+  });
+
+  // 构建用户信息文本
+  let userInfoText = '';
+  if (userInfo) {
+    userInfoText = `
+    性别：${userInfo.gender || '未知'}
+    出生日期：${userInfo.birthdate || '未知'}
+    年龄：${userInfo.age || '未知'}
+    星座：${userInfo.zodiac || '未知'}
+    生肖：${userInfo.chineseZodiac || '未知'}
+    八字：${userInfo.bazi || '未知'}
+    命主：${userInfo.dayMaster || '未知'}
+    五行分布：${userInfo.elementDist ? JSON.stringify(userInfo.elementDist) : '未知'}
+    `;
+  }
+
+  const prompt = `用户输入了"${character}"字进行测字分析。
+
+用户基本信息：${userInfoText}
+
+请基于用户的生辰八字、五行分布和所测之字，按照以下步骤进行深度分析:
+
+1. 拆解该字的结构(偏旁部首、笔画数等)，并分析与用户八字的关联
+2. 根据焦氏易林原理结合用户生辰八字进行卦象分析（200字）
+3. 分析此字与用户命理五行的相生相克关系
+4. 猜测用户心中所想的事，将所测之字与用户八字、五行特征相结合进行解读（300字）
+5. 结合用户命理特征，给出运势建议和行动指南
+  
+请以JSON格式返回，包含以下字段：
+{
+  "structure": {
+    "character": "输入的汉字",
+    "radical": "偏旁部首",
+    "strokes": "笔画数",
+    "components": ["组成部件"],
+    "wuxing": "字的五行属性",
+    "baziRelation": "与用户八字的关系分析"
+  },
+  "hexagram": {
+    "primary": "主卦",
+    "secondary": "变卦",
+    "interpretation": "结合八字的卦象解释"
+  },
+  "wuxingAnalysis": {
+    "characterWuxing": "字的五行属性",
+    "userWuxing": "用户命局五行特征",
+    "relationship": "相生相克分析",
+    "influence": "对运势的影响"
+  },
+  "interpretation": "关联解读",
+  "advice": {
+    "general": "总体建议",
+    "action": ["具体行动建议"],
+    "caution": "需要注意的事项",
+    "timing": "最佳行动时机",
+    "direction": "有利方位"
+  }
+}`;
 
   const messages = [
     {
       role: 'system',
-      content: '你是一位精通汉字结构和易经卦象的专家。请始终以JSON格式返回数据，不要包含任何其他文本。确保返回的JSON格式完全符合要求的结构。'
+      content: '你是一位精通汉字结构、易经卦象和八字命理的大师。请结合用户的生辰八字和五行特征，对所测之字进行全面分析。请始终以JSON格式返回数据，不要包含任何其他文本。确保返回的JSON格式完全符合要求的结构。'
     },
     {
       role: 'user',
@@ -607,7 +675,9 @@ export const getCharacterAnalysis = async (character, userQuestion) => {
   ];
 
   try {
+    console.log('正在调用AI接口进行字测分析...');
     const response = await callDeepseek(messages);
+    console.log('成功获取AI响应');
     
     // 从响应中提取JSON字符串
     const jsonContent = response.match(/```json\n([\s\S]*?)\n```/);
@@ -617,33 +687,56 @@ export const getCharacterAnalysis = async (character, userQuestion) => {
     }
 
     try {
+      console.log('正在解析JSON响应...');
       const result = JSON.parse(jsonContent[1]);
       
       // 验证返回的数据结构
       if (!result.structure || !result.hexagram || !result.interpretation || !result.advice) {
+        console.error('返回的数据结构不完整:', result);
         throw new Error('返回的数据结构不完整');
       }
 
       // 格式化返回数据
-      return {
+      const formattedResult = {
         structure: {
           character: result.structure.character || character,
           radical: result.structure.radical || '未知',
           strokes: result.structure.strokes || 0,
-          components: result.structure.components || []
+          components: Array.isArray(result.structure.components) ? result.structure.components : [],
+          wuxing: result.structure.wuxing || '未知',
+          baziRelation: result.structure.baziRelation || '暂无分析'
         },
         hexagram: {
           primary: result.hexagram.primary || '未知',
           secondary: result.hexagram.secondary || '未知',
           interpretation: result.hexagram.interpretation || '暂无解析'
         },
+        wuxingAnalysis: {
+          characterWuxing: result.wuxingAnalysis?.characterWuxing || '未知',
+          userWuxing: result.wuxingAnalysis?.userWuxing || '未知',
+          relationship: result.wuxingAnalysis?.relationship || '暂无分析',
+          influence: result.wuxingAnalysis?.influence || '暂无分析'
+        },
         interpretation: result.interpretation || '暂无解读',
         advice: {
           general: result.advice.general || '暂无建议',
-          action: Array.isArray(result.advice.action) ? result.advice.action : ['暂无具体建议'],
-          caution: result.advice.caution || '暂无注意事项'
+          action: Array.isArray(result.advice.action) ? result.advice.action : ['请稍后再试'],
+          caution: result.advice.caution || '暂无注意事项',
+          timing: result.advice.timing || '暂无时机建议',
+          direction: result.advice.direction || '暂无方位建议'
         }
       };
+
+      console.log('成功格式化字测分析结果:', {
+        character: formattedResult.structure.character,
+        radical: formattedResult.structure.radical,
+        strokes: formattedResult.structure.strokes,
+        wuxing: formattedResult.structure.wuxing,
+        primaryHexagram: formattedResult.hexagram.primary,
+        baziRelation: formattedResult.structure.baziRelation
+      });
+
+      return formattedResult;
     } catch (parseError) {
       console.error('JSON解析失败:', parseError);
       throw new Error('JSON解析失败');
@@ -651,25 +744,37 @@ export const getCharacterAnalysis = async (character, userQuestion) => {
   } catch (error) {
     console.error('字测分析失败:', error);
     // 返回默认数据而不是抛出错误
-    return {
+    const defaultResult = {
       structure: {
         character: character,
         radical: '未知',
         strokes: 0,
-        components: []
+        components: [],
+        wuxing: '未知',
+        baziRelation: '暂无分析'
       },
       hexagram: {
         primary: '未知',
         secondary: '未知',
         interpretation: '分析失败，请稍后再试'
       },
+      wuxingAnalysis: {
+        characterWuxing: '未知',
+        userWuxing: '未知',
+        relationship: '暂无分析',
+        influence: '暂无分析'
+      },
       interpretation: '暂无解读',
       advice: {
         general: '暂无建议',
         action: ['请稍后再试'],
-        caution: '暂无注意事项'
+        caution: '暂无注意事项',
+        timing: '暂无时机建议',
+        direction: '暂无方位建议'
       }
     };
+    console.log('返回默认字测分析结果:', defaultResult);
+    return defaultResult;
   }
 };
 
