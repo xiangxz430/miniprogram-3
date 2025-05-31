@@ -1,5 +1,22 @@
 /* pages/user_profile/index.wxss */
 
+/* 重置button默认样式 */
+button {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: inherit;
+  line-height: inherit;
+  border-radius: 0;
+  outline: none;
+  box-sizing: border-box;
+}
+
+button::after {
+  border: none;
+}
+
 /* 容器样式 - 覆盖app.wxss中的默认设置 */
 .container {
   min-height: 100vh;
@@ -35,12 +52,31 @@
   position: absolute;
   top: 40rpx;
   right: 30rpx;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  font-size: 26rpx;
-  padding: 8rpx 20rpx;
-  border-radius: 30rpx;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 20rpx;
+  padding: 8rpx 16rpx;
+  font-size: 24rpx;
   font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(59, 130, 246, 0.2);
+  transition: all 0.3s ease;
+  line-height: 1.2;
+  height: 52rpx;
+  width: auto;
+  min-width: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.edit-btn-header:active {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: scale(0.96);
+  box-shadow: 0 1rpx 6rpx rgba(59, 130, 246, 0.3);
 }
 
 /* 昵称输入框样式 */
@@ -77,7 +113,7 @@
 
 .avatar-default {
   background-color: #fff;
-  color: #6366f1;
+  color: #3b82f6;
   font-size: 64rpx;
   font-weight: bold;
 }
@@ -116,25 +152,44 @@
 /* 标签页 */
 .tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   border-bottom: 1rpx solid #e5e7eb;
   width: 100%;
 }
 
 .tab {
   text-align: center;
-  padding: 30rpx 0;
-  font-size: 30rpx;
+  padding: 25rpx 10rpx;
+  font-size: 28rpx;
   position: relative;
   color: #64748b;
   font-weight: 500;
   border-bottom: 4rpx solid transparent;
   z-index: 1; /* 确保tab可点击 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tab.active {
-  color: #6366f1;
-  border-bottom: 4rpx solid #6366f1;
+  color: #3b82f6;
+  border-bottom: 4rpx solid #3b82f6;
+}
+
+/* 小屏幕设备优化 */
+@media screen and (max-width: 750rpx) {
+  .tab {
+    font-size: 26rpx;
+    padding: 20rpx 8rpx;
+  }
+}
+
+/* 极小屏幕设备优化 */
+@media screen and (max-width: 650rpx) {
+  .tab {
+    font-size: 24rpx;
+    padding: 18rpx 6rpx;
+  }
 }
 
 /* 内容区域 */
@@ -168,9 +223,35 @@
   margin-bottom: 30rpx;
 }
 
+.section-header .edit-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  color: white !important;
+  border: none;
+  border-radius: 20rpx;
+  padding: 8rpx 16rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(59, 130, 246, 0.2);
+  transition: all 0.3s ease;
+  line-height: 1.2;
+  height: 52rpx;
+  width: auto;
+  min-width: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.section-header .edit-btn:active {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: scale(0.96);
+  box-shadow: 0 1rpx 6rpx rgba(59, 130, 246, 0.3);
+}
+
 .view-all {
   font-size: 28rpx;
-  color: #6366f1;
+  color: #3b82f6;
 }
 
 /* 今日纵览卡片容器 */
@@ -210,7 +291,7 @@
 }
 
 .yellow-gradient {
-  background: linear-gradient(to bottom right, #fffbeb, #fef3c7);
+  background: linear-gradient(to bottom right, #ebf5ff, #dbeafe);
 }
 
 .card-icon {
@@ -230,8 +311,8 @@
 }
 
 .icon-bg-yellow {
-  background-color: rgba(251, 191, 36, 0.1);
-  color: #f59e0b;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
 }
 
 .card-content {
@@ -261,11 +342,11 @@
 }
 
 .yellow-gradient .card-value {
-  color: #eab308;
+  color: #3b82f6;
 }
 
 .star {
-  color: #eab308;
+  color: #3b82f6;
 }
 
 .star-empty {
@@ -307,6 +388,12 @@
   margin-right: 20rpx;
   font-size: 32rpx;
   color: #94a3b8;
+}
+
+/* 性别图标样式 */
+.icon-gender::before {
+  content: "👤";
+  font-size: 28rpx;
 }
 
 .info-value {
@@ -397,19 +484,56 @@
 
 /* 好友列表 */
 .add-friend-btn {
-  background-color: #6366f1;
-  color: #fff;
-  font-size: 26rpx;
-  display: flex;
-  align-items: center;
-  padding: 10rpx 20rpx;
-  border-radius: 40rpx;
-  line-height: normal;
+  background: linear-gradient(135deg, #3b82f6, #1e40af) !important;
+  color: #fff !important;
+  font-size: 24rpx !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 10rpx 18rpx !important;
+  border-radius: 28rpx !important;
+  line-height: 1.2 !important;
+  border: none !important;
+  box-shadow: 0 2rpx 10rpx rgba(59, 130, 246, 0.2) !important;
+  transition: all 0.3s ease !important;
+  font-weight: 500 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  height: 56rpx !important;
+  width: auto !important;
+  min-width: 90rpx !important;
+  white-space: nowrap !important;
+  margin: 0 !important;
+}
+
+.add-friend-btn::after {
+  border: none !important;
+}
+
+.add-friend-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.5s;
+}
+
+.add-friend-btn:hover::before {
+  left: 100%;
+}
+
+.add-friend-btn:active {
+  transform: translateY(1rpx) !important;
+  box-shadow: 0 1rpx 6rpx rgba(59, 130, 246, 0.3) !important;
 }
 
 .add-friend-btn .iconfont {
-  margin-right: 8rpx;
-  font-size: 24rpx;
+  margin-right: 6rpx !important;
+  font-size: 22rpx !important;
 }
 
 .friends-list {
@@ -420,246 +544,665 @@
 
 .friend-card {
   display: flex;
-  align-items: center;
-  padding: 24rpx;
-  background-color: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  align-items: flex-start;
+  background: white;
+  border-radius: 20rpx;
+  padding: 32rpx 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.friend-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+}
+
+.friend-card:hover {
+  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.12);
+  transform: translateY(-4rpx);
 }
 
 .friend-avatar {
-  width: 112rpx;
-  height: 112rpx;
-  border-radius: 56rpx;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 48rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 40rpx;
-  font-weight: bold;
-  margin-right: 20rpx;
-}
-
-.bg-blue-500 {
-  background-color: #3b82f6;
-}
-
-.bg-green-500 {
-  background-color: #22c55e;
-}
-
-.bg-pink-500 {
-  background-color: #ec4899;
-}
-
-.text-orange-500 {
-  color: #f97316;
-}
-
-.text-blue-500 {
-  color: #3b82f6;
-}
-
-.text-purple-500 {
-  color: #a855f7;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: white;
+  margin-right: 24rpx;
+  border: 3rpx solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 }
 
 .friend-info {
   flex: 1;
+  margin-left: 0;
+  cursor: pointer;
+  min-width: 0;
 }
 
 .friend-header {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 10rpx;
+  align-items: center;
+  margin-bottom: 8rpx;
+  flex-wrap: wrap;
+  gap: 12rpx;
 }
 
 .friend-name {
+  font-size: 32rpx;
   font-weight: 600;
-  color: #1e293b;
+  color: #1f2937;
 }
 
 .friend-zodiac {
-  font-size: 28rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
 }
 
 .friend-details {
+  margin-bottom: 12rpx;
   display: flex;
-  justify-content: space-between;
-  font-size: 26rpx;
-  color: #94a3b8;
-}
-
-/* 生日提醒 */
-.birthday-container {
-  background-color: #fff;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
-}
-
-.birthday-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 24rpx;
-}
-
-.birthday-title {
-  font-weight: 600;
-  color: #64748b;
-}
-
-.birthday-list {
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 16rpx;
 }
 
-.birthday-item {
-  display: flex;
-  align-items: center;
-  padding: 16rpx;
-  border-radius: 16rpx;
+.friend-mbti {
+  font-size: 26rpx;
+  color: #6b7280;
+  font-weight: 500;
 }
 
-.birthday-icon-container {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 20rpx;
-  position: relative;
-  font-size: 32rpx;
+.friend-relation {
+  padding: 4rpx 10rpx;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-radius: 12rpx;
+  font-size: 22rpx;
+  font-weight: 500;
 }
 
-.badge {
-  position: absolute;
-  top: -10rpx;
-  right: -10rpx;
-  width: 40rpx;
-  height: 40rpx;
-  border-radius: 20rpx;
-  background-color: #ef4444;
-  color: white;
+.friend-extra-info {
+  margin-top: 8rpx;
   font-size: 24rpx;
+  color: #9ca3af;
+  line-height: 1.5;
+}
+
+.friend-birth {
+  display: block;
+  margin-bottom: 4rpx;
+  font-weight: 500;
+}
+
+.friend-location {
+  display: block;
+  color: #9ca3af;
+}
+
+.friend-actions {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 6rpx;
+  margin-left: 12rpx;
+  align-items: flex-end;
   justify-content: center;
 }
 
-.birthday-content {
+.friend-action-btn {
+  /* 强制重置微信小程序button默认样式 */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: none !important;
+  box-sizing: border-box !important;
+  
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  min-width: 52rpx !important;
+  width: auto !important;
+  height: 48rpx !important;
+  padding: 0 10rpx !important;
+  font-size: 22rpx !important;
+  border-radius: 24rpx !important;
+  border: none !important;
+  transition: all 0.3s ease !important;
+  font-weight: 500 !important;
+  box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.06) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  margin: 0 !important;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  color: white !important;
+  vertical-align: middle !important;
+}
+
+.friend-action-btn::after {
+  border: none !important;
+  display: none !important;
+}
+
+.friend-action-btn::before {
+  display: none !important;
+}
+
+.friend-action-btn:active {
+  background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+  transform: scale(0.96) !important;
+}
+
+/* 好友操作按钮内部元素样式 */
+.friend-action-btn .iconfont {
+  margin-right: 4rpx !important;
+  font-size: 18rpx !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  line-height: 1 !important;
+}
+
+.friend-action-btn text {
+  display: inline-flex !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+/* 空状态优化 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx;
+  text-align: center;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-state::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8, #2563eb);
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.6;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #6b7280;
+  margin-bottom: 48rpx;
+  line-height: 1.5;
+  max-width: 360rpx;
+}
+
+.empty-action-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 28rpx;
+  padding: 12rpx 32rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  box-shadow: 0 3rpx 12rpx rgba(59, 130, 246, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  height: 64rpx;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.empty-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.5s;
+}
+
+.empty-action-btn:hover::before {
+  left: 100%;
+}
+
+.empty-action-btn:active {
+  transform: translateY(1rpx);
+  box-shadow: 0 2rpx 10rpx rgba(59, 130, 246, 0.3);
+}
+
+/* 模态框样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 40rpx;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 640rpx;
+  max-height: 80vh;
+  background: white;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.modal-close-btn {
+  width: 48rpx;
+  height: 48rpx;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10rpx);
+  line-height: 1;
+}
+
+.modal-close-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(0.9);
+}
+
+.modal-body {
+  padding: 32rpx;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.form-group {
+  margin-bottom: 32rpx;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 24rpx;
+  padding: 32rpx;
+  border-top: 1rpx solid #f0f0f0;
+  background: #fafafa;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 80rpx;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  line-height: 1.2;
+}
+
+.modal-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.4s;
+}
+
+.modal-btn:hover::before {
+  left: 100%;
+}
+
+.cancel-btn {
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  color: #64748b;
+  border: 1rpx solid #e2e8f0;
+}
+
+.cancel-btn:active {
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+  transform: translateY(1rpx);
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  box-shadow: 0 2rpx 12rpx rgba(59, 130, 246, 0.25);
+}
+
+.confirm-btn:active {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(1rpx);
+  box-shadow: 0 1rpx 8rpx rgba(59, 130, 246, 0.3);
+}
+
+.confirm-btn[disabled] {
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  color: #64748b;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.confirm-btn[disabled]::before {
+  display: none;
+}
+
+/* 好友详情模态框 */
+.friend-detail-modal {
+  width: 100%;
+  max-width: 700rpx;
+  max-height: 85vh;
+  background: white;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.3);
+}
+
+.friend-detail-header {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  position: relative;
+}
+
+.friend-detail-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  font-weight: 600;
+  color: white;
+  margin-right: 24rpx;
+  border: 4rpx solid rgba(255, 255, 255, 0.3);
+}
+
+.friend-detail-info {
   flex: 1;
 }
 
-.birthday-name {
-  font-size: 28rpx;
-  font-weight: 500;
-  color: #1e293b;
+.friend-detail-name {
   display: block;
+  font-size: 40rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
 }
 
-.birthday-date {
+.friend-detail-zodiac {
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
   font-size: 24rpx;
-  color: #94a3b8;
+  margin-bottom: 8rpx;
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* 关系匹配 */
-.compatibility-cards {
+.friend-detail-relation {
+  display: block;
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+.friend-detail-content {
+  padding: 32rpx;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.detail-section {
+  margin-bottom: 32rpx;
+}
+
+.detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.detail-section-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.detail-items {
   display: flex;
   flex-direction: column;
   gap: 16rpx;
 }
 
-.compatibility-card {
-  background-color: #fff;
+.detail-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+}
+
+.detail-label {
+  font-size: 28rpx;
+  color: #666;
+  min-width: 140rpx;
+}
+
+.detail-value {
+  font-size: 28rpx;
+  color: #333;
+  flex: 1;
+}
+
+/* 好友八字面板 */
+.friend-bazi-panel {
+  background: #f8f9fa;
   border-radius: 16rpx;
   padding: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
-.compatibility-header {
+.friend-bazi-pillars {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16rpx;
+  margin-bottom: 20rpx;
 }
 
-.compatibility-title-container {
+.friend-pillar {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  flex: 1;
 }
 
-.compatibility-title {
-  font-weight: 600;
-  color: #64748b;
-  margin-bottom: 4rpx;
-}
-
-.compatibility-tag {
+.friend-pillar-label {
   font-size: 24rpx;
-  padding: 6rpx 16rpx;
-  border-radius: 40rpx;
-  font-weight: 500;
+  color: #666;
+  margin-bottom: 8rpx;
 }
 
-.compatibility-tag.good {
-  background-color: #dcfce7;
-  color: #16a34a;
+.friend-pillar-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding: 12rpx 16rpx;
+  border-radius: 12rpx;
+  min-width: 80rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
 }
 
-.compatibility-tag.excellent {
-  background-color: #dbeafe;
+.friend-day-master {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #e9ecef;
+}
+
+.friend-day-master-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-right: 12rpx;
+}
+
+.friend-day-master-value {
+  font-size: 28rpx;
+  font-weight: 600;
   color: #3b82f6;
 }
 
-.compatibility-desc {
-  font-size: 26rpx;
-  color: #94a3b8;
-  display: block;
-}
-
-.compatibility-items {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16rpx;
-  margin-top: 16rpx;
-}
-
-.compatibility-item {
+.friend-detail-actions {
   display: flex;
-  align-items: center;
-  padding: 20rpx;
-  border-radius: 16rpx;
+  gap: 16rpx;
+  padding: 32rpx 28rpx;
+  border-top: 1rpx solid #e2e8f0;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
 }
 
-.compatibility-icon {
-  width: 64rpx;
+.friend-detail-btn {
+  flex: 1;
   height: 64rpx;
-  border-radius: 32rpx;
+  border: none;
+  border-radius: 14rpx;
+  font-size: 24rpx;
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 16rpx;
-  font-size: 28rpx;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+  line-height: 1.2;
 }
 
-.compatibility-info {
-  flex: 1;
+.friend-detail-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.4s;
 }
 
-.compatibility-name {
-  font-size: 28rpx;
-  font-weight: 500;
-  color: #1e293b;
-  display: block;
+.friend-detail-btn:hover::before {
+  left: 100%;
 }
 
-.compatibility-percent {
-  font-size: 24rpx;
-  display: block;
+.friend-detail-btn .iconfont {
+  margin-right: 6rpx;
+  font-size: 22rpx;
+}
+
+.compatibility-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+}
+
+.compatibility-btn:active {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: scale(0.96);
+}
+
+.friend-detail-btn.edit-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  color: white !important;
+}
+
+.friend-detail-btn.edit-btn:active {
+  background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+  transform: scale(0.96) !important;
+}
+
+.friend-detail-btn.delete-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.friend-detail-btn.delete-btn:active {
+  background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+  transform: scale(0.96) !important;
 }
 
 /* 图标字体定义 */
@@ -706,19 +1249,9 @@
   content: "\e90d";
 }
 
-/* 编辑按钮样式 */
-.edit-btn {
-  font-size: 28rpx;
-  color: #6366f1;
-  background-color: rgba(99, 102, 241, 0.1);
-  padding: 6rpx 16rpx;
-  border-radius: 30rpx;
-  font-weight: 500;
-}
-
 /* 编辑状态下的样式 */
 .info-value.editing {
-  color: #6366f1;
+  color: #3b82f6;
   padding-right: 10rpx;
 }
 
@@ -726,7 +1259,7 @@
 .text-input {
   height: 60rpx;
   line-height: 60rpx;
-  color: #6366f1;
+  color: #3b82f6;
   text-align: right;
   padding-right: 10rpx;
   font-size: 28rpx;
@@ -747,15 +1280,548 @@
 }
 
 .location-btn {
-  background-color: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
   font-size: 22rpx;
   padding: 4rpx 12rpx;
   border-radius: 20rpx;
   margin-left: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 /* 图标字体定义 - 添加位置图标 */
 .icon-location:before {
   content: "\e90e";
+}
+
+/* 高级功能相关样式 */
+
+/* 八字分析表单样式 */
+.bazi-form {
+  padding: 32rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.form-description {
+  margin-bottom: 32rpx;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  border-radius: 16rpx;
+  border-left: 4rpx solid #3b82f6;
+}
+
+.description-text {
+  font-size: 26rpx;
+  color: #64748b;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.form-group {
+  margin-bottom: 28rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #1f2937;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+  padding-left: 4rpx;
+}
+
+.form-input {
+  padding: 24rpx 20rpx;
+  background-color: #f8fafc;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #374151;
+  border: 1rpx solid #d1d5db;
+  transition: all 0.3s ease;
+  box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.04);
+  width: 100%;
+  box-sizing: border-box;
+  line-height: 1.3;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+}
+
+.form-input:focus {
+  border-color: #3b82f6;
+  background-color: #fff;
+  box-shadow: 0 0 0 3rpx rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.form-input-text {
+  padding: 24rpx 20rpx;
+  background-color: #f8fafc;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #374151;
+  border: 1rpx solid #d1d5db;
+  transition: all 0.3s ease;
+  box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.04);
+  width: 100%;
+  box-sizing: border-box;
+  line-height: 1.3;
+  height: 88rpx;
+}
+
+.form-input-text:focus {
+  border-color: #3b82f6;
+  background-color: #fff;
+  box-shadow: 0 0 0 3rpx rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.form-input::placeholder,
+.form-input-text::placeholder {
+  color: #9ca3af;
+  font-size: 26rpx;
+}
+
+.calculate-bazi-btn {
+  width: 100%;
+  height: 88rpx;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  box-shadow: 0 4rpx 20rpx rgba(59, 130, 246, 0.25);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.calculate-bazi-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.5s;
+}
+
+.calculate-bazi-btn:hover::before {
+  left: 100%;
+}
+
+.calculate-bazi-btn:active {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(1rpx);
+  box-shadow: 0 2rpx 16rpx rgba(59, 130, 246, 0.3);
+}
+
+.calculate-bazi-btn[disabled] {
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  color: #64748b;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.calculate-bazi-btn[disabled]::before {
+  display: none;
+}
+
+/* 八字分析结果样式 */
+.bazi-result {
+  padding: 20rpx;
+}
+
+.panel-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 25rpx;
+  padding-left: 15rpx;
+  border-left: 6rpx solid #3b82f6;
+}
+
+/* 八字排盘样式 */
+.bazi-panel {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.bazi-pillars {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.pillar {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 10rpx;
+}
+
+.pillar-label {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 10rpx;
+}
+
+.pillar-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.day-master-info {
+  text-align: center;
+  padding: 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+}
+
+.day-master-label {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.day-master-value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+/* 五行分析样式 */
+.wuxing-analysis {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.wuxing-distribution {
+  margin-bottom: 30rpx;
+}
+
+.wuxing-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.wuxing-name {
+  width: 60rpx;
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.wuxing-bar {
+  flex: 1;
+  height: 20rpx;
+  background-color: #f0f0f0;
+  border-radius: 10rpx;
+  margin: 0 20rpx;
+  overflow: hidden;
+}
+
+.wuxing-fill {
+  height: 100%;
+  border-radius: 10rpx;
+  transition: width 0.5s ease;
+}
+
+.wuxing-count {
+  width: 60rpx;
+  text-align: right;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.wuxing-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+}
+
+.detail-item {
+  padding: 15rpx;
+  background-color: #f8f9fa;
+  border-radius: 10rpx;
+}
+
+.detail-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.detail-value {
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 详细分析样式 */
+.detailed-analysis {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.analysis-section {
+  margin-bottom: 30rpx;
+}
+
+.analysis-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15rpx;
+  padding-left: 12rpx;
+  border-left: 4rpx solid #3b82f6;
+}
+
+.analysis-content {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+  text-indent: 2em;
+}
+
+/* 开运建议样式 */
+.lucky-advice {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.advice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25rpx;
+  margin-bottom: 30rpx;
+}
+
+.advice-item {
+  padding: 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+}
+
+.advice-label {
+  display: block;
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 15rpx;
+}
+
+.advice-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.advice-tag {
+  padding: 8rpx 16rpx;
+  background-color: #3b82f6;
+  color: white;
+  font-size: 22rpx;
+  border-radius: 20rpx;
+}
+
+.suggestions {
+  padding: 25rpx;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 12rpx;
+}
+
+.suggestions-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.suggestion-list {
+  line-height: 1.8;
+}
+
+.suggestion-item {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.recalculate-btn {
+  width: 100%;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  color: #3b82f6;
+  border: 2rpx solid #3b82f6;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  box-shadow: 0 2rpx 12rpx rgba(59, 130, 246, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  line-height: 1.2;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.recalculate-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.08), transparent);
+  transition: left 0.4s;
+}
+
+.recalculate-btn:hover::before {
+  left: 100%;
+}
+
+.recalculate-btn:active {
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+  transform: translateY(1rpx);
+  box-shadow: 0 1rpx 8rpx rgba(59, 130, 246, 0.15);
+}
+
+/* 操作按钮区域样式 */
+.bazi-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-top: 48rpx;
+  padding: 32rpx;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 16rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+}
+
+.save-my-bazi-btn {
+  width: 100%;
+  height: 80rpx;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  box-shadow: 0 2rpx 12rpx rgba(59, 130, 246, 0.25);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.save-my-bazi-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.4s;
+}
+
+.save-my-bazi-btn:hover::before {
+  left: 100%;
+}
+
+.save-my-bazi-btn:active {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(1rpx);
+  box-shadow: 0 1rpx 8rpx rgba(59, 130, 246, 0.3);
+}
+
+.save-friend-btn {
+  width: 100%;
+  height: 80rpx;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  box-shadow: 0 2rpx 12rpx rgba(59, 130, 246, 0.25);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.save-friend-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.4s;
+}
+
+.save-friend-btn:hover::before {
+  left: 100%;
+}
+
+.save-friend-btn:active {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(1rpx);
+  box-shadow: 0 1rpx 8rpx rgba(59, 130, 246, 0.3);
+}
+
+/* 编辑按钮样式 */
+.settings-edit-btn {
+  font-size: 28rpx;
+  color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
+  padding: 6rpx 16rpx;
+  border-radius: 30rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 } 
