@@ -15,8 +15,8 @@ Page({
   data: {
     activeTab: 0,           // 当前激活的标签页（0: 性格测试, 1: 玄学人格模型, 2: AI建议）
     tabItems: [
-      { text: 'mbti测试' },
-      { text: '人格模型' },
+      { text: 'MBTI测试' },
+      { text: '人格雷达' },
       { text: 'AI建议' },
       { text: '每日分析' }
     ],
@@ -26,9 +26,9 @@ Page({
     currentQuestion: 0,     // 当前题目索引
     selectedOption: '',     // 当前选中的选项
     questions: [],          // 当前测试的题目集
-    testMode: '',           // 测试模式：'standard'(标准版) 或 'short'(简化版)
-    showTestModeSelection: false, // 是否显示测试模式选择界面
-    currentStep: 'welcome', // welcome, testing, result
+    testMode: 'standard',           // 测试模式：'standard'(标准版) 或 'short'(简化版)
+    showTestModeSelection: true, // 是否显示测试模式选择界面
+    currentStep: 'mode_selection', // welcome, testing, result
     currentQuestionIndex: 0,
     scores: {
       EI: 0,
@@ -42,25 +42,12 @@ Page({
     loading: false,
     testCompleted: false,
     modelData: {
-      nativeType: 'INTJ',
-      nativeName: '建筑师',
-      nativeDescription: '战略性思考者，擅长发现模式，开发创新解决方案',
-      socialType: 'ENTJ',
-      socialName: '统帅',
-      socialDescription: '在社交环境中表现出领导特质，高效组织者',
-      industries: [
-        { name: '软件开发', icon: 'icon-code' },
-        { name: '系统设计', icon: 'icon-architecture' },
-        { name: '科学研究', icon: 'icon-research' },
-        { name: '战略咨询', icon: 'icon-strategy' }
-      ],
-      directions: [
-        { name: '东南方', type: 'good' },
-        { name: '西北方', type: 'good' },
-        { name: '东北方', type: 'bad' },
-        { name: '西南方', type: 'bad' }
-      ],
-      directionTip: '东南方向适合设立工作台，有助于提升思考能力和创造力。'
+      personalityRadar: [],
+      socialMask: null,
+      careerTraits: [],
+      industryMatch: [],
+      directionAdvice: null,
+      relationships: null
     },
     tabNavClass: '', // 初始化标签导航类
     
@@ -68,21 +55,14 @@ Page({
     aiAdviceLoaded: false,  // AI建议是否已加载
     aiAdviceError: false,   // 加载AI建议是否出错
     aiAdviceErrorMsg: '',   // 错误信息
-    aiAdvice: {            // AI建议数据
-      overallAdvice: '',    // 整体发展建议
-      careerAdvice: '',     // 职业建议
-      relationshipAdvice: '', // 人际关系建议
-      stressManagement: '', // 压力管理
-      growthAreas: [],      // 成长方向
-      pitfalls: []          // 需避免的陷阱
-    },
+    aiAdvice: null,            // AI建议数据
     // 天气相关数据
     weatherData: {
-      city: '',
+      city: '杭州',
       currentTemp: '--',
       maxTemp: '--',
       minTemp: '--',
-      condition: '--',
+      condition: '多云',
       humidity: '--',
       windSpeed: '--',
       airQuality: '--',
@@ -91,58 +71,35 @@ Page({
     currentTime: '',
     // 穿衣建议
     clothingAdvice: {
-      index: '--',
-      recommendation: '',
-      tips: '',
-      zodiacAdvice: ''
+      index: '舒适',
+      recommendation: '轻薄外套配长裤，透气舒适',
+      tips: '早晚温差较大，建议携带外套',
+      zodiacAdvice: '今日适合穿着明亮色彩，提升运势'
     },
     // 字测相关
     inputCharacter: '',
-    characterResult: {
-      structure: {
-        character: '',
-        radical: '',
-        strokes: 0,
-        components: []
+    characterResult: null,
+    divinationResult: {},
+    
+    // 黄历数据
+    lunarCalendar: {
+      lunarDate: '',
+      lunarYear: '',
+      lunarMonth: '',
+      lunarDay: '',
+      chineseDate: '',
+      ganzhi: {
+        year: '',
+        month: '',
+        day: ''
       },
-      hexagram: {
-        primary: '',
-        secondary: '',
-        interpretation: ''
-      },
-      interpretation: '',
-      advice: {
-        general: '',
-        action: [],
-        caution: ''
-      }
-    },
-    divinationResult: {
-      hexagram: {
-        name: '',
-        description: '',
-        analysis: ''
-      },
-      trend: {
-        current: '',
-        future: '',
-        timing: ''
-      },
-      guidance: {
-        favorable: [],
-        unfavorable: [],
-        precautions: []
-      },
-      recommendations: {
-        timing: '',
-        direction: '',
-        colors: [],
-        actions: []
-      },
-      resolution: {
-        challenges: [],
-        solutions: []
-      }
+      suitable: [], // 宜
+      avoid: [], // 忌
+      direction: '', // 财神方位
+      luckyTime: '', // 吉时
+      unluckyTime: '', // 凶时
+      dailyFortune: '', // 今日运势简述
+      tips: '' // 黄历提示
     }
   },
 
@@ -177,30 +134,19 @@ Page({
     // 初始化模型数据（保持不变）
     this.setData({
       modelData: {
-        nativeType: 'INTJ',
-        nativeName: '建筑师',
-        nativeDescription: '战略性思考者，擅长发现模式，开发创新解决方案',
-        socialType: 'ENTJ',
-        socialName: '统帅',
-        socialDescription: '在社交环境中表现出领导特质，高效组织者',
-        industries: [
-          { name: '软件开发', icon: 'icon-code' },
-          { name: '系统设计', icon: 'icon-architecture' },
-          { name: '科学研究', icon: 'icon-research' },
-          { name: '战略咨询', icon: 'icon-strategy' }
-        ],
-        directions: [
-          { name: '东南方', type: 'good' },
-          { name: '西北方', type: 'good' },
-          { name: '东北方', type: 'bad' },
-          { name: '西南方', type: 'bad' }
-        ],
-        directionTip: '东南方向适合设立工作台，有助于提升思考能力和创造力。'
+        personalityRadar: [],
+        socialMask: null,
+        careerTraits: [],
+        industryMatch: [],
+        directionAdvice: null,
+        relationships: null
       }
     });
     
     this.updateCurrentTime();
     this.loadWeatherData();
+    // 移除单独的黄历数据加载，现在由loadWeatherData方法统一处理
+    // this.getLunarCalendarData();
   },
 
   onShow() {
@@ -370,6 +316,11 @@ Page({
       if (!cachedAdvice || !this.data.aiAdviceLoaded) {
         this.loadAiAdvice();
       }
+    }
+    
+    // 如果切换到每日分析标签页，检查天气和黄历数据
+    if (index == 3) {
+      this.checkAndLoadDailyAnalysisData();
     }
     
     // 如果切换到测试标签页，检查是否有未完成的测试
@@ -1006,18 +957,12 @@ Page({
     // 更新modelData
     this.setData({
       modelData: {
-        nativeType: mbtiType,
-        nativeName: typeInfo.name || '未知类型',
-        nativeDescription: typeInfo.description || '暂无描述',
-        socialType: socialType,
-        socialName: socialTypeInfo.name || '未知类型',
-        socialDescription: socialTypeInfo.description ? socialTypeInfo.description.substring(0, 60) + '...' : '暂无描述',
-        industries: industries,
-        directions: directions,
-        directionTip: this.getDirectionTip(mbtiType),
-        radarData: radarData,
+        personalityRadar: radarData,
+        socialMask: socialType,
         careerTraits: careerTraits,
-        relationships: relationships // 添加关系匹配数据
+        industryMatch: industries,
+        directionAdvice: directions,
+        relationships: relationships
       }
     });
     
@@ -2220,13 +2165,116 @@ Page({
     });
   },
 
-  // 加载天气数据
+  // 检查并加载每日分析数据
+  async checkAndLoadDailyAnalysisData() {
+    console.log('检查每日分析数据...');
+    
+    try {
+      // 检查当前是否有天气数据
+      const hasWeatherData = this.data.weatherData && 
+                            this.data.weatherData.currentTemp && 
+                            this.data.weatherData.currentTemp !== '--';
+      
+      // 检查当前是否有黄历数据
+      const hasLunarData = this.data.lunarCalendar && 
+                          this.data.lunarCalendar.lunarDate && 
+                          this.data.lunarCalendar.lunarDate !== '';
+      
+      // 检查缓存数据是否存在且有效
+      const today = new Date().toDateString();
+      const cachedData = wx.getStorageSync('weatherData');
+      const isCacheValid = cachedData && cachedData.date === today;
+      
+      console.log('数据检查结果:', {
+        hasWeatherData,
+        hasLunarData,
+        isCacheValid,
+        today,
+        cachedDate: cachedData?.date,
+        currentWeatherTemp: this.data.weatherData?.currentTemp,
+        currentLunarDate: this.data.lunarCalendar?.lunarDate
+      });
+      
+      // 判断是否需要更新数据
+      let needUpdate = false;
+      let updateReason = '';
+      
+      if (!hasWeatherData && !hasLunarData) {
+        needUpdate = true;
+        updateReason = '无天气和黄历数据';
+      } else if (!hasWeatherData) {
+        needUpdate = true;
+        updateReason = '缺少天气数据';
+      } else if (!hasLunarData) {
+        needUpdate = true;
+        updateReason = '缺少黄历数据';
+      } else if (!isCacheValid) {
+        needUpdate = true;
+        updateReason = '数据已过期，需要更新';
+      }
+      
+      if (needUpdate) {
+        console.log(`需要更新数据: ${updateReason}`);
+        wx.showToast({
+          title: '正在更新数据...',
+          icon: 'loading',
+          duration: 1500
+        });
+        await this.loadWeatherData();
+        console.log('每日分析数据更新完成');
+      } else {
+        console.log('使用历史数据，无需更新');
+        // 如果有缓存数据但页面数据不完整，从缓存恢复
+        if (isCacheValid && cachedData) {
+          if (!hasWeatherData && cachedData.data) {
+            this.setData({
+              weatherData: cachedData.data
+            });
+            console.log('从缓存恢复天气数据');
+          }
+          if (!hasLunarData && cachedData.lunarCalendar) {
+            this.setData({
+              lunarCalendar: cachedData.lunarCalendar
+            });
+            console.log('从缓存恢复黄历数据');
+          }
+          if (cachedData.clothingAdvice) {
+            this.setData({
+              clothingAdvice: cachedData.clothingAdvice
+            });
+            console.log('从缓存恢复穿衣建议');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('检查每日分析数据失败:', error);
+      // 如果检查失败，尝试加载数据
+      try {
+        await this.loadWeatherData();
+      } catch (loadError) {
+        console.error('加载数据也失败了:', loadError);
+        wx.showToast({
+          title: '数据加载失败',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    }
+  },
+
   async loadWeatherData() {
     try {
       // 从用户设置中获取位置信息
       const userSettings = wx.getStorageSync('userSettings') || {};
       const location = {
         city: userSettings.currentLocation ? userSettings.currentLocation.split('，')[0] : '杭州'
+      };
+      
+      // 构建包含MBTI信息的用户信息对象
+      const userInfo = {
+        ...userSettings,
+        mbti: this.data.result?.type || userSettings.mbti || '未知',
+        mbtiType: this.data.result?.type || userSettings.mbti || '未知'
       };
       
       // 检查是否有当天的缓存数据，且位置未变更
@@ -2237,24 +2285,23 @@ Page({
       if (cachedData && cachedData.date === today && isSameLocation) {
         this.setData({
           weatherData: cachedData.data,
-          clothingAdvice: cachedData.clothingAdvice
+          clothingAdvice: cachedData.clothingAdvice,
+          lunarCalendar: cachedData.lunarCalendar || this.getLunarCalendarData() // 如果缓存中没有黄历数据，则使用本地计算
         });
         return;
       }
       
-      // 显示加载提示
-      wx.showLoading({
-        title: '更新天气中...',
-        mask: true
-      });
+      // 静默更新天气数据，不显示阻断性加载窗口
+      console.log('正在静默更新天气和黄历数据...');
       
-      // 调用API获取新数据
-      const { weather, clothingAdvice } = await getWeatherAndAdvice(location, userSettings);
+      // 调用API获取新数据（现在包含黄历信息）
+      const { weather, clothingAdvice, lunarCalendar } = await getWeatherAndAdvice(location, userInfo);
       
       // 更新数据
       this.setData({
         weatherData: weather,
-        clothingAdvice
+        clothingAdvice,
+        lunarCalendar: lunarCalendar || this.getLunarCalendarData() // 如果API没有返回黄历数据，使用本地计算
       });
       
       // 缓存数据
@@ -2262,17 +2309,23 @@ Page({
         date: today,
         location: location.city,
         data: weather,
-        clothingAdvice
+        clothingAdvice,
+        lunarCalendar
       });
       
-      wx.hideLoading();
-    } catch (error) {
-      console.error('加载天气数据失败:', error);
-      wx.hideLoading();
-      wx.showToast({
-        title: '获取天气信息失败',
-        icon: 'none'
+      console.log('天气和黄历数据更新完成:', {
+        weather: weather?.condition,
+        lunarDate: lunarCalendar?.lunarDate,
+        ganzhi: lunarCalendar?.ganzhi
       });
+    } catch (error) {
+      console.error('加载天气和黄历数据失败:', error);
+      // 如果API调用失败，使用本地计算的黄历数据
+      const localLunarCalendar = this.getLunarCalendarData();
+      this.setData({
+        lunarCalendar: localLunarCalendar
+      });
+      console.log('天气数据获取失败，已加载本地黄历数据');
     }
   },
 
@@ -2283,7 +2336,7 @@ Page({
     });
   },
 
-  // 提交字测分析
+  // 提交测事情分析
   async submitDivination() {
     const { inputText } = this.data;
     if (!inputText) {
@@ -2426,5 +2479,283 @@ MBTI类型：${userInfo.mbti || '未知'}
       selectedOption: '',
       answers: new Array(this.data.questions.length).fill(null)
     });
+  },
+
+  // 获取今日黄历数据
+  getLunarCalendarData() {
+    const today = new Date();
+    const lunarDate = this.calculateLunarDate(today);
+    const ganzhi = this.calculateGanzhi(today);
+    
+    // 宜事项列表
+    const suitableActivities = [
+      '祭祀', '结网', '捕捉', '除虫害', '治病', '平治道涂', '扫舍',
+      '开市', '交易', '立券', '纳财', '栽种', '纳畜', '牧养',
+      '嫁娶', '订盟', '安床', '会亲友', '求嗣', '进人口',
+      '出行', '移徙', '开业', '动土', '破土', '安葬'
+    ];
+    
+    // 忌事项列表
+    const avoidActivities = [
+      '探病', '嫁娶', '开市', '动土', '破土', '安葬', '修造',
+      '上梁', '开仓', '出货财', '纳财', '开渠', '掘井',
+      '栽种', '牧养', '纳畜', '破屋', '坏垣', '求医',
+      '治病', '针灸', '开池', '理发', '整手足甲'
+    ];
+
+    // 吉神宜趋
+    const luckyGods = [
+      '母仓', '敬安', '喜神', '正南', '福神', '正东', '财神', '正南',
+      '天德', '月德', '天恩', '母仓', '不将', '圣心', '益后', '续世'
+    ];
+
+    // 凶神宜忌  
+    const unluckyGods = [
+      '天罡', '劫煞', '土符', '厌对', '招摇', '九焦', '九坎',
+      '月害', '土府', '土符', '大煞', '往亡', '重日', '朱雀'
+    ];
+
+    // 十二建星
+    const buildingStars = ['建', '除', '满', '平', '定', '执', '破', '危', '成', '收', '开', '闭'];
+    const todayBuildingStar = buildingStars[today.getDate() % 12];
+
+    // 二十八宿
+    const constellations = [
+      '角', '亢', '氐', '房', '心', '尾', '箕', '斗', '牛', '女', '虚', '危',
+      '室', '壁', '奎', '娄', '胃', '昴', '毕', '觜', '参', '井', '鬼', '柳',
+      '星', '张', '翼', '轸'
+    ];
+    const todayConstellation = constellations[today.getDate() % 28];
+
+    // 计算星座 - 修复：将Date对象转换为字符串格式
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const zodiacSign = this.getZodiacSign(todayStr);
+
+    // 五行纳音
+    const nayin = this.calculateNayin(ganzhi.year);
+
+    this.setData({
+      lunarCalendar: {
+        // 基本日期信息 - 与API返回格式统一
+        solarYear: today.getFullYear(),
+        solarMonth: today.getMonth() + 1,
+        solarDay: today.getDate(),
+        weekday: ['日', '一', '二', '三', '四', '五', '六'][today.getDay()],
+        zodiacSign: zodiacSign,
+        
+        // 农历信息 - 使用字符串格式
+        lunarDate: lunarDate.displayDate, // 使用displayDate而不是整个对象
+        
+        // 干支信息 - 展开为单独字段
+        yearGanzhi: ganzhi.year,
+        monthGanzhi: ganzhi.month, 
+        dayGanzhi: ganzhi.day,
+        timeGanzhi: ganzhi.time,
+
+        // 宜忌事项 - 与API格式统一
+        suitable: this.getRandomActivities(suitableActivities, 4, 6),
+        avoid: this.getRandomActivities(avoidActivities, 3, 5),
+
+        // 神煞信息 - 与API格式统一
+        jishen: this.getRandomActivities(luckyGods, 4, 6),
+        xiongshen: this.getRandomActivities(unluckyGods, 3, 5),
+
+        // 方位信息 - 展开为单独字段
+        caishen: this.calculateCaishenDirection(today),
+        xishen: this.calculateXishenDirection(today),
+        fushen: this.calculateFushenDirection(today),
+        taishen: this.calculateTaishenDirection(today),
+
+        // 冲煞信息 - 展开为单独字段
+        chong: this.calculateChong(ganzhi.day),
+        sha: this.calculateSha(today),
+
+        // 五行信息 - 展开为单独字段
+        nayin: nayin,
+        wuxing: this.calculateDayWuxing(ganzhi.day),
+
+        // 时辰信息 - 与API格式统一
+        jishi: this.calculateLuckyTime(today),
+        xiongshi: this.calculateUnluckyTime(today),
+
+        // 每日信息
+        pengzu: this.getDailyWords(today),
+        dailyWords: this.getDailyWords(today),
+        tips: this.getDailyTips(today)
+      }
+    });
+  },
+
+  // 计算财神方位
+  calculateCaishenDirection(date) {
+    const directions = ['正东', '东南', '正南', '西南', '正西', '西北', '正北', '东北'];
+    return directions[date.getDate() % 8];
+  },
+
+  // 计算喜神方位
+  calculateXishenDirection(date) {
+    const directions = ['东北', '西北', '西南', '正南', '东南', '正东', '正北', '正西'];
+    return directions[date.getDate() % 8];
+  },
+
+  // 计算福神方位
+  calculateFushenDirection(date) {
+    const directions = ['正北', '东北', '正东', '东南', '正南', '西南', '正西', '西北'];
+    return directions[date.getDate() % 8];
+  },
+
+  // 计算胎神方位
+  calculateTaishenDirection(date) {
+    const positions = [
+      '仓库炉房内南', '碓磨门房内南', '厨灶炉房内南', '仓库门房内南',
+      '房床炉房内南', '门鸡栖房内南', '碓磨床房内南', '厨灶门房内南',
+      '仓库碓房内南', '房床门房内南', '门鸡栖炉房内南', '碓磨厨房内南'
+    ];
+    return positions[date.getDate() % 12];
+  },
+
+  // 计算冲
+  calculateChong(dayGanzhi) {
+    const earthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    const zodiacAnimals = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+    
+    // 简化的冲的计算（实际应该根据地支计算）
+    const dayIndex = earthlyBranches.indexOf(dayGanzhi.charAt(1));
+    const chongIndex = (dayIndex + 6) % 12;
+    
+    return `冲${zodiacAnimals[chongIndex]}`;
+  },
+
+  // 计算煞
+  calculateSha(date) {
+    const shaDirections = ['煞东', '煞南', '煞西', '煞北'];
+    return shaDirections[date.getDate() % 4];
+  },
+
+  // 计算五行纳音
+  calculateNayin(yearGanzhi) {
+    const nayinList = [
+      '海中金', '炉中火', '大林木', '路旁土', '剑锋金', '山头火',
+      '涧下水', '城头土', '白蜡金', '杨柳木', '泉中水', '屋上土',
+      '霹雳火', '松柏木', '长流水', '沙中金', '山下火', '平地木',
+      '壁上土', '金箔金', '覆灯火', '天河水', '大驿土', '钗钏金',
+      '桑柘木', '大溪水', '沙中土', '天上火', '石榴木', '大海水'
+    ];
+    
+    // 简化的纳音计算
+    return nayinList[new Date().getFullYear() % 30];
+  },
+
+  // 计算日五行
+  calculateDayWuxing(dayGanzhi) {
+    const wuxingMap = {
+      '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土',
+      '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水'
+    };
+    return wuxingMap[dayGanzhi.charAt(0)] || '木';
+  },
+
+  // 计算吉时
+  calculateLuckyTime(date) {
+    const times = [
+      '子时', '丑时', '寅时', '卯时', '辰时', '巳时',
+      '午时', '未时', '申时', '酉时', '戌时', '亥时'
+    ];
+    const luckyCount = 2 + (date.getDate() % 3);
+    return this.getRandomActivities(times, luckyCount, luckyCount);
+  },
+
+  // 计算凶时
+  calculateUnluckyTime(date) {
+    const times = [
+      '子时', '丑时', '寅时', '卯时', '辰时', '巳时',
+      '午时', '未时', '申时', '酉时', '戌时', '亥时'
+    ];
+    const unluckyCount = 2 + (date.getDate() % 2);
+    return this.getRandomActivities(times, unluckyCount, unluckyCount);
+  },
+
+  // 获取每日一言
+  getDailyWords(date) {
+    const words = [
+      '彭祖百忌：壬不汲水更难提防 申不安床鬼祟入房',
+      '今日宜祭祀祈福，忌动土开工，平安是福',
+      '吉神在方，宜求财纳福，凶神远避，忌争讼官司',
+      '天时地利人和，诸事皆宜，把握良机',
+      '宜静不宜动，修身养性为上，急躁易生祸端'
+    ];
+    return words[date.getDate() % words.length];
+  },
+
+  // 获取每日提示
+  getDailyTips(date) {
+    const tips = [
+      '今日运势较佳，适合处理重要事务，但需注意与人交往时的言辞',
+      '财运旺盛的一天，投资理财需谨慎，切忌盲目跟风',
+      '健康方面需要关注，适当休息，避免过度劳累',
+      '人际关系和谐，适合拜访朋友、洽谈合作',
+      '学习运势不错，适合充电提升，开拓视野'
+    ];
+    return tips[date.getDate() % tips.length];
+  },
+
+  // 随机选择活动
+  getRandomActivities(activities, min, max) {
+    const count = Math.floor(Math.random() * (max - min + 1)) + min;
+    const shuffled = [...activities].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+  },
+
+  // 简化的农历日期计算
+  calculateLunarDate(date) {
+    const lunarMonths = [
+      '正月', '二月', '三月', '四月', '五月', '六月',
+      '七月', '八月', '九月', '十月', '冬月', '腊月'
+    ];
+    
+    const lunarDays = [
+      '初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
+      '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+      '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'
+    ];
+    
+    // 简化计算（实际应该使用专业的农历转换算法）
+    const month = date.getMonth();
+    const day = date.getDate();
+    
+    const lunarMonth = lunarMonths[month % 12];
+    const lunarDay = lunarDays[(day - 1) % lunarDays.length];
+    
+    return {
+      year: `乙巳年`,
+      month: lunarMonth,
+      day: lunarDay,
+      fullDate: `乙巳年${lunarMonth}${lunarDay}`,
+      displayDate: `${lunarMonth}${lunarDay}`
+    };
+  },
+
+  // 计算干支
+  calculateGanzhi(date) {
+    const heavenlyStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    const earthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hour = date.getHours();
+    
+    // 简化的干支计算
+    const yearGanzhi = heavenlyStems[year % 10] + earthlyBranches[year % 12];
+    const monthGanzhi = heavenlyStems[month % 10] + earthlyBranches[month % 12];
+    const dayGanzhi = heavenlyStems[day % 10] + earthlyBranches[day % 12];
+    const timeGanzhi = heavenlyStems[(hour / 2) % 10] + earthlyBranches[(hour / 2) % 12];
+    
+    return {
+      year: yearGanzhi,
+      month: monthGanzhi,
+      day: dayGanzhi,
+      time: timeGanzhi
+    };
   }
 }) 

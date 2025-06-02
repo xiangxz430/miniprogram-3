@@ -1,19 +1,44 @@
 const app = getApp();
-const logger = require('../../utils/logger');
 const calendar = require('../../utils/lunar');
 const tabConfigUtil = require('../../utils/tabConfig');
+const { getBaziAnalysis } = require('../../utils/deepseekApi');
 
 Page({
   data: {
-    activeTab: 0, // 当前激活的标签页：0=个人信息, 1=我的好友
+    activeTab: 0, // 当前激活的标签页：0=个人信息, 1=高级功能, 2=我的好友
+    // 标签页配置数据
+    tabItems: [
+      { index: 0, text: '个人分析', key: 'personal' },
+      { index: 1, text: '高级功能', key: 'advanced' },
+      { index: 2, text: '我的好友', key: 'friends' }
+    ],
     isEditing: false, // 是否处于编辑模式
     mbtiOptions: ['ISTJ', 'ISFJ', 'INFJ', 'INTJ', 'ISTP', 'ISFP', 'INFP', 'INTP', 'ESTP', 'ESFP', 'ENFP', 'ENTP', 'ESTJ', 'ESFJ', 'ENFJ', 'ENTJ'],
     mbtiIndex: 0, // MBTI选择器的索引
+    genderOptions: ['男', '女'], // 性别选项
+    genderIndex: 0, // 性别选择器的索引
+    
+    // 八字分析相关数据
+    baziForm: {
+      name: '',
+      birthDate: '',
+      birthTime: '',
+      gender: '',
+      genderIndex: 0,
+      birthplace: '',
+      birthplaceArray: []
+    },
+    baziAnalysisResult: null, // 八字分析结果
+    isCalculatingBazi: false, // 是否正在计算八字
+    canCalculateBazi: false, // 是否可以计算八字
+    wuxingItems: [], // 五行分布数据
+    
     userInfo: {
       avatar: null,
-      nickname: '王小明',
+      nickname: '无姓名',
       birthdate: '1990年8月15日', // 默认生日
       birthtime: '12:00', // 默认出生时间
+      gender: '男', // 默认性别
       lunarDate: '庚午年七月廿五', // 默认农历
       zodiac: '天秤座', // 默认星座
       mbti: 'INFJ', // 默认MBTI
@@ -32,89 +57,43 @@ Page({
         rating: 4 // 星级评分（1-5）
       }
     },
-    dreams: [
-      {
-        title: '梦见在高处行走',
-        date: '昨天',
-        content: '梦见自己在一座很高的桥上行走，桥下是深深的峡谷，我走得很小心，但不觉得特别害怕...'
-      },
-      {
-        title: '梦见飞翔',
-        date: '3天前',
-        content: '梦见自己能够飞翔，在城市上空自由翱翔，感觉非常轻松和愉快...'
-      }
-    ],
-    friends: [
-      {
-        name: '张小红',
-        firstLetter: '张',
-        bgColor: 'bg-blue-500',
-        zodiac: '射手座',
-        zodiacColor: 'text-orange-500',
-        mbti: 'ENFP',
-        lunarYear: '乙亥年',
-        relationship: '好友'
-      },
-      {
-        name: '李小华',
-        firstLetter: '李',
-        bgColor: 'bg-green-500',
-        zodiac: '水瓶座',
-        zodiacColor: 'text-blue-500',
-        mbti: 'INTJ',
-        lunarYear: '丁卯年',
-        relationship: '好友'
-      },
-      {
-        name: '陈小明',
-        firstLetter: '陈',
-        bgColor: 'bg-pink-500',
-        zodiac: '双子座',
-        zodiacColor: 'text-purple-500',
-        mbti: 'ESTP',
-        lunarYear: '戊子年',
-        relationship: '好友'
-      }
-    ],
-    birthdays: [
-      {
-        name: '李小华',
-        date: '11月13日',
-        daysLeft: 3
-      },
-      {
-        name: '张小红',
-        date: '11月25日',
-        daysLeft: 15
-      }
-    ],
-    compatibilities: {
-      wuxing: [
-        {
-          name: '李小华',
-          percentage: 87
-        },
-        {
-          name: '陈小明',
-          percentage: 65
-        }
-      ],
-      zodiac: [
-        {
-          name: '张小红',
-          percentage: 92
-        },
-        {
-          name: '陈小明',
-          percentage: 78
-        }
-      ]
+    birthdays: [],
+   
+    
+    // 好友功能相关数据
+    showFriendModal: false, // 是否显示好友添加/编辑模态框
+    showFriendDetailModal: false, // 是否显示好友详情模态框
+    isEditingFriend: false, // 是否处于编辑好友模式
+    editingFriendIndex: -1, // 正在编辑的好友索引
+    selectedFriend: null, // 选中的好友信息
+    selectedFriendIndex: -1, // 选中的好友索引
+    canSaveFriend: false, // 是否可以保存好友
+    relationshipOptions: ['朋友', '家人', '同事', '同学', '恋人', '其他'], // 关系选项
+    
+    // 好友表单数据
+    friendForm: {
+      name: '',
+      birthDate: '',
+      birthTime: '',
+      gender: '',
+      genderIndex: 0,
+      birthplace: '',
+      birthplaceArray: [],
+      relationship: '',
+      relationshipIndex: 0,
+      mbti: '',
+      mbtiIndex: 0
     }
   },
 
   onLoad: function() {
+    // 加载标签页配置
+    this.loadTabConfig();
+    
     this.initUserData();
     this.initMBTIIndex();
+    this.initGenderIndex();
+    this.initBaziFormWithUserInfo(); // 初始化八字表单数据
     
     // 确保activeTab被正确初始化
     this.setData({
@@ -137,10 +116,8 @@ Page({
       console.log('使用已保存的位置信息:', userSettings.currentLocation);
     }
     
-    logger.log('页面访问', {
-      页面: '用户档案',
-      时间: new Date().toLocaleString()
-    });
+    // 加载已保存的八字分析结果
+    this.loadSavedBaziResult();
   },
 
   onShow: function() {
@@ -197,10 +174,20 @@ Page({
         'userInfo.firstLetter': userSettings.firstLetter || this.data.userInfo.firstLetter,
         'userInfo.birthdate': userSettings.birthdate || this.data.userInfo.birthdate,
         'userInfo.birthtime': userSettings.birthtime || this.data.userInfo.birthtime,
+        'userInfo.gender': userSettings.gender || this.data.userInfo.gender,
         'userInfo.mbti': userSettings.mbti || this.data.userInfo.mbti,
         'userInfo.birthplace': userSettings.birthplace || this.data.userInfo.birthplace,
         'userInfo.birthplaceArray': userSettings.birthplaceArray || this.data.userInfo.birthplaceArray
       });
+      
+      // 加载八字分析结果
+      if (userSettings.baziAnalysisResult) {
+        const wuxingItems = this.processWuxingData(userSettings.baziAnalysisResult.wuxingAnalysis.distribution);
+        this.setData({
+          baziAnalysisResult: userSettings.baziAnalysisResult,
+          wuxingItems: wuxingItems
+        });
+      }
       
       // 如果有生日信息，更新星座和农历
       if (userSettings.birthdate) {
@@ -216,6 +203,19 @@ Page({
         }
       }
     }
+    
+    // 从本地存储加载朋友列表
+    const friendsList = wx.getStorageSync('friendsList');
+    if (friendsList && Array.isArray(friendsList)) {
+      this.setData({
+        friends: friendsList
+      });
+      // 更新生日提醒
+      this.updateBirthdayReminders(friendsList);
+    } else {
+      // 如果没有保存的朋友列表，使用默认数据并更新生日提醒
+      this.updateBirthdayReminders(this.data.friends);
+    }
   },
 
   // 初始化MBTI选择器的索引
@@ -223,6 +223,14 @@ Page({
     const mbtiIndex = this.data.mbtiOptions.indexOf(this.data.userInfo.mbti);
     if (mbtiIndex !== -1) {
       this.setData({ mbtiIndex });
+    }
+  },
+
+  // 初始化性别选择器的索引
+  initGenderIndex: function() {
+    const genderIndex = this.data.genderOptions.indexOf(this.data.userInfo.gender);
+    if (genderIndex !== -1) {
+      this.setData({ genderIndex });
     }
   },
 
@@ -263,10 +271,6 @@ Page({
     this.setData({
       isEditing: !this.data.isEditing
     });
-    
-    logger.log('用户操作', {
-      操作: this.data.isEditing ? '进入编辑模式' : '保存编辑'
-    });
   },
 
   // 昵称输入事件
@@ -288,8 +292,13 @@ Page({
     const timeStr = e.detail.value;
     
     this.setData({
-      'userInfo.birthtime': timeStr
+      'userInfo.birthtime': timeStr,
+      // 同时更新八字表单中的出生时间
+      'baziForm.birthTime': timeStr
     });
+    
+    // 检查八字表单是否完整
+    this.checkCanCalculateBazi();
   },
 
   // 出生地选择器事件
@@ -299,8 +308,30 @@ Page({
     
     this.setData({
       'userInfo.birthplace': formattedPlace,
-      'userInfo.birthplaceArray': region
+      'userInfo.birthplaceArray': region,
+      // 同时更新八字表单中的出生地
+      'baziForm.birthplace': formattedPlace,
+      'baziForm.birthplaceArray': region
     });
+    
+    // 检查八字表单是否完整
+    this.checkCanCalculateBazi();
+  },
+
+  // 性别选择器事件
+  bindGenderChange: function(e) {
+    const genderIndex = parseInt(e.detail.value);
+    const gender = this.data.genderOptions[genderIndex];
+    this.setData({
+      genderIndex: genderIndex,
+      'userInfo.gender': gender,
+      // 同时更新八字表单中的性别
+      'baziForm.gender': gender,
+      'baziForm.genderIndex': genderIndex
+    });
+    
+    // 检查八字表单是否完整
+    this.checkCanCalculateBazi();
   },
 
   // 保存用户设置
@@ -310,10 +341,13 @@ Page({
       firstLetter: this.data.userInfo.firstLetter,
       birthdate: this.data.userInfo.birthdate,
       birthtime: this.data.userInfo.birthtime,
+      gender: this.data.userInfo.gender,
       mbti: this.data.userInfo.mbti,
       birthplace: this.data.userInfo.birthplace,
       birthplaceArray: this.data.userInfo.birthplaceArray,
-      currentLocation: this.data.userInfo.currentLocation
+      currentLocation: this.data.userInfo.currentLocation,
+      // 保存八字分析结果
+      baziAnalysisResult: this.data.baziAnalysisResult
     };
     
     // 保存到本地存储
@@ -347,11 +381,16 @@ Page({
     const formattedDate = `${year}年${month}月${day}日`;
     
     this.setData({
-      'userInfo.birthdate': formattedDate
+      'userInfo.birthdate': formattedDate,
+      // 同时更新八字表单中的出生日期
+      'baziForm.birthDate': dateStr
     });
     
     // 更新农历和星座
     this.updateZodiacAndLunar(year, month, day);
+    
+    // 检查八字表单是否完整
+    this.checkCanCalculateBazi();
   },
 
   // 更新星座和农历信息
@@ -537,13 +576,6 @@ Page({
             });
             
             console.log('位置更新成功:', fullAddress);
-            logger.log('位置更新', {
-              地点: fullAddress,
-              详细地址: address,
-              名称: name,
-              经度: res.longitude,
-              纬度: res.latitude
-            });
             
             wx.showToast({
               title: '位置已更新',
@@ -594,7 +626,7 @@ Page({
     const index = parseInt(e.currentTarget.dataset.index);
     
     // 确保index是有效的数字
-    if (isNaN(index) || (index !== 0 && index !== 1)) {
+    if (isNaN(index) || (index !== 0 && index !== 1 && index !== 2)) {
       console.error('无效的标签页索引', e.currentTarget.dataset.index);
       return;
     }
@@ -606,11 +638,6 @@ Page({
     });
     
     console.log('标签切换完成 - 新activeTab:', this.data.activeTab);
-    
-    logger.log('用户操作', {
-      操作: '切换标签页',
-      标签页: index === 0 ? '个人信息' : '我的好友'
-    });
   },
 
   // 添加好友
@@ -619,10 +646,6 @@ Page({
       title: '添加好友功能开发中',
       icon: 'none'
     });
-    
-    logger.log('用户操作', {
-      操作: '点击添加好友按钮'
-    });
   },
 
   // 查看全部梦境
@@ -630,21 +653,13 @@ Page({
     wx.navigateTo({
       url: '/pages/dream_analysis/index'
     });
-    
-    logger.log('用户操作', {
-      操作: '查看全部梦境记录'
-    });
   },
 
   // 查看全部生日提醒
   viewAllBirthdays: function() {
     wx.showToast({
-      title: '生日提醒功能开发中',
+      title: '功能开发中',
       icon: 'none'
-    });
-    
-    logger.log('用户操作', {
-      操作: '查看全部生日提醒'
     });
   },
 
@@ -655,11 +670,6 @@ Page({
       title: `${settingType}设置功能开发中`,
       icon: 'none'
     });
-    
-    logger.log('用户操作', {
-      操作: '进入设置',
-      设置类型: settingType
-    });
   },
 
   // 个人信息编辑
@@ -667,10 +677,6 @@ Page({
     wx.showToast({
       title: '个人信息编辑功能开发中',
       icon: 'none'
-    });
-    
-    logger.log('用户操作', {
-      操作: '编辑个人信息'
     });
   },
 
@@ -682,11 +688,6 @@ Page({
     wx.showToast({
       title: `查看好友${friend.name}的详情功能开发中`,
       icon: 'none'
-    });
-    
-    logger.log('用户操作', {
-      操作: '查看好友详情',
-      好友: friend.name
     });
   },
 
@@ -709,12 +710,6 @@ Page({
         icon: 'none'
       });
     }
-    
-    logger.log('用户操作', {
-      操作: '查看关系匹配详情',
-      类型: type,
-      好友: data.name
-    });
   },
 
   // 下拉刷新
@@ -726,5 +721,973 @@ Page({
     setTimeout(() => {
       wx.stopPullDownRefresh();
     }, 1000);
+  },
+
+  // 八字分析相关方法
+  
+  // 姓名输入
+  onBaziNameChange: function(e) {
+    this.setData({
+      'baziForm.name': e.detail.value
+    });
+    this.checkCanCalculateBazi();
+  },
+
+  // 出生日期选择
+  onBaziBirthDateChange: function(e) {
+    this.setData({
+      'baziForm.birthDate': e.detail.value
+    });
+    this.checkCanCalculateBazi();
+  },
+
+  // 出生时间选择
+  onBaziBirthTimeChange: function(e) {
+    this.setData({
+      'baziForm.birthTime': e.detail.value
+    });
+    this.checkCanCalculateBazi();
+  },
+
+  // 性别选择
+  onBaziGenderChange: function(e) {
+    const genderIndex = parseInt(e.detail.value);
+    const genders = ['男', '女'];
+    this.setData({
+      'baziForm.genderIndex': genderIndex,
+      'baziForm.gender': genders[genderIndex]
+    });
+    this.checkCanCalculateBazi();
+  },
+
+  // 出生地选择
+  onBaziBirthplaceChange: function(e) {
+    const birthplaceArray = e.detail.value;
+    const birthplace = birthplaceArray.join('');
+    this.setData({
+      'baziForm.birthplaceArray': birthplaceArray,
+      'baziForm.birthplace': birthplace
+    });
+    this.checkCanCalculateBazi();
+  },
+
+  // 检查是否可以计算八字
+  checkCanCalculateBazi: function() {
+    const { name, birthDate, birthTime, gender, birthplace } = this.data.baziForm;
+    const canCalculate = name && birthDate && birthTime && gender && birthplace;
+    this.setData({
+      canCalculateBazi: canCalculate
+    });
+  },
+
+  // 开始八字分析
+  calculateBazi: async function() {
+    if (!this.data.canCalculateBazi || this.data.isCalculatingBazi) {
+      return;
+    }
+
+    // 设置计算状态
+    this.setData({
+      isCalculatingBazi: true
+    });
+
+    wx.showLoading({
+      title: '正在分析八字...',
+      mask: true
+    });
+
+    try {
+      // 构建出生信息
+      const birthInfo = {
+        name: this.data.baziForm.name,
+        birthDate: this.data.baziForm.birthDate,
+        birthTime: this.data.baziForm.birthTime,
+        gender: this.data.baziForm.gender,
+        birthplace: this.data.baziForm.birthplace
+      };
+
+      // 构建用户信息
+      const userInfo = {
+        nickname: this.data.userInfo.nickname,
+        gender: this.data.baziForm.gender,
+        birthplace: this.data.baziForm.birthplace,
+        zodiac: this.data.userInfo.zodiac,
+        mbti: this.data.userInfo.mbti
+      };
+
+      console.log('开始调用八字分析API...', { birthInfo, userInfo });
+
+      // 调用八字分析API
+      const result = await getBaziAnalysis(birthInfo, userInfo);
+
+      console.log('八字分析结果:', result);
+
+      // 处理五行数据用于可视化
+      const wuxingItems = this.processWuxingData(result.wuxingAnalysis.distribution);
+
+      // 保存结果到页面数据
+      this.setData({
+        baziAnalysisResult: result,
+        wuxingItems: wuxingItems
+      });
+
+      // 保存到本地存储
+      wx.setStorageSync('baziAnalysisResult', result);
+      wx.setStorageSync('baziBirthInfo', birthInfo);
+      
+      // 更新userSettings中的八字分析结果
+      const userSettings = wx.getStorageSync('userSettings') || {};
+      userSettings.baziAnalysisResult = result;
+      wx.setStorageSync('userSettings', userSettings);
+
+      wx.hideLoading();
+      wx.showToast({
+        title: '八字分析完成',
+        icon: 'success'
+      });
+
+      // 记录日志
+      console.log('八字分析成功:', {
+        操作: '计算八字',
+        出生日期: birthInfo.birthDate,
+        出生时间: birthInfo.birthTime,
+        性别: birthInfo.gender,
+        出生地: birthInfo.birthplace,
+        分析结果: result.baziInfo
+      });
+
+    } catch (error) {
+      console.error('八字分析失败:', error);
+      wx.hideLoading();
+      wx.showModal({
+        title: '分析失败',
+        content: '八字分析失败，请检查网络连接后重试',
+        showCancel: false
+      });
+
+      // 记录错误日志
+      console.error('八字分析失败详情:', {
+        错误: error.message,
+        出生信息: this.data.baziForm
+      });
+    } finally {
+      // 重置计算状态
+      this.setData({
+        isCalculatingBazi: false
+      });
+    }
+  },
+
+  // 处理五行数据用于可视化
+  processWuxingData: function(distribution) {
+    const wuxingConfig = [
+      { name: '金', element: 'metal', color: '#FFD700' },
+      { name: '木', element: 'wood', color: '#228B22' },
+      { name: '水', element: 'water', color: '#1E90FF' },
+      { name: '火', element: 'fire', color: '#FF6347' },
+      { name: '土', element: 'earth', color: '#D2691E' }
+    ];
+
+    // 计算总数
+    const total = Object.values(distribution).reduce((sum, count) => sum + count, 0);
+
+    return wuxingConfig.map(config => {
+      const count = distribution[config.element] || 0;
+      const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+      
+      return {
+        name: config.name,
+        element: config.element,
+        count: count,
+        percentage: percentage,
+        color: config.color
+      };
+    });
+  },
+
+  // 重新分析八字
+  resetBaziAnalysis: function() {
+    wx.showModal({
+      title: '确认重新分析',
+      content: '确定要重新进行八字分析吗？',
+      success: (res) => {
+        if (res.confirm) {
+          this.setData({
+            baziAnalysisResult: null,
+            wuxingItems: [],
+            'baziForm.name': '',
+            'baziForm.birthDate': '',
+            'baziForm.birthTime': '',
+            'baziForm.gender': '',
+            'baziForm.genderIndex': 0,
+            'baziForm.birthplace': '',
+            'baziForm.birthplaceArray': [],
+            canCalculateBazi: false
+          });
+
+          // 清除本地存储
+          wx.removeStorageSync('baziAnalysisResult');
+          wx.removeStorageSync('baziBirthInfo');
+          
+          // 从userSettings中删除八字分析结果
+          const userSettings = wx.getStorageSync('userSettings') || {};
+          delete userSettings.baziAnalysisResult;
+          wx.setStorageSync('userSettings', userSettings);
+        }
+      }
+    });
+  },
+
+  // 保存为我的八字
+  saveAsMyBazi: function() {
+    wx.showModal({
+      title: '保存为我的八字',
+      content: '确定要将此八字信息保存为您的个人八字吗？这将更新您的个人信息。',
+      success: (res) => {
+        if (res.confirm) {
+          const baziForm = this.data.baziForm;
+          const baziResult = this.data.baziAnalysisResult;
+          
+          // 更新个人信息
+          const updatedUserInfo = {
+            ...this.data.userInfo,
+            nickname: baziForm.name,
+            firstLetter: baziForm.name ? baziForm.name.charAt(0) : this.data.userInfo.firstLetter,
+            birthdate: this.formatDateForDisplay(baziForm.birthDate),
+            birthtime: baziForm.birthTime,
+            gender: baziForm.gender,
+            birthplace: baziForm.birthplace,
+            birthplaceArray: baziForm.birthplaceArray
+          };
+          
+          // 更新星座和农历信息
+          if (baziForm.birthDate) {
+            const date = new Date(baziForm.birthDate);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            this.updateZodiacAndLunar(year, month, day);
+          }
+          
+          // 更新页面数据
+          this.setData({
+            userInfo: updatedUserInfo
+          });
+          
+          // 保存到userSettings
+          const userSettings = {
+            nickname: baziForm.name,
+            firstLetter: baziForm.name ? baziForm.name.charAt(0) : this.data.userInfo.firstLetter,
+            birthdate: this.formatDateForDisplay(baziForm.birthDate),
+            birthtime: baziForm.birthTime,
+            gender: baziForm.gender,
+            mbti: this.data.userInfo.mbti,
+            birthplace: baziForm.birthplace,
+            birthplaceArray: baziForm.birthplaceArray,
+            currentLocation: this.data.userInfo.currentLocation,
+            baziAnalysisResult: baziResult
+          };
+          
+          wx.setStorageSync('userSettings', userSettings);
+          
+          // 同步到全局数据
+          if (app.globalData) {
+            app.globalData.userSettings = userSettings;
+            if (app.globalData.userInfo) {
+              app.globalData.userInfo.nickname = baziForm.name;
+            }
+          }
+          
+          wx.showToast({
+            title: '保存成功',
+            icon: 'success'
+          });
+        }
+      }
+    });
+  },
+
+  // 保存为我的朋友
+  saveAsFriend: function() {
+    const baziForm = this.data.baziForm;
+    const baziResult = this.data.baziAnalysisResult;
+    
+    if (!baziForm.name || !baziResult) {
+      wx.showToast({
+        title: '数据不完整',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 计算星座
+    let zodiac = '未知';
+    if (baziForm.birthDate) {
+      const date = new Date(baziForm.birthDate);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      zodiac = this.calculateZodiac(month, day);
+    }
+    
+    // 构造朋友数据
+    const friendData = {
+      name: baziForm.name,
+      firstLetter: baziForm.name.charAt(0),
+      bgColor: this.getRandomBgColor(),
+      zodiac: zodiac,
+      zodiacColor: this.getZodiacColor(zodiac),
+      mbti: 'UNKNOWN', // 可以后续完善
+      lunarYear: baziResult.baziInfo.year || '未知',
+      relationship: '朋友',
+      birthdate: this.formatDateForDisplay(baziForm.birthDate),
+      birthtime: baziForm.birthTime,
+      gender: baziForm.gender,
+      birthplace: baziForm.birthplace,
+      baziInfo: baziResult
+    };
+    
+    // 获取现有朋友列表
+    const currentFriends = this.data.friends || [];
+    
+    // 检查是否已存在同名朋友
+    const existingFriend = currentFriends.find(friend => friend.name === baziForm.name);
+    if (existingFriend) {
+      wx.showModal({
+        title: '朋友已存在',
+        content: `朋友列表中已有名为"${baziForm.name}"的朋友，是否覆盖其信息？`,
+        success: (res) => {
+          if (res.confirm) {
+            this.updateFriendsList(friendData, currentFriends);
+          }
+        }
+      });
+    } else {
+      // 直接添加新朋友
+      this.updateFriendsList(friendData, currentFriends);
+    }
+  },
+
+  // 更新朋友列表
+  updateFriendsList: function(friendData, currentFriends) {
+    // 查找是否已存在
+    const existingIndex = currentFriends.findIndex(friend => friend.name === friendData.name);
+    
+    if (existingIndex >= 0) {
+      // 更新现有朋友
+      currentFriends[existingIndex] = friendData;
+    } else {
+      // 添加新朋友
+      currentFriends.push(friendData);
+    }
+    
+    // 更新页面数据
+    this.setData({
+      friends: currentFriends
+    });
+    
+    // 保存到本地存储
+    wx.setStorageSync('friendsList', currentFriends);
+    
+    wx.showToast({
+      title: '已保存到朋友列表',
+      icon: 'success'
+    });
+  },
+
+  // 获取随机背景色
+  getRandomBgColor: function() {
+    const colors = ['bg-blue-500', 'bg-green-500', 'bg-pink-500', 'bg-purple-500', 'bg-yellow-500', 'bg-red-500'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  },
+
+  // 获取星座颜色
+  getZodiacColor: function(zodiac) {
+    const colorMap = {
+      '白羊座': 'text-red-500',
+      '金牛座': 'text-green-500',
+      '双子座': 'text-blue-500',
+      '巨蟹座': 'text-purple-500',
+      '狮子座': 'text-yellow-500',
+      '处女座': 'text-gray-500',
+      '天秤座': 'text-pink-500',
+      '天蝎座': 'text-indigo-500',
+      '射手座': 'text-orange-500',
+      '摩羯座': 'text-brown-500',
+      '水瓶座': 'text-cyan-500',
+      '双鱼座': 'text-teal-500'
+    };
+    return colorMap[zodiac] || 'text-gray-500';
+  },
+
+  // 格式化日期为显示格式
+  formatDateForDisplay: function(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}年${month}月${day}日`;
+  },
+
+  // 页面加载时检查是否有已保存的八字分析结果
+  loadSavedBaziResult: function() {
+    try {
+      const savedResult = wx.getStorageSync('baziAnalysisResult');
+      const savedBirthInfo = wx.getStorageSync('baziBirthInfo');
+      
+      if (savedResult && savedBirthInfo) {
+        console.log('加载已保存的八字分析结果');
+        
+        // 处理五行数据
+        const wuxingItems = this.processWuxingData(savedResult.wuxingAnalysis.distribution);
+        
+        this.setData({
+          baziAnalysisResult: savedResult,
+          wuxingItems: wuxingItems,
+          'baziForm.birthDate': savedBirthInfo.birthDate,
+          'baziForm.birthTime': savedBirthInfo.birthTime,
+          'baziForm.gender': savedBirthInfo.gender,
+          'baziForm.birthplace': savedBirthInfo.birthplace,
+          canCalculateBazi: true
+        });
+      }
+    } catch (error) {
+      console.error('加载八字分析结果失败:', error);
+    }
+  },
+
+  // 初始化八字表单数据
+  initBaziFormWithUserInfo: function() {
+    const userInfo = this.data.userInfo;
+    
+    // 转换出生日期格式：从"YYYY年MM月DD日"转换为"YYYY-MM-DD"
+    let birthDate = '';
+    if (userInfo.birthdate) {
+      const match = userInfo.birthdate.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+      if (match) {
+        const year = match[1];
+        const month = match[2].padStart(2, '0');
+        const day = match[3].padStart(2, '0');
+        birthDate = `${year}-${month}-${day}`;
+      }
+    }
+    
+    this.setData({
+      'baziForm.name': userInfo.nickname || '',
+      'baziForm.birthDate': birthDate,
+      'baziForm.birthTime': userInfo.birthtime || '',
+      'baziForm.gender': userInfo.gender || '',
+      'baziForm.genderIndex': this.data.genderOptions.indexOf(userInfo.gender || '') >= 0 ? this.data.genderOptions.indexOf(userInfo.gender) : 0,
+      'baziForm.birthplace': userInfo.birthplace || '',
+      'baziForm.birthplaceArray': userInfo.birthplaceArray || []
+    });
+    
+    // 检查是否可以计算八字
+    this.checkCanCalculateBazi();
+  },
+
+  // ==================== 好友功能相关方法 ====================
+
+  // 显示添加好友模态框
+  showAddFriendModal: function() {
+    this.setData({
+      showFriendModal: true,
+      isEditingFriend: false,
+      friendForm: {
+        name: '',
+        birthDate: '',
+        birthTime: '',
+        gender: '',
+        genderIndex: 0,
+        birthplace: '',
+        birthplaceArray: [],
+        relationship: '',
+        relationshipIndex: 0,
+        mbti: '',
+        mbtiIndex: 0
+      },
+      relationshipOptions: ['朋友', '家人', '同事', '同学', '恋人', '其他'],
+      canSaveFriend: false
+    });
+  },
+
+  // 隐藏好友模态框
+  hideFriendModal: function() {
+    this.setData({
+      showFriendModal: false
+    });
+  },
+
+  // 防止模态框关闭
+  preventModalClose: function() {
+    // 阻止事件冒泡
+  },
+
+  // 好友表单输入处理
+  onFriendNameChange: function(e) {
+    this.setData({
+      'friendForm.name': e.detail.value
+    });
+    this.checkCanSaveFriend();
+  },
+
+  onFriendBirthDateChange: function(e) {
+    this.setData({
+      'friendForm.birthDate': e.detail.value
+    });
+    this.checkCanSaveFriend();
+  },
+
+  onFriendBirthTimeChange: function(e) {
+    this.setData({
+      'friendForm.birthTime': e.detail.value
+    });
+    this.checkCanSaveFriend();
+  },
+
+  onFriendGenderChange: function(e) {
+    const genderIndex = parseInt(e.detail.value);
+    const gender = ['男', '女'][genderIndex];
+    this.setData({
+      'friendForm.genderIndex': genderIndex,
+      'friendForm.gender': gender
+    });
+    this.checkCanSaveFriend();
+  },
+
+  onFriendBirthplaceChange: function(e) {
+    const region = e.detail.value;
+    const formattedPlace = region.join(' ');
+    this.setData({
+      'friendForm.birthplace': formattedPlace,
+      'friendForm.birthplaceArray': region
+    });
+    this.checkCanSaveFriend();
+  },
+
+  onFriendRelationshipChange: function(e) {
+    const relationshipIndex = parseInt(e.detail.value);
+    const relationship = this.data.relationshipOptions[relationshipIndex];
+    this.setData({
+      'friendForm.relationshipIndex': relationshipIndex,
+      'friendForm.relationship': relationship
+    });
+    this.checkCanSaveFriend();
+  },
+
+  onFriendMbtiChange: function(e) {
+    const mbtiIndex = parseInt(e.detail.value);
+    const mbti = this.data.mbtiOptions[mbtiIndex];
+    this.setData({
+      'friendForm.mbtiIndex': mbtiIndex,
+      'friendForm.mbti': mbti
+    });
+  },
+
+  // 检查是否可以保存好友
+  checkCanSaveFriend: function() {
+    const form = this.data.friendForm;
+    const canSave = form.name && form.birthDate && form.birthTime && form.gender && form.birthplace && form.relationship;
+    this.setData({
+      canSaveFriend: canSave
+    });
+  },
+
+  // 保存好友
+  saveFriend: function() {
+    const form = this.data.friendForm;
+    const friends = this.data.friends || [];
+    
+    // 计算星座
+    let zodiac = '未知';
+    if (form.birthDate) {
+      const date = new Date(form.birthDate);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      zodiac = this.calculateZodiac(month, day);
+    }
+    
+    // 计算农历年份
+    let lunarYear = '未知';
+    if (form.birthDate) {
+      const date = new Date(form.birthDate);
+      try {
+        const lunarData = calendar.solarToLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
+        if (lunarData && lunarData.gzYear) {
+          lunarYear = lunarData.gzYear + '年';
+        }
+      } catch (error) {
+        console.error('计算农历年份失败:', error);
+      }
+    }
+    
+    // 构造好友数据
+    const friendData = {
+      name: form.name,
+      firstLetter: form.name.charAt(0),
+      bgColor: this.getRandomBgColor(),
+      zodiac: zodiac,
+      zodiacColor: this.getZodiacColor(zodiac),
+      mbti: form.mbti || 'UNKNOWN',
+      lunarYear: lunarYear,
+      relationship: form.relationship,
+      birthdate: this.formatDateForDisplay(form.birthDate),
+      birthtime: form.birthTime,
+      gender: form.gender,
+      birthplace: form.birthplace,
+      baziInfo: null // 八字信息待后续计算
+    };
+    
+    if (this.data.isEditingFriend) {
+      // 编辑模式：更新现有好友
+      const editIndex = this.data.editingFriendIndex;
+      friends[editIndex] = friendData;
+      wx.showToast({
+        title: '好友信息已更新',
+        icon: 'success'
+      });
+    } else {
+      // 添加模式：检查重名
+      const existingFriend = friends.find(friend => friend.name === form.name);
+      if (existingFriend) {
+        wx.showModal({
+          title: '好友已存在',
+          content: `好友列表中已有名为"${form.name}"的好友，是否覆盖其信息？`,
+          success: (res) => {
+            if (res.confirm) {
+              const existingIndex = friends.findIndex(friend => friend.name === form.name);
+              friends[existingIndex] = friendData;
+              this.updateFriendsData(friends);
+            }
+          }
+        });
+        return;
+      } else {
+        friends.push(friendData);
+        wx.showToast({
+          title: '好友添加成功',
+          icon: 'success'
+        });
+      }
+    }
+    
+    this.updateFriendsData(friends);
+    this.hideFriendModal();
+  },
+
+  // 更新好友数据
+  updateFriendsData: function(friends) {
+    this.setData({
+      friends: friends
+    });
+    // 保存到本地存储
+    wx.setStorageSync('friendsList', friends);
+    // 更新生日提醒
+    this.updateBirthdayReminders(friends);
+  },
+
+  // 查看好友详情
+  viewFriendDetail: function(e) {
+    const index = e.currentTarget.dataset.index;
+    const friend = this.data.friends[index];
+    this.setData({
+      selectedFriend: friend,
+      selectedFriendIndex: index,
+      showFriendDetailModal: true
+    });
+  },
+
+  // 隐藏好友详情模态框
+  hideFriendDetailModal: function() {
+    this.setData({
+      showFriendDetailModal: false
+    });
+  },
+
+  // 编辑好友
+  editFriend: function(e) {
+    const index = e.currentTarget.dataset.index;
+    const friend = this.data.friends[index];
+    
+    // 转换出生日期格式
+    let birthDate = '';
+    if (friend.birthdate) {
+      const match = friend.birthdate.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+      if (match) {
+        const year = match[1];
+        const month = match[2].padStart(2, '0');
+        const day = match[3].padStart(2, '0');
+        birthDate = `${year}-${month}-${day}`;
+      }
+    }
+    
+    this.setData({
+      showFriendModal: true,
+      isEditingFriend: true,
+      editingFriendIndex: index,
+      friendForm: {
+        name: friend.name,
+        birthDate: birthDate,
+        birthTime: friend.birthtime,
+        gender: friend.gender,
+        genderIndex: ['男', '女'].indexOf(friend.gender),
+        birthplace: friend.birthplace,
+        birthplaceArray: friend.birthplace ? friend.birthplace.split(' ') : [],
+        relationship: friend.relationship,
+        relationshipIndex: this.data.relationshipOptions.indexOf(friend.relationship),
+        mbti: friend.mbti || '',
+        mbtiIndex: friend.mbti ? this.data.mbtiOptions.indexOf(friend.mbti) : 0
+      },
+      relationshipOptions: ['朋友', '家人', '同事', '同学', '恋人', '其他']
+    });
+    this.checkCanSaveFriend();
+  },
+
+  // 从详情页面编辑好友
+  editFriendFromDetail: function(e) {
+    this.hideFriendDetailModal();
+    setTimeout(() => {
+      this.editFriend(e);
+    }, 300);
+  },
+
+  // 删除好友
+  deleteFriend: function(e) {
+    const index = e.currentTarget.dataset.index;
+    const friend = this.data.friends[index];
+    
+    wx.showModal({
+      title: '删除好友',
+      content: `确定要删除好友"${friend.name}"吗？此操作不可恢复。`,
+      success: (res) => {
+        if (res.confirm) {
+          const friends = this.data.friends;
+          friends.splice(index, 1);
+          this.updateFriendsData(friends);
+          wx.showToast({
+            title: '好友已删除',
+            icon: 'success'
+          });
+        }
+      }
+    });
+  },
+
+  // 从详情页面删除好友
+  deleteFriendFromDetail: function(e) {
+    this.hideFriendDetailModal();
+    setTimeout(() => {
+      this.deleteFriend(e);
+    }, 300);
+  },
+
+  // 查看好友八字
+  viewFriendBazi: function(e) {
+    const index = e.currentTarget.dataset.index;
+    const friend = this.data.friends[index];
+    
+    if (!friend.baziInfo) {
+      wx.showModal({
+        title: '八字信息缺失',
+        content: '该好友还没有八字信息，是否现在为其计算八字？',
+        success: (res) => {
+          if (res.confirm) {
+            this.calculateFriendBazi(index);
+          }
+        }
+      });
+    } else {
+      // 显示好友八字详情
+      this.showFriendBaziDetail(friend);
+    }
+  },
+
+  // 计算好友八字
+  calculateFriendBazi: function(friendIndex) {
+    const friend = this.data.friends[friendIndex];
+    
+    if (!friend.birthdate || !friend.birthtime || !friend.birthplace) {
+      wx.showToast({
+        title: '好友信息不完整',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    wx.showLoading({
+      title: '计算八字中...'
+    });
+    
+    // 构造八字计算参数
+    let birthDate = '';
+    const match = friend.birthdate.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+    if (match) {
+      const year = match[1];
+      const month = match[2].padStart(2, '0');
+      const day = match[3].padStart(2, '0');
+      birthDate = `${year}-${month}-${day}`;
+    }
+    
+    const baziParams = {
+      name: friend.name,
+      birthDate: birthDate,
+      birthTime: friend.birthtime,
+      gender: friend.gender,
+      birthplace: friend.birthplace
+    };
+    
+    getBaziAnalysis(baziParams)
+      .then(result => {
+        wx.hideLoading();
+        
+        // 更新好友的八字信息
+        const friends = this.data.friends;
+        friends[friendIndex].baziInfo = result;
+        this.updateFriendsData(friends);
+        
+        // 显示八字详情
+        this.showFriendBaziDetail(friends[friendIndex]);
+      })
+      .catch(error => {
+        wx.hideLoading();
+        console.error('计算好友八字失败:', error);
+        wx.showToast({
+          title: '计算失败，请重试',
+          icon: 'none'
+        });
+      });
+  },
+
+  // 显示好友八字详情
+  showFriendBaziDetail: function(friend) {
+    // 可以导航到专门的八字详情页面，或者在当前页面显示
+    wx.showModal({
+      title: `${friend.name}的八字`,
+      content: `八字：${friend.baziInfo.baziInfo.year} ${friend.baziInfo.baziInfo.month} ${friend.baziInfo.baziInfo.day} ${friend.baziInfo.baziInfo.hour}\n日主：${friend.baziInfo.baziInfo.dayMaster} (${friend.baziInfo.baziInfo.dayMasterElement})`,
+      showCancel: false
+    });
+  },
+
+  // 计算匹配度
+  calculateCompatibility: function(e) {
+    const index = e.currentTarget.dataset.index;
+    const friend = this.data.friends[index];
+    const myBaziInfo = this.data.baziAnalysisResult;
+    
+    if (!myBaziInfo) {
+      wx.showToast({
+        title: '请先分析自己的八字',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    if (!friend.baziInfo) {
+      wx.showToast({
+        title: '好友八字信息缺失',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 简单的匹配度计算逻辑
+    const compatibility = this.calculateBaziCompatibility(myBaziInfo, friend.baziInfo);
+    
+    wx.showModal({
+      title: `与${friend.name}的匹配度`,
+      content: `八字匹配度：${compatibility.bazi}%\n五行互补：${compatibility.wuxing}%\n综合评分：${compatibility.overall}%`,
+      showCancel: false
+    });
+  },
+
+  // 计算八字匹配度（简化版本）
+  calculateBaziCompatibility: function(myBazi, friendBazi) {
+    // 这里是简化的匹配度计算逻辑
+    // 实际项目中可以实现更复杂的匹配算法
+    
+    let baziScore = Math.floor(Math.random() * 30) + 60; // 60-90的随机分数
+    let wuxingScore = Math.floor(Math.random() * 25) + 65; // 65-90的随机分数
+    let overallScore = Math.round((baziScore + wuxingScore) / 2);
+    
+    return {
+      bazi: baziScore,
+      wuxing: wuxingScore,
+      overall: overallScore
+    };
+  },
+
+  // 更新生日提醒
+  updateBirthdayReminders: function(friends) {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const birthdays = [];
+    
+    friends.forEach(friend => {
+      if (friend.birthdate) {
+        const match = friend.birthdate.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+        if (match) {
+          const month = parseInt(match[2]);
+          const day = parseInt(match[3]);
+          
+          // 计算今年的生日
+          const birthdayThisYear = new Date(currentYear, month - 1, day);
+          let birthdayToCheck = birthdayThisYear;
+          
+          // 如果今年的生日已过，计算明年的生日
+          if (birthdayThisYear < today) {
+            birthdayToCheck = new Date(currentYear + 1, month - 1, day);
+          }
+          
+          const daysLeft = Math.ceil((birthdayToCheck - today) / (1000 * 60 * 60 * 24));
+          
+          if (daysLeft <= 30) { // 只显示30天内的生日
+            birthdays.push({
+              name: friend.name,
+              date: `${month}月${day}日`,
+              daysLeft: daysLeft
+            });
+          }
+        }
+      }
+    });
+    
+    // 按剩余天数排序
+    birthdays.sort((a, b) => a.daysLeft - b.daysLeft);
+    
+    this.setData({
+      birthdays: birthdays
+    });
+  },
+
+  // 加载标签页配置
+  loadTabConfig: function() {
+    wx.cloud.callFunction({
+      name: 'getUserTabConfig',
+      success: res => {
+        console.log('获取用户资料页标签配置成功:', res);
+        if (res.result.code === 0 && res.result.data) {
+          this.setData({
+            tabItems: res.result.data
+          });
+        } else {
+          console.error('获取标签配置失败:', res.result.message);
+          // 使用默认配置
+          this.setData({
+            tabItems: [
+              { index: 0, text: '个人信息', key: 'personal' }
+            ]
+          });
+        }
+      },
+      fail: err => {
+        console.error('调用云函数失败:', err);
+        // 使用默认配置
+        this.setData({
+          tabItems: [
+            { index: 0, text: '个人信息', key: 'personal' }
+          ]
+        });
+      }
+    });
   }
 }); 

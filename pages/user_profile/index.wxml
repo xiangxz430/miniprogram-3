@@ -24,8 +24,7 @@
   <!-- 标签页导航 -->
   <view class="tabs-container">
     <view class="tabs">
-      <view class="tab {{activeTab === 0 ? 'active' : ''}}" catchtap="switchTab" data-index="0">个人信息</view>
-      <view class="tab {{activeTab === 1 ? 'active' : ''}}" catchtap="switchTab" data-index="1">我的好友</view>
+      <view wx:for="{{tabItems}}" wx:key="index" class="tab {{activeTab === item.index ? 'active' : ''}}" catchtap="switchTab" data-index="{{item.index}}">{{item.text}}</view>
     </view>
     
     <!-- 个人信息内容 -->
@@ -95,6 +94,20 @@
             <view wx:if="{{!isEditing}}" class="info-value">{{userInfo.birthtime || '未设置'}}</view>
             <picker wx:else mode="time" value="{{userInfo.birthtime}}" bindchange="bindBirthtimeChange" class="picker-input">
               <view class="info-value editing">{{userInfo.birthtime || '请选择出生时间'}}</view>
+            </picker>
+          </view>
+          
+          <!-- 添加性别字段 -->
+          <view class="info-item">
+            <view class="info-label">
+              <view class="info-icon">
+                <text class="iconfont icon-gender"></text>
+              </view>
+              <text>性别</text>
+            </view>
+            <view wx:if="{{!isEditing}}" class="info-value">{{userInfo.gender || '未设置'}}</view>
+            <picker wx:else mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="bindGenderChange" class="picker-input">
+              <view class="info-value editing">{{userInfo.gender || '请选择性别'}}</view>
             </picker>
           </view>
           
@@ -207,22 +220,214 @@
       </view>
     </view>
     
-    <!-- 好友内容 -->
+    <!-- 高级功能内容 -->
     <view class="tab-content" wx:if="{{activeTab === 1}}">
+      <!-- 分析功能 -->
+      <view class="section">
+        <view class="section-title">个人数据分析</view>
+        
+        <!-- 当没有八字信息时显示输入表单 -->
+        <view class="bazi-form" wx:if="{{!baziAnalysisResult}}">
+          <view class="form-description">
+            <text class="description-text">请输入准确的出生信息，我们将用伏羲大模型为您进行专业的分析</text>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">姓名</text>
+            <input class="form-input-text" type="text" value="{{baziForm.name}}" bindinput="onBaziNameChange" placeholder="请输入姓名" maxlength="10"/>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">出生日期</text>
+            <picker mode="date" value="{{baziForm.birthDate}}" start="1900-01-01" end="2030-12-31" bindchange="onBaziBirthDateChange">
+              <view class="form-input">{{baziForm.birthDate || '请选择出生日期'}}</view>
+            </picker>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">出生时间</text>
+            <picker mode="time" value="{{baziForm.birthTime}}" bindchange="onBaziBirthTimeChange">
+              <view class="form-input">{{baziForm.birthTime || '请选择出生时间'}}</view>
+            </picker>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">性别</text>
+            <picker mode="selector" range="{{['男', '女']}}" value="{{baziForm.genderIndex}}" bindchange="onBaziGenderChange">
+              <view class="form-input">{{baziForm.gender || '请选择性别'}}</view>
+            </picker>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">出生地</text>
+            <picker mode="region" value="{{baziForm.birthplaceArray}}" bindchange="onBaziBirthplaceChange">
+              <view class="form-input">{{baziForm.birthplace || '请选择出生地'}}</view>
+            </picker>
+          </view>
+          
+          <button class="calculate-bazi-btn" bindtap="calculateBazi" disabled="{{!canCalculateBazi || isCalculatingBazi}}">
+            {{isCalculatingBazi ? '分析中...' : '开始八字分析'}}
+          </button>
+        </view>
+        
+        <!-- 八字分析结果显示 -->
+        <view class="bazi-result" wx:if="{{baziAnalysisResult}}">
+          <!-- 八字排盘 -->
+          <view class="bazi-panel">
+            <view class="panel-title">八字排盘</view>
+            <view class="bazi-pillars">
+              <view class="pillar">
+                <text class="pillar-label">年柱</text>
+                <text class="pillar-value">{{baziAnalysisResult.baziInfo.year}}</text>
+              </view>
+              <view class="pillar">
+                <text class="pillar-label">月柱</text>
+                <text class="pillar-value">{{baziAnalysisResult.baziInfo.month}}</text>
+              </view>
+              <view class="pillar">
+                <text class="pillar-label">日柱</text>
+                <text class="pillar-value">{{baziAnalysisResult.baziInfo.day}}</text>
+              </view>
+              <view class="pillar">
+                <text class="pillar-label">时柱</text>
+                <text class="pillar-value">{{baziAnalysisResult.baziInfo.hour}}</text>
+              </view>
+            </view>
+            <view class="day-master-info">
+              <text class="day-master-label">日主：</text>
+              <text class="day-master-value">{{baziAnalysisResult.baziInfo.dayMaster}}（{{baziAnalysisResult.baziInfo.dayMasterElement}}）</text>
+            </view>
+          </view>
+          
+          <!-- 五行分析 -->
+          <view class="wuxing-analysis">
+            <view class="panel-title">五行分析</view>
+            <view class="wuxing-distribution">
+              <view class="wuxing-item" wx:for="{{wuxingItems}}" wx:key="element">
+                <text class="wuxing-name">{{item.name}}</text>
+                <view class="wuxing-bar">
+                  <view class="wuxing-fill" style="width: {{item.percentage}}%; background-color: {{item.color}}"></view>
+                </view>
+                <text class="wuxing-count">{{item.count}}</text>
+              </view>
+            </view>
+            <view class="wuxing-details">
+              <view class="detail-item">
+                <text class="detail-label">格局：</text>
+                <text class="detail-value">{{baziAnalysisResult.wuxingAnalysis.pattern}}</text>
+              </view>
+              <view class="detail-item">
+                <text class="detail-label">强弱：</text>
+                <text class="detail-value">{{baziAnalysisResult.wuxingAnalysis.strength}}</text>
+              </view>
+              <view class="detail-item">
+                <text class="detail-label">用神：</text>
+                <text class="detail-value">{{baziAnalysisResult.wuxingAnalysis.usefulGod}}</text>
+              </view>
+              <view class="detail-item">
+                <text class="detail-label">忌神：</text>
+                <text class="detail-value">{{baziAnalysisResult.wuxingAnalysis.tabooGod}}</text>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 详细分析 -->
+          <view class="detailed-analysis">
+            <view class="analysis-section">
+              <view class="analysis-title">性格特征</view>
+              <text class="analysis-content">{{baziAnalysisResult.personalityAnalysis}}</text>
+            </view>
+            
+            <view class="analysis-section">
+              <view class="analysis-title">事业财运</view>
+              <text class="analysis-content">{{baziAnalysisResult.careerFortune}}</text>
+            </view>
+            
+            <view class="analysis-section">
+              <view class="analysis-title">婚姻感情</view>
+              <text class="analysis-content">{{baziAnalysisResult.loveFortune}}</text>
+            </view>
+            
+            <view class="analysis-section">
+              <view class="analysis-title">健康运势</view>
+              <text class="analysis-content">{{baziAnalysisResult.healthFortune}}</text>
+            </view>
+            
+            <view class="analysis-section">
+              <view class="analysis-title">大运流年</view>
+              <view class="analysis-content">{{baziAnalysisResult.majorPeriods}}</view>
+            </view>
+          </view>
+          
+          <!-- 开运建议 -->
+          <view class="lucky-advice">
+            <view class="panel-title">开运建议</view>
+            
+            <view class="advice-grid">
+              <view class="advice-item">
+                <text class="advice-label">有利颜色</text>
+                <view class="advice-tags">
+                  <text class="advice-tag" wx:for="{{baziAnalysisResult.luckyAdvice.colors}}" wx:key="index">{{item}}</text>
+                </view>
+              </view>
+              
+              <view class="advice-item">
+                <text class="advice-label">有利方位</text>
+                <view class="advice-tags">
+                  <text class="advice-tag" wx:for="{{baziAnalysisResult.luckyAdvice.directions}}" wx:key="index">{{item}}</text>
+                </view>
+              </view>
+              
+              <view class="advice-item">
+                <text class="advice-label">幸运数字</text>
+                <view class="advice-tags">
+                  <text class="advice-tag" wx:for="{{baziAnalysisResult.luckyAdvice.numbers}}" wx:key="index">{{item}}</text>
+                </view>
+              </view>
+              
+              <view class="advice-item">
+                <text class="advice-label">补充五行</text>
+                <view class="advice-tags">
+                  <text class="advice-tag" wx:for="{{baziAnalysisResult.luckyAdvice.elements}}" wx:key="index">{{item}}</text>
+                </view>
+              </view>
+            </view>
+            
+            <view class="suggestions">
+              <text class="suggestions-title">具体建议：</text>
+              <view class="suggestion-list">
+                <text class="suggestion-item" wx:for="{{baziAnalysisResult.luckyAdvice.suggestions}}" wx:key="index">• {{item}}</text>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 操作按钮区域 -->
+          <view class="bazi-actions">
+            <button class="recalculate-btn" bindtap="resetBaziAnalysis">重新分析</button>
+            <button class="save-my-bazi-btn" bindtap="saveAsMyBazi">保存为我的八字</button>
+            <button class="save-friend-btn" bindtap="saveAsFriend">保存为我的朋友</button>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 好友内容 -->
+    <view class="tab-content" wx:if="{{activeTab === 2}}">
       <!-- 好友管理 -->
       <view class="section">
         <view class="section-header">
-          <text class="section-title">好友列表</text>
-          <button class="add-friend-btn" catchtap="addFriend">
+          <text class="section-title">好友列表 ({{friends.length}})</text>
+          <button class="add-friend-btn" catchtap="showAddFriendModal">
             <text class="iconfont icon-add-friend"></text>
             <text>添加好友</text>
           </button>
         </view>
         
-        <view class="friends-list">
-          <view class="friend-card" wx:for="{{friends}}" wx:key="index" catchtap="viewFriendDetail" data-index="{{index}}">
+        <!-- 好友列表 -->
+        <view class="friends-list" wx:if="{{friends.length > 0}}">
+          <view class="friend-card" wx:for="{{friends}}" wx:key="index">
             <view class="friend-avatar {{item.bgColor}}">{{item.firstLetter}}</view>
-            <view class="friend-info">
+            <view class="friend-info" catchtap="viewFriendDetail" data-index="{{index}}">
               <view class="friend-header">
                 <text class="friend-name">{{item.name}}</text>
                 <text class="friend-zodiac {{item.zodiacColor}}">{{item.zodiac}}</text>
@@ -231,99 +436,186 @@
                 <text class="friend-mbti">{{item.mbti}} · {{item.lunarYear}}</text>
                 <text class="friend-relation">{{item.relationship}}</text>
               </view>
+              <view class="friend-extra-info">
+                <text class="friend-birth">{{item.birthdate}} {{item.birthtime}}</text>
+                <text class="friend-location">{{item.birthplace}}</text>
+              </view>
+            </view>
+            <view class="friend-actions">
+              <button class="friend-action-btn view-btn" catchtap="viewFriendBazi" data-index="{{index}}">
+                <text class="iconfont icon-hexagram"></text>
+                <text>八字</text>
+              </button>
+              <button class="friend-action-btn edit-btn" catchtap="editFriend" data-index="{{index}}">
+                <text class="iconfont icon-edit"></text>
+                <text>编辑</text>
+              </button>
+              <button class="friend-action-btn delete-btn" catchtap="deleteFriend" data-index="{{index}}">
+                <text class="iconfont icon-delete"></text>
+                <text>删除</text>
+              </button>
             </view>
           </view>
         </view>
-      </view>
-      
-      <!-- 生日提醒 -->
-      <view class="section">
-        <view class="section-title">生日提醒</view>
         
-        <view class="birthday-container">
-          <view class="birthday-header">
-            <text class="birthday-title">即将到来的生日</text>
-            <text class="view-all" bindtap="viewAllBirthdays">全部</text>
+        <!-- 空状态 -->
+        <view class="empty-state" wx:else>
+          <view class="empty-icon">👥</view>
+          <text class="empty-title">还没有好友</text>
+          <text class="empty-desc">添加好友，开始探索八字匹配的奥秘</text>
+          <button class="empty-action-btn" catchtap="showAddFriendModal">立即添加好友</button>
+        </view>
+      </view>
+    </view>
+      
+    <!-- 好友添加/编辑模态框 -->
+    <view class="modal-overlay" wx:if="{{showFriendModal}}" catchtap="hideFriendModal">
+      <view class="modal-content" catchtap="preventModalClose">
+        <view class="modal-header">
+          <text class="modal-title">{{isEditingFriend ? '编辑好友' : '添加好友'}}</text>
+          <button class="modal-close-btn" catchtap="hideFriendModal">✕</button>
+        </view>
+        
+        <view class="modal-body">
+          <view class="form-group">
+            <text class="form-label">姓名</text>
+            <input class="form-input-text" type="text" value="{{friendForm.name}}" bindinput="onFriendNameChange" placeholder="请输入好友姓名" maxlength="10"/>
           </view>
           
-          <view class="birthday-list">
-            <view class="birthday-item" wx:for="{{birthdays}}" wx:key="index" 
-                  style="background-color: {{item.daysLeft <= 7 ? 'rgba(251, 191, 36, 0.1)' : 'rgba(59, 130, 246, 0.1)'}}">
-              <view class="birthday-icon-container" 
-                    style="background-color: {{item.daysLeft <= 7 ? 'rgba(251, 191, 36, 0.2)' : 'rgba(59, 130, 246, 0.2)'}}">
-                <text class="iconfont icon-cake"></text>
-                <view class="badge">{{item.daysLeft}}</view>
+          <view class="form-group">
+            <text class="form-label">出生日期</text>
+            <picker mode="date" value="{{friendForm.birthDate}}" start="1900-01-01" end="2030-12-31" bindchange="onFriendBirthDateChange">
+              <view class="form-input">{{friendForm.birthDate || '请选择出生日期'}}</view>
+            </picker>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">出生时间</text>
+            <picker mode="time" value="{{friendForm.birthTime}}" bindchange="onFriendBirthTimeChange">
+              <view class="form-input">{{friendForm.birthTime || '请选择出生时间'}}</view>
+            </picker>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">性别</text>
+            <picker mode="selector" range="{{['男', '女']}}" value="{{friendForm.genderIndex}}" bindchange="onFriendGenderChange">
+              <view class="form-input">{{friendForm.gender || '请选择性别'}}</view>
+            </picker>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">出生地</text>
+            <picker mode="region" value="{{friendForm.birthplaceArray}}" bindchange="onFriendBirthplaceChange">
+              <view class="form-input">{{friendForm.birthplace || '请选择出生地'}}</view>
+            </picker>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">关系</text>
+            <picker mode="selector" range="{{relationshipOptions}}" value="{{friendForm.relationshipIndex}}" bindchange="onFriendRelationshipChange">
+              <view class="form-input">{{friendForm.relationship || '请选择关系'}}</view>
+            </picker>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">MBTI (可选)</text>
+            <picker mode="selector" range="{{mbtiOptions}}" value="{{friendForm.mbtiIndex}}" bindchange="onFriendMbtiChange">
+              <view class="form-input">{{friendForm.mbti || '请选择MBTI类型'}}</view>
+            </picker>
+          </view>
+        </view>
+        
+        <view class="modal-footer">
+          <button class="modal-btn cancel-btn" catchtap="hideFriendModal">取消</button>
+          <button class="modal-btn confirm-btn" catchtap="saveFriend" disabled="{{!canSaveFriend}}">
+            {{isEditingFriend ? '保存' : '添加'}}
+          </button>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 好友详情模态框 -->
+    <view class="modal-overlay" wx:if="{{showFriendDetailModal}}" catchtap="hideFriendDetailModal">
+      <view class="friend-detail-modal" catchtap="preventModalClose">
+        <view class="friend-detail-header">
+          <view class="friend-detail-avatar {{selectedFriend.bgColor}}">{{selectedFriend.firstLetter}}</view>
+          <view class="friend-detail-info">
+            <text class="friend-detail-name">{{selectedFriend.name}}</text>
+            <text class="friend-detail-zodiac {{selectedFriend.zodiacColor}}">{{selectedFriend.zodiac}}</text>
+            <text class="friend-detail-relation">{{selectedFriend.relationship}}</text>
+          </view>
+          <button class="modal-close-btn" catchtap="hideFriendDetailModal">✕</button>
+        </view>
+        
+        <view class="friend-detail-content">
+          <view class="detail-section">
+            <text class="detail-section-title">基础信息</text>
+            <view class="detail-items">
+              <view class="detail-item">
+                <text class="detail-label">生日：</text>
+                <text class="detail-value">{{selectedFriend.birthdate}}</text>
               </view>
-              
-              <view class="birthday-content">
-                <text class="birthday-name">{{item.name}}的生日还有{{item.daysLeft}}天</text>
-                <text class="birthday-date">{{item.date}}</text>
+              <view class="detail-item">
+                <text class="detail-label">出生时间：</text>
+                <text class="detail-value">{{selectedFriend.birthtime}}</text>
+              </view>
+              <view class="detail-item">
+                <text class="detail-label">性别：</text>
+                <text class="detail-value">{{selectedFriend.gender}}</text>
+              </view>
+              <view class="detail-item">
+                <text class="detail-label">出生地：</text>
+                <text class="detail-value">{{selectedFriend.birthplace}}</text>
+              </view>
+              <view class="detail-item">
+                <text class="detail-label">MBTI：</text>
+                <text class="detail-value">{{selectedFriend.mbti}}</text>
+              </view>
+            </view>
+          </view>
+          
+          <view class="detail-section" wx:if="{{selectedFriend.baziInfo}}">
+            <text class="detail-section-title">八字信息</text>
+            <view class="friend-bazi-panel">
+              <view class="friend-bazi-pillars">
+                <view class="friend-pillar">
+                  <text class="friend-pillar-label">年</text>
+                  <text class="friend-pillar-value">{{selectedFriend.baziInfo.baziInfo.year}}</text>
+                </view>
+                <view class="friend-pillar">
+                  <text class="friend-pillar-label">月</text>
+                  <text class="friend-pillar-value">{{selectedFriend.baziInfo.baziInfo.month}}</text>
+                </view>
+                <view class="friend-pillar">
+                  <text class="friend-pillar-label">日</text>
+                  <text class="friend-pillar-value">{{selectedFriend.baziInfo.baziInfo.day}}</text>
+                </view>
+                <view class="friend-pillar">
+                  <text class="friend-pillar-label">时</text>
+                  <text class="friend-pillar-value">{{selectedFriend.baziInfo.baziInfo.hour}}</text>
+                </view>
+              </view>
+              <view class="friend-day-master">
+                <text class="friend-day-master-label">日主：</text>
+                <text class="friend-day-master-value">{{selectedFriend.baziInfo.baziInfo.dayMaster}} ({{selectedFriend.baziInfo.baziInfo.dayMasterElement}})</text>
               </view>
             </view>
           </view>
         </view>
-      </view>
-      
-      <!-- 关系匹配 -->
-      <view class="section">
-        <view class="section-title">关系匹配</view>
         
-        <view class="compatibility-cards">
-          <!-- 五行合作指数卡片 -->
-          <view class="compatibility-card">
-            <view class="compatibility-header">
-              <view class="compatibility-title-container">
-                <text class="compatibility-title">五行合作指数</text>
-                <text class="compatibility-desc">基于八字五行相生相克的关系匹配</text>
-              </view>
-              <text class="compatibility-tag good">良好</text>
-            </view>
-            
-            <view class="compatibility-items">
-              <view class="compatibility-item" wx:for="{{compatibilities.wuxing}}" wx:key="index"
-                    style="background-color: {{item.percentage >= 80 ? 'rgba(34, 197, 94, 0.1)' : 'rgba(234, 179, 8, 0.1)'}}">
-                <view class="compatibility-icon" 
-                      style="background-color: {{item.percentage >= 80 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(234, 179, 8, 0.2)'}}">
-                  <text class="iconfont icon-wuxing"></text>
-                </view>
-                <view class="compatibility-info">
-                  <text class="compatibility-name">{{item.name}}</text>
-                  <text class="compatibility-percent" 
-                        style="color: {{item.percentage >= 80 ? '#16a34a' : '#ca8a04'}}">
-                    五行互补 {{item.percentage}}%
-                  </text>
-                </view>
-              </view>
-            </view>
-          </view>
-          
-          <!-- 星座合盘指数卡片 -->
-          <view class="compatibility-card">
-            <view class="compatibility-header">
-              <view class="compatibility-title-container">
-                <text class="compatibility-title">星座合盘指数</text>
-                <text class="compatibility-desc">基于星座元素与宫位的匹配分析</text>
-              </view>
-              <text class="compatibility-tag excellent">极佳</text>
-            </view>
-            
-            <view class="compatibility-items">
-              <view class="compatibility-item" wx:for="{{compatibilities.zodiac}}" wx:key="index"
-                    style="background-color: {{item.percentage >= 80 ? 'rgba(59, 130, 246, 0.1)' : 'rgba(124, 58, 237, 0.1)'}}">
-                <view class="compatibility-icon" 
-                      style="background-color: {{item.percentage >= 80 ? 'rgba(59, 130, 246, 0.2)' : 'rgba(124, 58, 237, 0.2)'}}">
-                  <text class="iconfont icon-zodiac"></text>
-                </view>
-                <view class="compatibility-info">
-                  <text class="compatibility-name">{{item.name}}</text>
-                  <text class="compatibility-percent" 
-                        style="color: {{item.percentage >= 80 ? '#3b82f6' : '#7c3aed'}}">
-                    星座契合 {{item.percentage}}%
-                  </text>
-                </view>
-              </view>
-            </view>
-          </view>
+        <view class="friend-detail-actions">
+          <button class="friend-detail-btn compatibility-btn" catchtap="calculateCompatibility" data-index="{{selectedFriendIndex}}">
+            <text class="iconfont icon-wuxing"></text>
+            <text>匹配分析</text>
+          </button>
+          <button class="friend-detail-btn edit-btn" catchtap="editFriendFromDetail" data-index="{{selectedFriendIndex}}">
+            <text class="iconfont icon-edit"></text>
+            <text>编辑</text>
+          </button>
+          <button class="friend-detail-btn delete-btn" catchtap="deleteFriendFromDetail" data-index="{{selectedFriendIndex}}">
+            <text class="iconfont icon-delete"></text>
+            <text>删除</text>
+          </button>
         </view>
       </view>
     </view>

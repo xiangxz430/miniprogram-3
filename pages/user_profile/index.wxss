@@ -857,25 +857,41 @@ button::after {
 }
 
 .modal-close-btn {
-  width: 48rpx;
-  height: 48rpx;
-  border: none;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border-radius: 24rpx;
-  font-size: 28rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10rpx);
-  line-height: 1;
+  width: 32rpx !important;
+  height: 32rpx !important;
+  min-width: 32rpx !important;
+  max-width: 32rpx !important;
+  border: none !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+  border-radius: 16rpx !important;
+  font-size: 20rpx !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(10rpx) !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  /* 重置微信小程序button默认样式 */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: none !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+}
+
+.modal-close-btn::after {
+  border: none !important;
+  display: none !important;
 }
 
 .modal-close-btn:active {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.25) !important;
+  transform: scale(0.9) !important;
 }
 
 .modal-body {
@@ -1557,15 +1573,18 @@ button::after {
 }
 
 .wuxing-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20rpx;
 }
 
 .detail-item {
-  padding: 15rpx;
+  padding: 15rpx 20rpx;
   background-color: #f8f9fa;
   border-radius: 10rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .detail-label {

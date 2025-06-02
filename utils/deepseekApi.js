@@ -1,36 +1,9 @@
 // utils/deepseekApi.js
 const API_CONFIG = require('./config');
-const logger = require('./logger');
 
 // DeepSeek API配置
 const DEEPSEEK_API_KEY = API_CONFIG.DEEPSEEK.API_KEY;
 const DEEPSEEK_API_URL = API_CONFIG.DEEPSEEK.API_URL;
-
-/**
- * 日志记录函数
- * @param {String} type - 日志类型
- * @param {any} data - 要记录的数据
- */
-function logApiActivity(type, data) {
-  switch (type) {
-    case '请求':
-      logger.logRequest(data);
-      break;
-    case '响应状态':
-    case 'AI回答':
-    case '解析结果':
-    case 'JSON解析':
-      logger.logResponse(data);
-      break;
-    case '错误':
-    case '解析失败':
-    case '解析错误':
-      logger.logError(data);
-      break;
-    default:
-      logger.log(type, data);
-  }
-}
 
 /**
  * 获取MBTI人格类型的AI个性化建议
@@ -44,7 +17,7 @@ function getMbtiAiAdvice(mbtiInfo, userInfo = {}) {
     const prompt = buildMbtiPrompt(mbtiInfo, userInfo);
     
     // 记录请求信息
-    logApiActivity('请求', {
+    console.log('请求', {
       url: DEEPSEEK_API_URL,
       method: 'POST',
       model: 'deepseek-chat',
@@ -68,13 +41,13 @@ function getMbtiAiAdvice(mbtiInfo, userInfo = {}) {
     callDeepseek(messages)
       .then(aiResponse => {
         // 记录AI回答内容
-        logApiActivity('AI回答', aiResponse);
+        console.log('AI回答', aiResponse);
         
         // 解析AI响应
         const parsedResult = parseMbtiAIResponse(aiResponse, mbtiInfo);
         
         // 记录解析后的结果
-        logApiActivity('解析结果', {
+        console.log('解析结果', {
           MBTI类型: parsedResult.type,
           整体建议: parsedResult.overallAdvice ? parsedResult.overallAdvice.substring(0, 50) + '...' : '无',
           职业建议: parsedResult.careerAdvice ? parsedResult.careerAdvice.substring(0, 50) + '...' : '无',
@@ -85,7 +58,7 @@ function getMbtiAiAdvice(mbtiInfo, userInfo = {}) {
       })
       .catch(err => {
         console.error('DeepSeek API调用失败:', err);
-        logApiActivity('错误', {
+        console.log('错误', {
           错误类型: 'API调用失败',
           详情: err
         });
@@ -191,7 +164,7 @@ function parseMbtiAIResponse(aiResponse, originalMbtiInfo) {
       const jsonStr = jsonMatch[0];
       
       // 记录JSON解析过程
-      logApiActivity('JSON解析', {
+      console.log('JSON解析', {
         提取的JSON字符串长度: jsonStr.length,
         JSON示例: jsonStr.substring(0, 100) + '...'
       });
@@ -213,7 +186,7 @@ function parseMbtiAIResponse(aiResponse, originalMbtiInfo) {
     }
     
     // 如果无法解析JSON，构造简单结构
-    logApiActivity('解析失败', {
+    console.log('解析失败', {
       错误类型: '无法解析JSON',
       AI响应: aiResponse.substring(0, 200) + '...'
     });
@@ -233,7 +206,7 @@ function parseMbtiAIResponse(aiResponse, originalMbtiInfo) {
       }
     };
   } catch (err) {
-    logApiActivity('解析错误', {
+    console.log('解析错误', {
       错误类型: 'JSON解析异常',
       错误信息: err.message,
       AI响应: aiResponse.substring(0, 200) + '...'
@@ -280,7 +253,7 @@ function getHexagramInterpretation(hexagramInfo, userInfo = {}) {
     const prompt = buildPrompt(hexagramInfo, userInfo);
     
     // 记录请求信息
-    logApiActivity('请求', {
+    console.log('请求', {
       url: DEEPSEEK_API_URL,
       method: 'POST',
       model: 'deepseek-chat',
@@ -304,13 +277,13 @@ function getHexagramInterpretation(hexagramInfo, userInfo = {}) {
     callDeepseek(messages)
       .then(aiResponse => {
         // 记录AI回答内容
-        logApiActivity('AI回答', aiResponse);
+        console.log('AI回答', aiResponse);
         
         // 解析AI响应
         const parsedResult = parseAIResponse(aiResponse, hexagramInfo);
         
         // 记录解析后的结果
-        logApiActivity('解析结果', {
+        console.log('解析结果', {
           卦象: parsedResult.name,
           解析: parsedResult.meaning ? parsedResult.meaning.substring(0, 50) + '...' : '无',
           整体运势: parsedResult.overall ? parsedResult.overall.substring(0, 50) + '...' : '无',
@@ -322,7 +295,7 @@ function getHexagramInterpretation(hexagramInfo, userInfo = {}) {
       })
       .catch(err => {
         console.error('DeepSeek API调用失败:', err);
-        logApiActivity('错误', {
+        console.log('错误', {
           错误类型: 'API调用失败',
           详情: err
         });
@@ -379,7 +352,7 @@ function parseAIResponse(aiResponse, originalHexagramInfo) {
       const jsonStr = jsonMatch[0];
       
       // 记录JSON解析过程
-      logApiActivity('JSON解析', {
+      console.log('JSON解析', {
         提取的JSON字符串长度: jsonStr.length,
         JSON示例: jsonStr.substring(0, 100) + '...'
       });
@@ -404,14 +377,14 @@ function parseAIResponse(aiResponse, originalHexagramInfo) {
     }
     
     // 如果无法解析JSON，返回原始数据
-    logApiActivity('解析失败', {
+    console.log('解析失败', {
       错误类型: '无法解析JSON',
       AI响应: aiResponse.substring(0, 200) + '...'
     });
     console.error('无法解析AI响应为JSON:', aiResponse);
     return originalHexagramInfo;
   } catch (err) {
-    logApiActivity('解析错误', {
+    console.log('解析错误', {
       错误类型: 'JSON解析异常',
       错误信息: err.message,
       AI响应: aiResponse.substring(0, 200) + '...'
@@ -452,31 +425,70 @@ function callDeepseek(messages, model = 'deepseek-chat') {
 
 // 获取天气预报和穿衣建议
 export const getWeatherAndAdvice = async (location, userInfo) => {
-
-
-  console.log('开始获取天气预报和穿衣建议:', {
+  // 构建用户信息文本
+  let userInfoText = '';
+  if (userInfo) {
+    userInfoText = `
+    性别：${userInfo.gender || '未知'}
+    出生日期：${userInfo.birthdate || '未知'}
+    年龄：${userInfo.age || '未知'}
+    星座：${userInfo.zodiac || '未知'}
+    生肖：${userInfo.chineseZodiac || '未知'}
+    八字：${userInfo.bazi || '未知'}
+    命主：${userInfo.dayMaster || '未知'}
+    五行分布：${userInfo.elementDist ? JSON.stringify(userInfo.elementDist) : '未知'}
+    MBTI类型：${userInfo.mbti || userInfo.mbtiType || '未知'}
+    `;
+  }
+  
+  // 获取当前日期信息
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+  const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+  const weekday = weekdays[today.getDay()];
+  
+  console.log('开始获取天气预报和黄历信息:', {
     location,
+    date: dateStr,
     userInfo: {
-      ...userInfo,
-      zodiac: userInfo.zodiac || '未知'
+      ...userInfo
     }
   });
 
-  const prompt = `基于以下信息生成天气预报和穿衣建议:
+  const prompt = `基于以下信息生成今日（${dateStr} ${weekday}）的天气预报、穿衣建议和完整黄历信息:
   地点: ${location.city}
-  请明确指出我的个人特征如何影响这些建议，个人信息包括："${userInfo.birthdate ? '出生于' + userInfo.birthdate + '的' : ''} ${userInfo.gender || ''}性，${userInfo.age ? userInfo.age + '岁' : ''}，${userInfo.zodiac || ''}星座，${userInfo.chineseZodiac ? userInfo.chineseZodiac + '年出生' : ''}，MBTI类型为${mbtiInfo.type}，所以......"
-  请包含以下内容：
-  请提供:
-  1. 当前天气详情(温度、天气状况、湿度、风速、空气质量)
+  用户信息：${userInfoText}
+  
+  请提供完整的今日信息包括:
+  
+  1. 天气详情(温度、天气状况、湿度、风速、空气质量)
   2. 24小时天气预报
-  3. 基于个人信息结合天气给的穿衣建议200字
-  4. 运势提示 300字
+  3. 基于个人信息结合天气的穿衣建议
+  4. 运势提示
+  5. 完整的传统黄历信息，包括：
+     - 农历日期
+     - 年月日干支
+     - 五行纳音
+     - 今日宜事（6-8项具体活动）
+     - 今日忌事（6-8项具体活动）
+     - 财神方位
+     - 喜神方位
+     - 福神方位
+     - 胎神方位
+     - 冲煞信息
+     - 吉神宜趋（4-6项）
+     - 凶神宜忌（4-6项）
+     - 吉时（3-4个时辰）
+     - 凶时（3-4个时辰）
+     - 彭祖百忌
+     - 今日一言（传统格言）
+     - 温馨提示
   
   请以JSON格式返回，包含以下字段：
   {
     "weather": {
       "currentTemp": "当前温度",
-      "maxTemp": "最高温度",
+      "maxTemp": "最高温度", 
       "minTemp": "最低温度",
       "condition": "天气状况",
       "humidity": "湿度",
@@ -495,13 +507,57 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
       "recommendation": "推荐搭配",
       "tips": "特别提示",
       "zodiacAdvice": "星座运势提示"
+    },
+    "lunarCalendar": {
+      "solarDate": {
+        "year": ${today.getFullYear()},
+        "month": ${today.getMonth() + 1},
+        "day": ${today.getDate()},
+        "weekday": "${weekday}"
+      },
+      "lunarDate": {
+        "year": "农历年份",
+        "month": "农历月份", 
+        "day": "农历日期",
+        "monthName": "农历月份名称",
+        "dayName": "农历日期名称"
+      },
+      "ganzhi": {
+        "year": "年干支",
+        "month": "月干支", 
+        "day": "日干支"
+      },
+      "nayin": "五行纳音",
+      "suitable": ["宜事1", "宜事2", "宜事3", "宜事4", "宜事5", "宜事6"],
+      "avoid": ["忌事1", "忌事2", "忌事3", "忌事4", "忌事5", "忌事6"],
+      "directions": {
+        "caishen": "财神方位",
+        "xishen": "喜神方位",
+        "fushen": "福神方位",
+        "taishen": "胎神方位"
+      },
+      "chongsha": {
+        "chong": "冲",
+        "sha": "煞"
+      },
+      "gods": {
+        "lucky": ["吉神1", "吉神2", "吉神3", "吉神4"],
+        "unlucky": ["凶神1", "凶神2", "凶神3", "凶神4"]
+      },
+      "times": {
+        "lucky": ["子时", "寅时", "申时"],
+        "unlucky": ["丑时", "卯时", "酉时"]
+      },
+      "pengzu": "彭祖百忌内容",
+      "dailyWords": "今日一言格言",
+      "tips": "温馨提示内容"
     }
   }`;
   
   const messages = [
     {
       role: 'system',
-      content: '你是一位专业的天气预报和穿衣搭配顾问。请始终以JSON格式返回数据，不要包含任何其他文本。确保返回的JSON格式完全符合要求的结构。'
+      content: '你是一位专业的天气预报和传统黄历专家。请始终以JSON格式返回数据，不要包含任何其他文本。确保返回的JSON格式完全符合要求的结构，特别注意黄历信息要准确且完整。'
     },
     {
       role: 'user',
@@ -510,23 +566,24 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
   ];
 
   try {
-    console.log('正在调用AI接口获取天气建议...');
+    console.log('正在调用AI接口获取天气和黄历信息...');
     const response = await callDeepseek(messages);
     console.log('成功获取AI响应');
     
     // 从响应中提取JSON字符串
-    const jsonContent = response.match(/```json\n([\s\S]*?)\n```/);
-    if (!jsonContent || !jsonContent[1]) {
+    const jsonContent = response.match(/```json\n([\s\S]*?)\n```/) || response.match(/\{[\s\S]*\}/);
+    if (!jsonContent || !jsonContent[1] && !jsonContent[0]) {
       console.error('无法从响应中提取JSON内容');
       throw new Error('无法从响应中提取JSON内容');
     }
 
     try {
       console.log('正在解析JSON响应...');
-      const result = JSON.parse(jsonContent[1]);
+      const jsonStr = jsonContent[1] || jsonContent[0];
+      const result = JSON.parse(jsonStr);
       
       // 验证返回的数据结构
-      if (!result.weather || !result.clothingAdvice) {
+      if (!result.weather || !result.clothingAdvice || !result.lunarCalendar) {
         console.error('返回的数据结构不完整:', result);
         throw new Error('返回的数据结构不完整');
       }
@@ -549,14 +606,60 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
           recommendation: result.clothingAdvice.recommendation || '暂无建议',
           tips: result.clothingAdvice.tips || '暂无提示',
           zodiacAdvice: result.clothingAdvice.zodiacAdvice || '暂无星座建议'
+        },
+        lunarCalendar: {
+          solarDate: result.lunarCalendar.solarDate || {
+            year: today.getFullYear(),
+            month: today.getMonth() + 1,
+            day: today.getDate(),
+            weekday: weekday
+          },
+          lunarDate: result.lunarCalendar.lunarDate || {
+            year: '甲辰',
+            month: '腊月',
+            day: '十五',
+            monthName: '腊月',
+            dayName: '十五'
+          },
+          ganzhi: result.lunarCalendar.ganzhi || {
+            year: '甲辰',
+            month: '丁丑',
+            day: '庚申'
+          },
+          nayin: result.lunarCalendar.nayin || '白蜡金',
+          suitable: result.lunarCalendar.suitable || ['祭祀', '祈福', '出行', '纳财', '开市', '交易'],
+          avoid: result.lunarCalendar.avoid || ['动土', '破土', '安葬', '修造', '嫁娶', '入宅'],
+          directions: result.lunarCalendar.directions || {
+            caishen: '正北',
+            xishen: '西北',
+            fushen: '西南',
+            taishen: '厨灶床'
+          },
+          chongsha: result.lunarCalendar.chongsha || {
+            chong: '冲虎',
+            sha: '煞南'
+          },
+          gods: result.lunarCalendar.gods || {
+            lucky: ['天德', '月德', '时德', '民日'],
+            unlucky: ['月煞', '月虚', '血支', '天贼']
+          },
+          times: result.lunarCalendar.times || {
+            lucky: ['子时', '寅时', '申时'],
+            unlucky: ['丑时', '卯时', '酉时']
+          },
+          pengzu: result.lunarCalendar.pengzu || '庚不经络织机虚张，申不安床鬼祟入房',
+          dailyWords: result.lunarCalendar.dailyWords || '天道酬勤，厚德载物',
+          tips: result.lunarCalendar.tips || '今日宜静不宜动，保持内心平和'
         }
       };
 
-      console.log('成功格式化天气数据:', {
+      console.log('成功格式化天气和黄历数据:', {
         city: formattedResult.weather.city,
         currentTemp: formattedResult.weather.currentTemp,
         condition: formattedResult.weather.condition,
-        clothingIndex: formattedResult.clothingAdvice.index
+        clothingIndex: formattedResult.clothingAdvice.index,
+        lunarDate: formattedResult.lunarCalendar.lunarDate,
+        ganzhi: formattedResult.lunarCalendar.ganzhi
       });
 
       return formattedResult;
@@ -565,7 +668,7 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
       throw new Error('JSON解析失败');
     }
   } catch (error) {
-    console.error('获取天气数据失败:', error);
+    console.error('获取天气和黄历数据失败:', error);
     // 返回默认数据而不是抛出错误
     const defaultResult = {
       weather: {
@@ -584,16 +687,60 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
         recommendation: '暂无建议',
         tips: '获取数据失败，请稍后再试',
         zodiacAdvice: '暂无星座建议'
+      },
+      lunarCalendar: {
+        solarDate: {
+          year: today.getFullYear(),
+          month: today.getMonth() + 1,
+          day: today.getDate(),
+          weekday: weekday
+        },
+        lunarDate: {
+          year: '甲辰',
+          month: '腊月',
+          day: '十五',
+          monthName: '腊月',
+          dayName: '十五'
+        },
+        ganzhi: {
+          year: '甲辰',
+          month: '丁丑',
+          day: '庚申'
+        },
+        nayin: '白蜡金',
+        suitable: ['祭祀', '祈福', '出行', '纳财', '开市', '交易'],
+        avoid: ['动土', '破土', '安葬', '修造', '嫁娶', '入宅'],
+        directions: {
+          caishen: '正北',
+          xishen: '西北',
+          fushen: '西南',
+          taishen: '厨灶床'
+        },
+        chongsha: {
+          chong: '冲虎',
+          sha: '煞南'
+        },
+        gods: {
+          lucky: ['天德', '月德', '时德', '民日'],
+          unlucky: ['月煞', '月虚', '血支', '天贼']
+        },
+        times: {
+          lucky: ['子时', '寅时', '申时'],
+          unlucky: ['丑时', '卯时', '酉时']
+        },
+        pengzu: '庚不经络织机虚张，申不安床鬼祟入房',
+        dailyWords: '天道酬勤，厚德载物',
+        tips: '今日宜静不宜动，保持内心平和'
       }
     };
-    console.log('返回默认天气数据:', defaultResult);
+    console.log('返回默认天气和黄历数据:', defaultResult);
     return defaultResult;
   }
 };
 
-// 字测分析
+// 测事
 export const getCharacterAnalysis = async (character, userInfo) => {
-  console.log('开始字测分析:', {
+  console.log('开始测事分析:', {
     character,
     userInfo: {
       ...userInfo,
@@ -627,7 +774,7 @@ export const getCharacterAnalysis = async (character, userInfo) => {
 请基于用户的生辰八字、五行分布和所测之字，按照以下步骤进行深度分析:
 
 1. 拆解该字的结构(偏旁部首、笔画数等)，并分析与用户八字的关联
-2. 根据焦氏易林原理结合用户生辰八字进行卦象分析（200字）
+2. 根据焦氏易林原理结合用户生辰八字进行卦象分析（300字）
 3. 分析此字与用户命理五行的相生相克关系
 4. 猜测用户心中所想的事，将所测之字与用户八字、五行特征相结合进行解读（300字）
 5. 结合用户命理特征，给出运势建议和行动指南
@@ -778,10 +925,258 @@ export const getCharacterAnalysis = async (character, userInfo) => {
   }
 };
 
+// 格式化大运流年数据的辅助函数
+function formatMajorPeriods(periods) {
+  if (typeof periods === 'string') {
+    return periods;
+  } else if (typeof periods === 'object' && periods !== null) {
+    // 如果是对象，尝试格式化为易读的文本
+    if (Array.isArray(periods)) {
+      return periods.join('\n');
+    } else {
+      // 如果是对象，将其转换为易读的键值对
+      return Object.entries(periods)
+        .map(([key, value]) => `${key}：${value}`)
+        .join('\n');
+    }
+  } else {
+    return '暂无分析';
+  }
+}
+
+// 八字分析功能
+const getBaziAnalysis = async (birthInfo, userInfo = {}) => {
+  try {
+    // 记录请求信息
+    console.log('请求', {
+      功能: '八字分析',
+      出生信息: birthInfo,
+      用户信息: userInfo
+    });
+
+    // 构建用户信息文本
+    let userInfoText = '';
+    if (userInfo) {
+      userInfoText = `
+      性别：${userInfo.gender || '未知'}
+      昵称：${userInfo.nickname || '未知'}
+      出生地：${userInfo.birthplace || '未知'}
+      星座：${userInfo.zodiac || '未知'}
+      MBTI：${userInfo.mbti || '未知'}
+      `;
+    }
+
+    const prompt = `请根据以下出生信息进行专业的八字分析：
+出生日期：${birthInfo.birthDate}
+出生时间：${birthInfo.birthTime}
+性别：${birthInfo.gender}
+出生地：${birthInfo.birthplace || '未知'}
+
+用户基本信息：${userInfoText}
+
+请按照传统八字命理学进行分析，提供以下内容：
+
+1. 八字排盘：准确计算年柱、月柱、日柱、时柱（天干地支）
+2. 五行分析：分析八字中五行（金木水火土）的分布和强弱
+3. 日主分析：确定日主（日干）的五行属性和旺衰程度
+4. 用神喜忌：分析用神、忌神，以及喜用的五行
+5. 性格特征：基于八字分析性格优缺点和天赋才能
+6. 事业财运：分析适合的职业方向和财运特点
+7. 婚姻感情：分析感情运势和婚姻特点
+8. 健康运势：分析身体健康方面需要注意的事项
+9. 大运流年：分析人生各阶段的大运走势
+10. 开运建议：提供具体的开运方法和注意事项
+
+请以JSON格式返回，包含以下字段：
+{
+  "baziInfo": {
+    "year": "年柱（天干地支）",
+    "month": "月柱（天干地支）", 
+    "day": "日柱（天干地支）",
+    "hour": "时柱（天干地支）",
+    "dayMaster": "日主（日干）",
+    "dayMasterElement": "日主五行属性"
+  },
+  "wuxingAnalysis": {
+    "distribution": {
+      "metal": "金的个数",
+      "wood": "木的个数", 
+      "water": "水的个数",
+      "fire": "火的个数",
+      "earth": "土的个数"
+    },
+    "strength": "日主强弱分析",
+    "pattern": "格局类型",
+    "usefulGod": "用神",
+    "tabooGod": "忌神"
+  },
+  "personalityAnalysis": "性格特征分析",
+  "careerFortune": "事业财运分析", 
+  "loveFortune": "婚姻感情分析",
+  "healthFortune": "健康运势分析",
+  "majorPeriods": "大运流年分析",
+  "luckyAdvice": {
+    "colors": ["有利颜色"],
+    "directions": ["有利方位"],
+    "numbers": ["幸运数字"],
+    "elements": ["需要补充的五行"],
+    "suggestions": ["具体开运建议"]
+  }
+}`;
+
+    const messages = [
+      {
+        role: 'system',
+        content: '你是一位精通传统八字命理学的大师，具有深厚的易学功底。请严格按照传统八字理论进行分析，确保排盘准确，分析专业。请始终以JSON格式返回数据，不要包含任何其他文本。'
+      },
+      {
+        role: 'user',
+        content: prompt
+      }
+    ];
+
+    console.log('正在调用AI接口进行八字分析...');
+    const response = await callDeepseek(messages);
+    console.log('成功获取AI响应');
+    
+    // 记录AI回答
+    console.log('AI回答', {
+      原始回答: response.substring(0, 200) + '...'
+    });
+
+    // 从响应中提取JSON字符串
+    const jsonContent = response.match(/```json\n([\s\S]*?)\n```/) || response.match(/\{[\s\S]*\}/);
+    if (!jsonContent) {
+      console.error('无法从响应中提取JSON内容');
+      throw new Error('无法从响应中提取JSON内容');
+    }
+
+    try {
+      console.log('正在解析JSON响应...');
+      const jsonStr = jsonContent[1] || jsonContent[0];
+      const result = JSON.parse(jsonStr);
+      
+      // 验证返回的数据结构
+      if (!result.baziInfo || !result.wuxingAnalysis) {
+        console.error('返回的数据结构不完整:', result);
+        throw new Error('返回的数据结构不完整');
+      }
+
+      // 格式化返回数据
+      const formattedResult = {
+        baziInfo: {
+          year: result.baziInfo.year || '未知',
+          month: result.baziInfo.month || '未知',
+          day: result.baziInfo.day || '未知',
+          hour: result.baziInfo.hour || '未知',
+          dayMaster: result.baziInfo.dayMaster || '未知',
+          dayMasterElement: result.baziInfo.dayMasterElement || '未知'
+        },
+        wuxingAnalysis: {
+          distribution: {
+            metal: result.wuxingAnalysis.distribution?.metal || 0,
+            wood: result.wuxingAnalysis.distribution?.wood || 0,
+            water: result.wuxingAnalysis.distribution?.water || 0,
+            fire: result.wuxingAnalysis.distribution?.fire || 0,
+            earth: result.wuxingAnalysis.distribution?.earth || 0
+          },
+          strength: result.wuxingAnalysis.strength || '未知',
+          pattern: result.wuxingAnalysis.pattern || '未知',
+          usefulGod: result.wuxingAnalysis.usefulGod || '未知',
+          tabooGod: result.wuxingAnalysis.tabooGod || '未知'
+        },
+        personalityAnalysis: result.personalityAnalysis || '暂无分析',
+        careerFortune: result.careerFortune || '暂无分析',
+        loveFortune: result.loveFortune || '暂无分析',
+        healthFortune: result.healthFortune || '暂无分析',
+        majorPeriods: formatMajorPeriods(result.majorPeriods),
+        luckyAdvice: {
+          colors: Array.isArray(result.luckyAdvice?.colors) ? result.luckyAdvice.colors : [],
+          directions: Array.isArray(result.luckyAdvice?.directions) ? result.luckyAdvice.directions : [],
+          numbers: Array.isArray(result.luckyAdvice?.numbers) ? result.luckyAdvice.numbers : [],
+          elements: Array.isArray(result.luckyAdvice?.elements) ? result.luckyAdvice.elements : [],
+          suggestions: Array.isArray(result.luckyAdvice?.suggestions) ? result.luckyAdvice.suggestions : []
+        }
+      };
+
+      // 记录解析结果
+      console.log('解析结果', {
+        八字信息: `${formattedResult.baziInfo.year} ${formattedResult.baziInfo.month} ${formattedResult.baziInfo.day} ${formattedResult.baziInfo.hour}`,
+        日主: formattedResult.baziInfo.dayMaster,
+        日主五行: formattedResult.baziInfo.dayMasterElement,
+        五行分布: formattedResult.wuxingAnalysis.distribution,
+        用神: formattedResult.wuxingAnalysis.usefulGod
+      });
+
+      console.log('八字分析成功:', {
+        年柱: formattedResult.baziInfo.year,
+        月柱: formattedResult.baziInfo.month,
+        日柱: formattedResult.baziInfo.day,
+        时柱: formattedResult.baziInfo.hour,
+        日主: formattedResult.baziInfo.dayMaster,
+        五行分布: formattedResult.wuxingAnalysis.distribution
+      });
+
+      return formattedResult;
+    } catch (parseError) {
+      console.error('JSON解析失败:', parseError);
+      throw new Error('JSON解析失败');
+    }
+  } catch (error) {
+    console.error('八字分析失败:', error);
+    
+    // 记录错误
+    console.log('错误', {
+      错误类型: '八字分析失败',
+      详情: error.message
+    });
+
+    // 返回默认数据而不是抛出错误
+    const defaultResult = {
+      baziInfo: {
+        year: '未知',
+        month: '未知',
+        day: '未知',
+        hour: '未知',
+        dayMaster: '未知',
+        dayMasterElement: '未知'
+      },
+      wuxingAnalysis: {
+        distribution: {
+          metal: 0,
+          wood: 0,
+          water: 0,
+          fire: 0,
+          earth: 0
+        },
+        strength: '分析失败',
+        pattern: '未知',
+        usefulGod: '未知',
+        tabooGod: '未知'
+      },
+      personalityAnalysis: '八字分析失败，请稍后重试',
+      careerFortune: '暂无分析',
+      loveFortune: '暂无分析',
+      healthFortune: '暂无分析',
+      majorPeriods: '暂无分析',
+      luckyAdvice: {
+        colors: [],
+        directions: [],
+        numbers: [],
+        elements: [],
+        suggestions: ['请稍后重试']
+      }
+    };
+    console.log('返回默认八字分析结果:', defaultResult);
+    return defaultResult;
+  }
+};
+
 module.exports = {
   getHexagramInterpretation,
   getMbtiAiAdvice,
   callDeepseek,
   getWeatherAndAdvice,
-  getCharacterAnalysis
+  getCharacterAnalysis,
+  getBaziAnalysis
 }; 

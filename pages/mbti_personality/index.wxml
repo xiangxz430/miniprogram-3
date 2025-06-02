@@ -763,6 +763,127 @@
       </view>
     </view>
     
+    <!-- 今日黄历 -->
+    <view class="lunar-calendar" wx:if="{{lunarCalendar}}">
+      <!-- 黄历头部 -->
+      <view class="calendar-header">
+        <view class="header-left">
+          <view class="suitable-title">宜</view>
+          <view class="suitable-list">
+            <text wx:for="{{lunarCalendar.suitable || lunarCalendar.activities.suitable}}" wx:key="index" class="activity-item">{{item}}</text>
+          </view>
+        </view>
+        
+        <view class="header-center">
+          <view class="date-main">
+            <view class="solar-info">
+              <text class="solar-text">公历 {{lunarCalendar.solarYear}}年{{lunarCalendar.solarMonth}}月{{lunarCalendar.solarDay}}日 {{lunarCalendar.weekday}} {{lunarCalendar.zodiacSign}}座 (阳历)</text>
+            </view>
+            <view class="date-display">
+              <text class="month-year">【{{lunarCalendar.solarYear}}】</text>
+              <text class="day-large">{{lunarCalendar.solarMonth}}月{{lunarCalendar.solarDay}}日</text>
+            </view>
+            <view class="weekday">{{lunarCalendar.weekday}}</view>
+            <view class="lunar-info">农历 {{lunarCalendar.lunarDate}} (阴历)</view>
+          </view>
+        </view>
+        
+        <view class="header-right">
+          <view class="avoid-title">忌</view>
+          <view class="avoid-list">
+            <text wx:for="{{lunarCalendar.avoid || lunarCalendar.activities.avoid}}" wx:key="index" class="activity-item">{{item}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 黄历内容 -->
+      <view class="calendar-content">
+        <!-- 胎神和五行信息 -->
+        <view class="info-row">
+          <view class="info-section">
+            <view class="info-label">胎神：</view>
+            <view class="info-value">{{lunarCalendar.taishen}}</view>
+          </view>
+          <view class="info-section">
+            <view class="info-label">五行：</view>
+            <view class="info-value">{{lunarCalendar.nayin}} {{lunarCalendar.wuxing}}执位</view>
+          </view>
+        </view>
+
+        <!-- 吉神宜趋 -->
+        <view class="gods-section">
+          <view class="gods-left">
+            <view class="gods-title">吉神宜趋</view>
+            <view class="gods-content">
+              <text wx:for="{{lunarCalendar.jishen}}" wx:key="index" class="gods-item">{{item}}</text>
+            </view>
+          </view>
+
+          <!-- 干支信息 -->
+          <view class="ganzhi-center">
+            <view class="ganzhi-box">
+              <text class="ganzhi-text">{{lunarCalendar.yearGanzhi}} {{lunarCalendar.monthGanzhi}} {{lunarCalendar.dayGanzhi}}</text>
+              <view class="pengzu-text">{{lunarCalendar.pengzu || lunarCalendar.dailyWords}}</view>
+            </view>
+          </view>
+
+          <!-- 凶神宜忌 -->
+          <view class="gods-right">
+            <view class="gods-title">凶神宜忌</view>
+            <view class="gods-content">
+              <text wx:for="{{lunarCalendar.xiongshen}}" wx:key="index" class="gods-item">{{item}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 财神方位信息 -->
+        <view class="direction-row">
+          <view class="direction-item">
+            <view class="direction-label">喜神：</view>
+            <view class="direction-value">{{lunarCalendar.xishen}}</view>
+          </view>
+          <view class="direction-item">
+            <view class="direction-label">福神：</view>
+            <view class="direction-value">{{lunarCalendar.fushen}}</view>
+          </view>
+          <view class="direction-item">
+            <view class="direction-label">财神：</view>
+            <view class="direction-value">{{lunarCalendar.caishen}}</view>
+          </view>
+        </view>
+
+        <!-- 冲煞信息 -->
+        <view class="chongsha-row">
+          <view class="chongsha-item">
+            <text class="chongsha-text">{{lunarCalendar.chong}} {{lunarCalendar.sha}}</text>
+          </view>
+        </view>
+
+        <!-- 时辰信息 -->
+        <view class="time-section">
+          <view class="time-row">
+            <view class="time-item lucky-time">
+              <view class="time-label">吉时：</view>
+              <view class="time-value">
+                <text wx:for="{{lunarCalendar.jishi}}" wx:key="index" class="time-text">{{item}}</text>
+              </view>
+            </view>
+            <view class="time-item unlucky-time">
+              <view class="time-label">凶时：</view>
+              <view class="time-value">
+                <text wx:for="{{lunarCalendar.xiongshi}}" wx:key="index" class="time-text">{{item}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 每日提示 -->
+        <view class="daily-tips">
+          <view class="tips-content">{{lunarCalendar.tips}}</view>
+        </view>
+      </view>
+    </view>
+    
     <!-- AI穿衣建议 -->
     <view class="clothing-advice">
       <view class="advice-header">
@@ -782,7 +903,7 @@
         </view>
         
         <view class="zodiac-tips">
-          <text class="subtitle">星座运势提示</text>
+          <text class="subtitle">星座提示</text>
           <text class="content">{{clothingAdvice.zodiacAdvice}}</text>
         </view>
       </view>
@@ -792,8 +913,8 @@
     <view class="divination-analysis">
       <view class="input-section">
         <view class="input-header">
-          <text class="input-title">测事问卦</text>
-          <text class="input-desc">请输入你想测的事情，我们将为你进行周易分析</text>
+          <text class="input-title">伏羲大模型测事[VIP专属]</text>
+          <text class="input-desc">请输入想测的事,大模型将综合考虑天时(星宿)地利(所在地)人和(八字),结合《易经》《滴天髓》《三命通会》三本书籍为您进行分析,建议优先完善个人信息</text>
         </view>
         <view class="input-box">
           <textarea class="matter-input" 
