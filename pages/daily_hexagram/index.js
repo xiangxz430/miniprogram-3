@@ -145,12 +145,12 @@ Page({
     });
   },
   
-  // 分享功能
+  // 分享给朋友
   onShareAppMessage: function() {
     return {
-      title: '今日运势：' + this.data.hexagramInfo.name,
+      title: '每日一挂 - 探索命理的奥秘',
       path: '/pages/daily_hexagram/index',
-      imageUrl: '/images/share_hexagram.png' // 这里需要提供分享图片
+      // imageUrl: '/images/share_hexagram.png' // 这里需要提供分享图片
     };
   }
 }) 

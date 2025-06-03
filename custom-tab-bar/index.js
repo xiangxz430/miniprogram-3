@@ -32,32 +32,32 @@ Component({
         {
           "pagePath": "pages/index/index",
           "text": "首页",
-          "iconPath": "/images/icons/home.png",
-          "selectedIconPath": "/images/icons/home-active.svg"
+          "iconClass": "icon-home",
+          "selectedIconClass": "icon-home-active"
         },
         {
           "pagePath": "pages/daily_divination/index",
           "text": "每日一挂",
-          "iconPath": "/images/icons/hexagram.png",
-          "selectedIconPath": "/images/icons/hexagram-active.svg"
+          "iconClass": "icon-hexagram",
+          "selectedIconClass": "icon-hexagram-active"
         },
         {
           "pagePath": "pages/bazi_forecast/index",
           "text": "八字总运",
-          "iconPath": "/images/icons/bazi.png",
-          "selectedIconPath": "/images/icons/bazi-active.svg"
+          "iconClass": "icon-bazi",
+          "selectedIconClass": "icon-bazi-active"
         },
         {
           "pagePath": "pages/mbti_personality/index",
           "text": "MBTI测试",
-          "iconPath": "/images/icons/mbti.png",
-          "selectedIconPath": "/images/icons/mbti-active.svg"
+          "iconClass": "icon-mbti",
+          "selectedIconClass": "icon-mbti-active"
         },
         {
           "pagePath": "pages/user/index",
           "text": "我的",
-          "iconPath": "/images/icons/user.png",
-          "selectedIconPath": "/images/icons/user-active.svg"
+          "iconClass": "icon-user",
+          "selectedIconClass": "icon-user-active"
         }
       ];
       

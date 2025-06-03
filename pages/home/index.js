@@ -303,13 +303,13 @@ Page({
     })
   },
   
-  // 分享功能
+  // 分享给朋友
   onShareAppMessage: function() {
     return {
-      title: '每日运势 - 探索命理的奥秘',
+      title: '性格测算 - 探索你的人格特质',
       path: '/pages/home/index',
-      imageUrl: '/images/share.jpg' // 这里需要提供分享图片
-    }
+      // imageUrl: '/images/share.jpg' // 这里需要提供分享图片
+    };
   },
   
   // 下拉刷新

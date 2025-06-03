@@ -409,10 +409,59 @@
   margin-bottom: 20rpx;
   transition: transform 0.3s ease;
   z-index: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .feature-item:active .feature-icon {
   transform: scale(1.1);
+}
+
+/* 首页MBTI图标 */
+.icon-mbti-home {
+  position: relative;
+}
+
+.icon-mbti-home:before {
+  content: '';
+  position: absolute;
+  width: 35rpx;
+  height: 35rpx;
+  background-color: #ff9800;
+  border-radius: 4rpx;
+  top: 5rpx;
+  left: 5rpx;
+}
+
+.icon-mbti-home:after {
+  content: '';
+  position: absolute;
+  width: 35rpx;
+  height: 35rpx;
+  background-color: #ff9800;
+  border-radius: 4rpx;
+  top: 5rpx;
+  right: 5rpx;
+  box-shadow: 0 43rpx 0 #ff9800, -43rpx 0 0 #ff9800;
+}
+
+/* 首页星座图标 */
+.icon-zodiac-home {
+  position: relative;
+  border: 4rpx solid #ff9800;
+  border-radius: 50%;
+}
+
+.icon-zodiac-home:before {
+  content: '✦';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40rpx;
+  color: #ff9800;
 }
 
 .feature-name {

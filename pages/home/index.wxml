@@ -19,13 +19,13 @@
     <view class="section-title">精选功能</view>
     <view class="feature-grid">
       <navigator url="/pages/mbti_personality/index" class="feature-item">
-        <image class="feature-icon" src="/images/icons/mbti.png" />
+        <view class="feature-icon icon-mbti-home"></view>
         <text class="feature-name">MBTI测试</text>
         <text class="feature-desc">性格特质分析</text>
       </navigator>
       
       <view class="feature-item coming-soon">
-        <image class="feature-icon" src="/images/icons/zodiac.png" />
+        <view class="feature-icon icon-zodiac-home"></view>
         <text class="feature-name">其他功能</text>
         <text class="feature-desc">敬请期待</text>
         <view class="coming-soon-tag">Soon</view>

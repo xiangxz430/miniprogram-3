@@ -9,23 +9,7 @@
           bindtap="switchTab">
       <view class="tab-bar-item-content">
         <view class="icon-container">
-          <block wx:if="{{item.iconPath.includes('mbti')}}">
-            <view class="icon-mbti-wrapper">
-              <view class="square"></view>
-              <view class="square"></view>
-              <view class="square"></view>
-              <view class="square"></view>
-            </view>
-          </block>
-          <block wx:elif="{{item.iconPath.includes('user')}}">
-            <view class="icon-user-wrapper {{selected === index ? 'active' : ''}}">
-              <view class="icon-user-head"></view>
-              <view class="icon-user-body"></view>
-            </view>
-          </block>
-          <block wx:else>
-            <image class="tab-bar-item-icon" src="{{selected === index ? item.selectedIconPath : item.iconPath}}"></image>
-          </block>
+          <view class="tab-icon {{selected === index ? item.selectedIconClass : item.iconClass}}"></view>
           <view class="tab-bar-item-circle" wx:if="{{selected === index}}"></view>
         </view>
         <view class="tab-bar-item-text" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</view>

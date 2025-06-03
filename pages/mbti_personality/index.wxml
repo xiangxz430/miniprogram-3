@@ -913,8 +913,11 @@
     <view class="divination-analysis">
       <view class="input-section">
         <view class="input-header">
-          <text class="input-title">伏羲大模型测事[VIP专属]</text>
-          <text class="input-desc">请输入想测的事,大模型将综合考虑天时(星宿)地利(所在地)人和(八字),结合《易经》《滴天髓》《三命通会》三本书籍为您进行分析,建议优先完善个人信息</text>
+          <view class="title-row">
+            <text class="input-title">伏羲大模型测事[VIP专属]</text>
+            <text class="remaining-count">今日剩余：{{remainingCount === '∞' ? '∞ (无限制)' : remainingCount + '/5次'}}</text>
+          </view>
+          <text class="input-desc">请输入想测的事,建议优先完善个人信息</text>
         </view>
         <view class="input-box">
           <textarea class="matter-input" 
@@ -924,89 +927,144 @@
                     maxlength="100" />
           <text class="input-limit">{{inputText.length}}/100</text>
         </view>
+        
+        <!-- 推演提示 -->
+        <view class="divination-tip">
+          <text class="tip-text">推演事情过于复杂的情况可能因推演超时而没有结果，可以尝试换个问题</text>
+        </view>
+        
         <button class="submit-btn" bindtap="submitDivination">开始分析</button>
+        
+        <!-- 历史问题列表 -->
+        <view class="history-section" wx:if="{{divinationHistoryList.length > 0}}">
+          <view class="history-header" bindtap="toggleHistoryList">
+            <text class="history-title">历史问题列表（{{divinationHistoryList.length}}）</text>
+            <text class="toggle-icon">{{showHistoryList ? '▼' : '▶'}}</text>
+          </view>
+          
+          <view class="history-list" wx:if="{{showHistoryList}}">
+            <view class="history-item" wx:for="{{divinationHistoryList}}" wx:key="index">
+              <view class="history-content" bindtap="viewHistoryResult" data-index="{{index}}">
+                <view class="history-question">{{item.question}}</view>
+                <view class="history-time">{{item.timeString}}</view>
+              </view>
+              <view class="history-actions">
+                <text class="action-btn view-btn" bindtap="viewHistoryResult" data-index="{{index}}">查看</text>
+                <text class="action-btn delete-btn" bindtap="deleteHistoryItem" data-index="{{index}}">删除</text>
+              </view>
+            </view>
+          </view>
+        </view>
       </view>
 
-      <view class="analysis-result" wx:if="{{divinationResult.hexagram.name}}">
-        <view class="section hexagram-section">
-          <view class="section-title">卦象分析</view>
-          <view class="hexagram-content">
-            <view class="hexagram-item">本卦：{{divinationResult.hexagram.name}}</view>
-            <view class="hexagram-desc">{{divinationResult.hexagram.description}}</view>
-            <view class="hexagram-analysis">{{divinationResult.hexagram.analysis}}</view>
+      <view class="analysis-result" wx:if="{{divinationResult.tianshi}}">
+        <!-- 天时地利人和分析 -->
+        <view class="section tiandi-section">
+          <view class="section-title">天时地利人和</view>
+          <view class="tiandi-content">
+            <view class="tiandi-item">
+              <view class="tiandi-header">
+                <text class="tiandi-label">天时（{{divinationResult.tianshi.constellation}}宿）</text>
+              </view>
+              <text class="tiandi-analysis">{{divinationResult.tianshi.analysis}}</text>
+              <text class="tiandi-influence">影响：{{divinationResult.tianshi.influence}}</text>
+            </view>
+            
+            <view class="tiandi-item">
+              <view class="tiandi-header">
+                <text class="tiandi-label">地利（{{divinationResult.dili.location}}）</text>
+              </view>
+              <text class="tiandi-analysis">{{divinationResult.dili.analysis}}</text>
+              <text class="tiandi-influence">风水：{{divinationResult.dili.fengshui}}</text>
+            </view>
+            
+            <view class="tiandi-item">
+              <view class="tiandi-header">
+                <text class="tiandi-label">人和（八字命理）</text>
+              </view>
+              <text class="tiandi-analysis">{{divinationResult.renhe.analysis}}</text>
+              <text class="tiandi-influence">八字：{{divinationResult.renhe.bazi}}</text>
+              <text class="tiandi-influence">性格：{{divinationResult.renhe.personality}}</text>
+            </view>
           </view>
         </view>
 
+        <!-- 综合天时地利人和分析 -->
+        <view class="section comprehensive-section" wx:if="{{divinationResult.comprehensive}}">
+          <view class="section-title">综合天时地利人和分析</view>
+          <view class="comprehensive-content">
+            <view class="comprehensive-item">
+              <text class="comprehensive-label">整体分析：</text>
+              <text class="comprehensive-text">{{divinationResult.comprehensive.tianshi_dili_renhe}}</text>
+            </view>
+            <view class="comprehensive-item">
+              <text class="comprehensive-label">综合建议：</text>
+              <text class="comprehensive-text">{{divinationResult.comprehensive.overall_advice}}</text>
+            </view>
+            <view class="comprehensive-item">
+              <text class="comprehensive-label">协同效应：</text>
+              <text class="comprehensive-text">{{divinationResult.comprehensive.synergy_effect}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 卦象分析 -->
+        <view class="section hexagram-section">
+          <view class="section-title">《易经》卦象分析</view>
+          <view class="hexagram-content">
+            <view class="hexagram-item">本卦：{{divinationResult.hexagram.name}}</view>
+            <view class="hexagram-desc">{{divinationResult.hexagram.description}}</view>
+            <view class="hexagram-analysis">{{divinationResult.hexagram.yijing_analysis}}</view>
+          </view>
+        </view>
+
+        <!-- 命理演算 -->
+        <view class="section mingli-section">
+          <view class="section-title">传统经典命理演算</view>
+          <view class="mingli-content">
+            <view class="mingli-item">
+              <text class="mingli-label">《滴天髓》理论：</text>
+              <text class="mingli-text">{{divinationResult.mingli.ditianshui_analysis}}</text>
+            </view>
+            <view class="mingli-item">
+              <text class="mingli-label">《三命通会》理论：</text>
+              <text class="mingli-text">{{divinationResult.mingli.sanming_analysis}}</text>
+            </view>
+            <view class="mingli-item">
+              <text class="mingli-label">综合分析：</text>
+              <text class="mingli-text">{{divinationResult.mingli.combined_analysis}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 发展趋势 -->
         <view class="section trend-section">
-          <view class="section-title">事态发展</view>
+          <view class="section-title">事态发展趋势</view>
           <view class="trend-content">
             <view class="trend-item">
               <text class="trend-label">当前形势：</text>
               <text class="trend-text">{{divinationResult.trend.current}}</text>
             </view>
             <view class="trend-item">
-              <text class="trend-label">发展趋势：</text>
-              <text class="trend-text">{{divinationResult.trend.future}}</text>
+              <text class="trend-label">短期趋势（1-3个月）：</text>
+              <text class="trend-text">{{divinationResult.trend.short_term}}</text>
             </view>
             <view class="trend-item">
-              <text class="trend-label">时机分析：</text>
+              <text class="trend-label">长期趋势（3-12个月）：</text>
+              <text class="trend-text">{{divinationResult.trend.long_term}}</text>
+            </view>
+            <view class="trend-item">
+              <text class="trend-label">最佳时机：</text>
               <text class="trend-text">{{divinationResult.trend.timing}}</text>
             </view>
           </view>
         </view>
 
-        <view class="section guidance-section">
-          <view class="section-title">趋吉避凶</view>
-          <view class="guidance-content">
-            <view class="guidance-group">
-              <text class="guidance-label">有利因素：</text>
-              <view class="guidance-items">
-                <text class="guidance-item" wx:for="{{divinationResult.guidance.favorable}}" wx:key="index">{{item}}</text>
-              </view>
-            </view>
-            <view class="guidance-group">
-              <text class="guidance-label">不利因素：</text>
-              <view class="guidance-items">
-                <text class="guidance-item" wx:for="{{divinationResult.guidance.unfavorable}}" wx:key="index">{{item}}</text>
-              </view>
-            </view>
-            <view class="guidance-group">
-              <text class="guidance-label">注意事项：</text>
-              <view class="guidance-items">
-                <text class="guidance-item" wx:for="{{divinationResult.guidance.precautions}}" wx:key="index">{{item}}</text>
-              </view>
-            </view>
-          </view>
-        </view>
+       
 
-        <view class="section recommendations-section">
-          <view class="section-title">开运建议</view>
-          <view class="recommendations-content">
-            <view class="recommendation-item">
-              <text class="recommendation-label">最佳时机：</text>
-              <text class="recommendation-text">{{divinationResult.recommendations.timing}}</text>
-            </view>
-            <view class="recommendation-item">
-              <text class="recommendation-label">有利方位：</text>
-              <text class="recommendation-text">{{divinationResult.recommendations.direction}}</text>
-            </view>
-            <view class="recommendation-item">
-              <text class="recommendation-label">有利颜色：</text>
-              <view class="color-tags">
-                <text class="color-tag" wx:for="{{divinationResult.recommendations.colors}}" wx:key="index">{{item}}</text>
-              </view>
-            </view>
-            <view class="recommendation-item">
-              <text class="recommendation-label">建议行动：</text>
-              <view class="action-list">
-                <text class="action-item" wx:for="{{divinationResult.recommendations.actions}}" wx:key="index">{{index + 1}}. {{item}}</text>
-              </view>
-            </view>
-          </view>
-        </view>
-
+        <!-- 化解方案 -->
         <view class="section resolution-section">
-          <view class="section-title">化解方案</view>
+          <view class="section-title">注意事项与化解</view>
           <view class="resolution-content">
             <view class="challenges">
               <text class="resolution-label">潜在挑战：</text>
@@ -1018,6 +1076,12 @@
               <text class="resolution-label">化解方案：</text>
               <view class="solution-list">
                 <text class="solution-item" wx:for="{{divinationResult.resolution.solutions}}" wx:key="index">{{index + 1}}. {{item}}</text>
+              </view>
+            </view>
+            <view class="alternatives">
+              <text class="resolution-label">备选方案：</text>
+              <view class="alternative-list">
+                <text class="alternative-item" wx:for="{{divinationResult.resolution.alternative_plans}}" wx:key="index">{{index + 1}}. {{item}}</text>
               </view>
             </view>
           </view>
