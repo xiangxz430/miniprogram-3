@@ -4,7 +4,7 @@ const shortQuestions = require('./short_questions.js')
 const mbtiTypes = require('./mbti-types.js')
 const mbtiData = require('../../utils/mbtiFullDataMerged')
 const deepseekApi = require('../../utils/deepseekApi')
-const { getWeatherAndAdvice, getCharacterAnalysis } = deepseekApi
+const { getWeatherAndAdvice } = deepseekApi
 
 console.log('加载MBTI页面相关资源...');
 console.log('完整版题目数量:', questions.length);
@@ -2453,14 +2453,15 @@ Page({
   // 格式化黄历数据，确保所有字段都是正确的格式
   formatLunarCalendarData(lunarCalendar) {
     if (!lunarCalendar) {
-      return this.getLunarCalendarData();
+      console.log('没有农历数据，返回空');
+      return null;
     }
 
-    // 如果是API返回的数据格式，需要转换
+    // 如果是API返回的数据格式，保留完整的农历信息
     if (lunarCalendar.lunarDate && typeof lunarCalendar.lunarDate === 'object') {
       const apiData = lunarCalendar;
       
-      // 转换为本地格式
+      // 保留API返回的准确农历数据，不要转换成字符串
       const formattedData = {
         // 基本日期信息
         solarYear: apiData.solarDate?.year || new Date().getFullYear(),
@@ -2469,8 +2470,16 @@ Page({
         weekday: apiData.solarDate?.weekday || ['日', '一', '二', '三', '四', '五', '六'][new Date().getDay()],
         zodiacSign: this.getZodiacSign(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`),
         
-        // 农历信息 - 转换为字符串格式
-        lunarDate: apiData.lunarDate.monthName + apiData.lunarDate.dayName,
+        // 农历信息 - 保留完整的API数据
+        lunarDate: {
+          year: apiData.lunarDate.year || apiData.ganzhi?.year || '乙巳',
+          month: apiData.lunarDate.month,
+          day: apiData.lunarDate.day,
+          monthName: apiData.lunarDate.month, // 使用month而不是monthName
+          dayName: apiData.lunarDate.dayName,
+          displayDate: apiData.lunarDate.month + apiData.lunarDate.dayName, // 使用month而不是monthName
+          zodiac: apiData.lunarDate.zodiac || this.getChineseZodiac(`${new Date().getFullYear()}-01-01`) // 优先使用API返回的生肖
+        },
         
         // 干支信息
         yearGanzhi: apiData.ganzhi?.year || '甲辰',
@@ -2516,6 +2525,17 @@ Page({
       });
 
       return formattedData;
+    }
+
+    // 兼容旧的字符串格式数据
+    if (typeof lunarCalendar.lunarDate === 'string') {
+      // 为旧的字符串格式数据创建兼容的对象格式
+      return {
+        ...lunarCalendar,
+        lunarDate: {
+          displayDate: lunarCalendar.lunarDate
+        }
+      };
     }
 
     // 如果已经是本地格式，直接返回
@@ -2840,37 +2860,60 @@ MBTI类型：${userInfo.mbti || '未知'}
     const lunarDate = this.calculateLunarDate(today);
     const ganzhi = this.calculateGanzhi(today);
     
-    // 宜事项列表
+    // 基于日期的固定宜忌算法
+    const dateKey = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    
+    // 宜事项列表 - 按传统黄历分类
     const suitableActivities = [
-      '祭祀', '结网', '捕捉', '除虫害', '治病', '平治道涂', '扫舍',
-      '开市', '交易', '立券', '纳财', '栽种', '纳畜', '牧养',
-      '嫁娶', '订盟', '安床', '会亲友', '求嗣', '进人口',
-      '出行', '移徙', '开业', '动土', '破土', '安葬'
+      '祭祀', '祈福', '开光', '塑绘', '齐醮', '订盟', '纳采', '嫁娶',
+      '安床', '进人口', '入宅', '安香', '移徙', '安葬', '启钻', '修坟',
+      '立碑', '开市', '交易', '立券', '纳财', '栽种', '纳畜', '牧养',
+      '出行', '移徙', '分居', '理发', '整手足甲', '沐浴', '洗车', '扫舍',
+      '修造', '动土', '竖柱', '上梁', '开仓', '出货财', '开渠', '掘井',
+      '破土', '启钻', '修坟', '安葬', '入殓', '除服', '成服', '移柩'
     ];
     
     // 忌事项列表
     const avoidActivities = [
-      '探病', '嫁娶', '开市', '动土', '破土', '安葬', '修造',
-      '上梁', '开仓', '出货财', '纳财', '开渠', '掘井',
-      '栽种', '牧养', '纳畜', '破屋', '坏垣', '求医',
-      '治病', '针灸', '开池', '理发', '整手足甲'
+      '嫁娶', '开市', '安床', '栽种', '安葬', '破土', '修造', '动土',
+      '开仓', '出货财', '纳财', '开渠', '掘井', '牧养', '纳畜', '伐木',
+      '上梁', '竖柱', '盖屋', '造船', '开池', '塞穴', '补垣', '放水',
+      '酝酿', '开市', '立券', '交易', '出行', '移徙', '分居', '出火',
+      '进人口', '入宅', '安香', '会亲友', '求嗣', '上册', '上官', '临政',
+      '结网', '取渔', '畋猎', '理发', '整手足甲', '求医', '治病', '针灸'
     ];
 
     // 吉神宜趋
     const luckyGods = [
-      '母仓', '敬安', '喜神', '正南', '福神', '正东', '财神', '正南',
-      '天德', '月德', '天恩', '母仓', '不将', '圣心', '益后', '续世'
+      '天德', '月德', '天德合', '月德合', '天恩', '天赦', '天愿', '月恩',
+      '四相', '时德', '民日', '三合', '临日', '时阴', '生气', '益后',
+      '续世', '除神', '鸣犬', '守日', '吉期', '要安', '普护', '五富',
+      '圣心', '明堂', '月空', '不将', '敬安', '玉宇', '金匮', '金堂'
     ];
 
     // 凶神宜忌  
     const unluckyGods = [
-      '天罡', '劫煞', '土符', '厌对', '招摇', '九焦', '九坎',
-      '月害', '土府', '土符', '大煞', '往亡', '重日', '朱雀'
+      '月破', '大耗', '灾煞', '天火', '四忌', '四穷', '五墓', '土符',
+      '大时', '大败', '咸池', '小耗', '天贼', '地贼', '血支', '血忌',
+      '游祸', '归忌', '血支', '天狗', '白虎', '朱雀', '勾陈', '螣蛇',
+      '玄武', '天刑', '天牢', '元武', '四击', '大煞', '往亡', '重日'
     ];
+
+    // 使用日期作为种子，确保同一天结果一致
+    const getFixedItems = (items, count, seed) => {
+      const result = [];
+      for (let i = 0; i < count; i++) {
+        const index = (seed + i * 7) % items.length;
+        if (!result.includes(items[index])) {
+          result.push(items[index]);
+        }
+      }
+      return result;
+    };
 
     // 十二建星
     const buildingStars = ['建', '除', '满', '平', '定', '执', '破', '危', '成', '收', '开', '闭'];
-    const todayBuildingStar = buildingStars[today.getDate() % 12];
+    const todayBuildingStar = buildingStars[(today.getDate() + today.getMonth()) % 12];
 
     // 二十八宿
     const constellations = [
@@ -2878,66 +2921,78 @@ MBTI类型：${userInfo.mbti || '未知'}
       '室', '壁', '奎', '娄', '胃', '昴', '毕', '觜', '参', '井', '鬼', '柳',
       '星', '张', '翼', '轸'
     ];
-    const todayConstellation = constellations[today.getDate() % 28];
+    const todayConstellation = constellations[(today.getDate() + today.getMonth() * 3) % 28];
 
-    // 计算星座 - 修复：将Date对象转换为字符串格式
+    // 计算星座
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const zodiacSign = this.getZodiacSign(todayStr);
 
     // 五行纳音
     const nayin = this.calculateNayin(ganzhi.year);
 
+    // 基于日期的固定宜忌选择
+    const suitableCount = 5 + (dateKey % 3); // 5-7项
+    const avoidCount = 4 + (dateKey % 2); // 4-5项
+    const luckyGodsCount = 4 + (dateKey % 3); // 4-6项
+    const unluckyGodsCount = 3 + (dateKey % 3); // 3-5项
+
     // 构建黄历数据对象
     const lunarCalendarData = {
-      // 基本日期信息 - 与API返回格式统一
+      // 基本日期信息
       solarYear: today.getFullYear(),
       solarMonth: today.getMonth() + 1,
       solarDay: today.getDate(),
       weekday: ['日', '一', '二', '三', '四', '五', '六'][today.getDay()],
       zodiacSign: zodiacSign,
       
-      // 农历信息 - 使用字符串格式
-      lunarDate: lunarDate.displayDate, // 使用displayDate而不是整个对象
+      // 农历信息
+      lunarDate: lunarDate, // 传递完整的农历对象，包含year、month、day、zodiac等信息
       
-      // 干支信息 - 展开为单独字段
+      // 干支信息
       yearGanzhi: ganzhi.year,
       monthGanzhi: ganzhi.month, 
       dayGanzhi: ganzhi.day,
       timeGanzhi: ganzhi.time,
 
-      // 宜忌事项 - 与API格式统一
-      suitable: this.getRandomActivities(suitableActivities, 4, 6),
-      avoid: this.getRandomActivities(avoidActivities, 3, 5),
+      // 宜忌事项 - 使用固定算法
+      suitable: getFixedItems(suitableActivities, suitableCount, dateKey),
+      avoid: getFixedItems(avoidActivities, avoidCount, dateKey + 1000),
 
-      // 神煞信息 - 与API格式统一
-      jishen: this.getRandomActivities(luckyGods, 4, 6),
-      xiongshen: this.getRandomActivities(unluckyGods, 3, 5),
+      // 神煞信息 - 使用固定算法
+      jishen: getFixedItems(luckyGods, luckyGodsCount, dateKey + 2000),
+      xiongshen: getFixedItems(unluckyGods, unluckyGodsCount, dateKey + 3000),
 
-      // 方位信息 - 展开为单独字段
+      // 方位信息
       caishen: this.calculateCaishenDirection(today),
       xishen: this.calculateXishenDirection(today),
       fushen: this.calculateFushenDirection(today),
       taishen: this.calculateTaishenDirection(today),
 
-      // 冲煞信息 - 展开为单独字段
+      // 冲煞信息
       chong: this.calculateChong(ganzhi.day),
       sha: this.calculateSha(today),
 
-      // 五行信息 - 展开为单独字段
+      // 五行信息
       nayin: nayin,
       wuxing: this.calculateDayWuxing(ganzhi.day),
 
-      // 时辰信息 - 与API格式统一
+      // 时辰信息
       jishi: this.calculateLuckyTime(today),
       xiongshi: this.calculateUnluckyTime(today),
 
       // 每日信息
       pengzu: this.getDailyWords(today),
       dailyWords: this.getDailyWords(today),
-      tips: this.getDailyTips(today)
+      tips: this.getDailyTips(today),
+      
+      // 十二建星和二十八宿
+      buildingStar: todayBuildingStar,
+      constellation: todayConstellation
     };
 
-    // 返回黄历数据对象
+    console.log('农历数据结构:', lunarCalendarData);
+    console.log('农历日期对象:', lunarCalendarData.lunarDate);
+
     return lunarCalendarData;
   },
 
@@ -3016,8 +3071,20 @@ MBTI类型：${userInfo.mbti || '未知'}
       '子时', '丑时', '寅时', '卯时', '辰时', '巳时',
       '午时', '未时', '申时', '酉时', '戌时', '亥时'
     ];
-    const luckyCount = 2 + (date.getDate() % 3);
-    return this.getRandomActivities(times, luckyCount, luckyCount);
+    
+    // 基于日期的固定算法
+    const dateKey = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+    const luckyCount = 3 + (dateKey % 2); // 3-4个吉时
+    const result = [];
+    
+    for (let i = 0; i < luckyCount; i++) {
+      const index = (dateKey + i * 5) % times.length;
+      if (!result.includes(times[index])) {
+        result.push(times[index]);
+      }
+    }
+    
+    return result;
   },
 
   // 计算凶时
@@ -3026,20 +3093,50 @@ MBTI类型：${userInfo.mbti || '未知'}
       '子时', '丑时', '寅时', '卯时', '辰时', '巳时',
       '午时', '未时', '申时', '酉时', '戌时', '亥时'
     ];
-    const unluckyCount = 2 + (date.getDate() % 2);
-    return this.getRandomActivities(times, unluckyCount, unluckyCount);
+    
+    // 基于日期的固定算法，与吉时错开
+    const dateKey = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+    const unluckyCount = 2 + (dateKey % 2); // 2-3个凶时
+    const result = [];
+    
+    for (let i = 0; i < unluckyCount; i++) {
+      const index = (dateKey + 1000 + i * 7) % times.length;
+      if (!result.includes(times[index])) {
+        result.push(times[index]);
+      }
+    }
+    
+    return result;
   },
 
   // 获取每日一言
   getDailyWords(date) {
     const words = [
+      '彭祖百忌：甲不开仓财物耗散 子不问卜自惹祸殃',
+      '彭祖百忌：乙不栽植千株不长 丑不冠带主不还乡',
+      '彭祖百忌：丙不修灶必见灾殃 寅不祭祀神鬼不尝',
+      '彭祖百忌：丁不剃头头必生疮 卯不穿井水泉不香',
+      '彭祖百忌：戊不受田田主不祥 辰不哭泣必主重丧',
+      '彭祖百忌：己不破券二比并亡 巳不远行财物伏藏',
+      '彭祖百忌：庚不经络织机虚张 午不苫盖屋主更张',
+      '彭祖百忌：辛不合酱主人不尝 未不服药毒气入肠',
       '彭祖百忌：壬不汲水更难提防 申不安床鬼祟入房',
+      '彭祖百忌：癸不词讼理弱敌强 酉不会客醉坐颠狂',
       '今日宜祭祀祈福，忌动土开工，平安是福',
       '吉神在方，宜求财纳福，凶神远避，忌争讼官司',
       '天时地利人和，诸事皆宜，把握良机',
-      '宜静不宜动，修身养性为上，急躁易生祸端'
+      '宜静不宜动，修身养性为上，急躁易生祸端',
+      '财运亨通日，投资需谨慎，稳中求进为上策',
+      '人和为贵，宜会友聚会，忌口舌是非',
+      '学而时习之，不亦说乎，今日宜读书学习',
+      '身体健康最重要，劳逸结合，适度运动',
+      '家和万事兴，宜处理家庭事务，增进感情',
+      '事业有成靠努力，今日宜专心工作，忌懈怠'
     ];
-    return words[date.getDate() % words.length];
+    
+    // 基于日期的固定选择
+    const dateKey = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+    return words[dateKey % words.length];
   },
 
   // 获取每日提示
@@ -3049,62 +3146,169 @@ MBTI类型：${userInfo.mbti || '未知'}
       '财运旺盛的一天，投资理财需谨慎，切忌盲目跟风',
       '健康方面需要关注，适当休息，避免过度劳累',
       '人际关系和谐，适合拜访朋友、洽谈合作',
-      '学习运势不错，适合充电提升，开拓视野'
+      '学习运势不错，适合充电提升，开拓视野',
+      '工作效率较高，适合处理积压的任务，但要注意细节',
+      '感情运势平稳，单身者有机会遇到心仪对象',
+      '家庭和睦，适合与家人共度美好时光',
+      '创意灵感丰富，适合从事创作或策划工作',
+      '出行运佳，适合短途旅行或外出办事',
+      '贵人运强，容易得到他人帮助和支持',
+      '偏财运不错，可能有意外收获，但不宜贪心',
+      '口才佳，适合演讲、谈判或重要会议',
+      '直觉敏锐，相信第一感觉，往往是对的',
+      '适合整理思绪，制定未来计划和目标',
+      '社交运活跃，参加聚会或活动会有收获',
+      '专注力强，适合深入研究或学习新技能',
+      '心情愉悦，保持积极乐观的态度很重要',
+      '适合处理法律或合同相关事务',
+      '宜早睡早起，保持良好的作息习惯'
     ];
-    return tips[date.getDate() % tips.length];
+    
+    // 基于日期的固定选择，与每日一言错开
+    const dateKey = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
+    return tips[(dateKey + 500) % tips.length];
   },
 
-  // 随机选择活动
-  getRandomActivities(activities, min, max) {
-    const count = Math.floor(Math.random() * (max - min + 1)) + min;
-    const shuffled = [...activities].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count);
-  },
-
-  // 简化的农历日期计算
+  // 农历计算 - 使用更准确的算法
   calculateLunarDate(date) {
+    // 农历月份名称
     const lunarMonths = [
       '正月', '二月', '三月', '四月', '五月', '六月',
       '七月', '八月', '九月', '十月', '冬月', '腊月'
     ];
     
+    // 农历日期名称
     const lunarDays = [
       '初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
       '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
       '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'
     ];
-    
-    // 简化计算（实际应该使用专业的农历转换算法）
-    const month = date.getMonth();
-    const day = date.getDate();
-    
-    const lunarMonth = lunarMonths[month % 12];
-    const lunarDay = lunarDays[(day - 1) % lunarDays.length];
-    
+
+    // 农历年份天干地支
+    const yearStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    const yearBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    const zodiacAnimals = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+
+    // 基准日期：2024年2月10日为甲辰年正月初一
+    const baseDate = new Date(2024, 1, 10); // 2024年2月10日
+    const baseLunarYear = 2024;
+    const baseLunarMonth = 1; // 正月
+    const baseLunarDay = 1; // 初一
+
+    // 计算与基准日期的天数差
+    const diffTime = date.getTime() - baseDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    // 农历月份天数表（2024-2025年）
+    const lunarMonthDays = {
+      2024: [29, 30, 29, 29, 30, 29, 30, 30, 29, 30, 29, 30], // 甲辰年
+      2025: [30, 29, 30, 29, 29, 30, 29, 30, 29, 30, 30, 29], // 乙巳年
+      2026: [30, 30, 29, 30, 29, 29, 30, 29, 29, 30, 30, 29], // 丙午年
+      2023: [30, 29, 29, 30, 29, 30, 29, 30, 30, 29, 30, 30]  // 癸卯年
+    };
+
+    let currentYear = baseLunarYear;
+    let currentMonth = baseLunarMonth;
+    let currentDay = baseLunarDay + diffDays;
+
+    // 处理日期计算
+    while (currentDay > (lunarMonthDays[currentYear] ? lunarMonthDays[currentYear][currentMonth - 1] : 29)) {
+      const monthDays = lunarMonthDays[currentYear] ? lunarMonthDays[currentYear][currentMonth - 1] : 29;
+      currentDay -= monthDays;
+      currentMonth++;
+      
+      if (currentMonth > 12) {
+        currentMonth = 1;
+        currentYear++;
+      }
+    }
+
+    while (currentDay <= 0) {
+      currentMonth--;
+      if (currentMonth <= 0) {
+        currentMonth = 12;
+        currentYear--;
+      }
+      const monthDays = lunarMonthDays[currentYear] ? lunarMonthDays[currentYear][currentMonth - 1] : 29;
+      currentDay += monthDays;
+    }
+
+    // 计算农历年份干支
+    const yearIndex = (currentYear - 4) % 60; // 甲子年为公元4年
+    const stemIndex = yearIndex % 10;
+    const branchIndex = yearIndex % 12;
+    const yearGanzhi = yearStems[stemIndex] + yearBranches[branchIndex];
+    const zodiacAnimal = zodiacAnimals[branchIndex];
+
+    // 格式化农历日期
+    const lunarMonth = lunarMonths[currentMonth - 1];
+    const lunarDay = lunarDays[Math.min(currentDay - 1, lunarDays.length - 1)];
+
     return {
-      year: `乙巳年`,
+      year: `${yearGanzhi}年`,
       month: lunarMonth,
       day: lunarDay,
-      fullDate: `乙巳年${lunarMonth}${lunarDay}`,
-      displayDate: `${lunarMonth}${lunarDay}`
+      zodiac: zodiacAnimal,
+      fullDate: `${yearGanzhi}年${lunarMonth}${lunarDay}`,
+      displayDate: `${lunarMonth}${lunarDay}`,
+      yearNumber: currentYear,
+      monthNumber: currentMonth,
+      dayNumber: currentDay
     };
   },
 
-  // 计算干支
+  // 计算干支 - 使用更准确的算法
   calculateGanzhi(date) {
     const heavenlyStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
     const earthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
     
     const year = date.getFullYear();
-    const month = date.getMonth() + 1;
+    const month = date.getMonth(); // 不加1，保持0-11
     const day = date.getDate();
     const hour = date.getHours();
     
-    // 简化的干支计算
-    const yearGanzhi = heavenlyStems[year % 10] + earthlyBranches[year % 12];
-    const monthGanzhi = heavenlyStems[month % 10] + earthlyBranches[month % 12];
-    const dayGanzhi = heavenlyStems[day % 10] + earthlyBranches[day % 12];
-    const timeGanzhi = heavenlyStems[(hour / 2) % 10] + earthlyBranches[(hour / 2) % 12];
+    // 年干支计算（以立春为界）
+    let lunarYear = year;
+    // 更准确的立春判断：大致在2月3-5日之间
+    const isBeforeLichun = (month === 0) || (month === 1 && day < 4); // 1月或2月4日前
+    if (isBeforeLichun) {
+      lunarYear = year - 1;
+    }
+    
+    const yearStemIndex = (lunarYear - 4) % 10; // 甲子年为公元4年
+    const yearBranchIndex = (lunarYear - 4) % 12;
+    const yearGanzhi = heavenlyStems[yearStemIndex] + earthlyBranches[yearBranchIndex];
+    
+    // 月干支计算（以节气为界）
+    // 农历月份从寅月开始：寅(正月)、卯(二月)、辰(三月)...
+    // 地支索引：寅=2, 卯=3, 辰=4...
+    let lunarMonthIndex = month + 2; // 公历1月(0)对应寅月(2)
+    if (isBeforeLichun) {
+      lunarMonthIndex = month + 1; // 立春前调整
+    }
+    lunarMonthIndex = lunarMonthIndex % 12;
+    
+    // 月干计算公式：根据年干推算月干
+    // 甲己之年丙作首，乙庚之年戊为头，丙辛之年庚作首，丁壬壬位流，戊癸甲为始
+    const monthStemStart = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0]; // 对应甲乙丙丁戊己庚辛壬癸年的正月天干
+    const monthStemIndex = (monthStemStart[yearStemIndex] + (lunarMonthIndex - 2)) % 10;
+    const monthGanzhi = heavenlyStems[monthStemIndex] + earthlyBranches[lunarMonthIndex];
+    
+    // 日干支计算（使用公历日期推算）
+    // 基准：2024年1月1日为癸亥日
+    const baseDate = new Date(2024, 0, 1);
+    const diffDays = Math.floor((date.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
+    const baseDayStem = 9; // 癸
+    const baseDayBranch = 11; // 亥
+    
+    const dayStemIndex = (baseDayStem + diffDays) % 10;
+    const dayBranchIndex = (baseDayBranch + diffDays) % 12;
+    const dayGanzhi = heavenlyStems[dayStemIndex] + earthlyBranches[dayBranchIndex];
+    
+    // 时干支计算
+    const timeIndex = Math.floor((hour + 1) / 2) % 12;
+    const timeStemIndex = (dayStemIndex * 2 + timeIndex) % 10;
+    const timeGanzhi = heavenlyStems[timeStemIndex] + earthlyBranches[timeIndex];
     
     return {
       year: yearGanzhi,
@@ -3291,9 +3495,26 @@ MBTI类型：${userInfo.mbti || '未知'}
         lunarRefreshing: true
       });
 
-      // 重新计算黄历数据
-      const newLunarCalendar = this.getLunarCalendarData();
+      // 检查今日是否已有固定的黄历数据缓存
+      const today = new Date();
+      const dateKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+      const cachedLunarData = wx.getStorageSync(`lunarData_${dateKey}`);
       
+      if (cachedLunarData && cachedLunarData.suitable && cachedLunarData.avoid) {
+        console.log('使用已缓存的黄历数据，确保一致性:', dateKey);
+        this.setData({
+          lunarCalendar: cachedLunarData
+        });
+        
+        wx.hideLoading();
+        wx.showToast({
+          title: '黄历数据已是最新',
+          icon: 'success',
+          duration: 2000
+        });
+        return;
+      }
+
       // 尝试从API获取最新数据
       try {
         const userSettings = wx.getStorageSync('userSettings') || {};
@@ -3308,21 +3529,33 @@ MBTI类型：${userInfo.mbti || '未知'}
         };
 
         const { lunarCalendar } = await getWeatherAndAdvice(location, userInfo);
-        const formattedLunarCalendar = this.formatLunarCalendarData(lunarCalendar || newLunarCalendar);
+        const formattedLunarCalendar = this.formatLunarCalendarData(lunarCalendar);
         
-        this.setData({
-          lunarCalendar: formattedLunarCalendar
-        });
+        if (formattedLunarCalendar && formattedLunarCalendar.suitable && formattedLunarCalendar.avoid) {
+          // 缓存今日的黄历数据，确保一致性
+          wx.setStorageSync(`lunarData_${dateKey}`, formattedLunarCalendar);
+          console.log('新的黄历数据已缓存:', dateKey);
+          
+          this.setData({
+            lunarCalendar: formattedLunarCalendar
+          });
 
-        // 更新缓存
-        const today = new Date().toDateString();
-        const cachedData = wx.getStorageSync('weatherData') || {};
-        cachedData.lunarCalendar = formattedLunarCalendar;
-        cachedData.date = today;
-        wx.setStorageSync('weatherData', cachedData);
+          // 更新通用缓存
+          const cachedData = wx.getStorageSync('weatherData') || {};
+          cachedData.lunarCalendar = formattedLunarCalendar;
+          cachedData.date = today.toDateString();
+          wx.setStorageSync('weatherData', cachedData);
+        } else {
+          throw new Error('获取的黄历数据不完整');
+        }
 
       } catch (apiError) {
         console.log('API获取失败，使用本地计算数据:', apiError);
+        const newLunarCalendar = this.getLunarCalendarData();
+        
+        // 缓存本地计算的数据
+        wx.setStorageSync(`lunarData_${dateKey}`, newLunarCalendar);
+        
         this.setData({
           lunarCalendar: newLunarCalendar
         });

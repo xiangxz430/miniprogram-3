@@ -717,9 +717,15 @@
   <view class="tab-content" hidden="{{activeTab != 3}}">
     <!-- 天气卡片 -->
     <view class="weather-card">
-      <view class="location-info">
-        <text class="city-name">{{weatherData.city}}</text>
-        <text class="current-time">{{currentTime}}</text>
+      <view class="weather-header">
+        <view class="location-info">
+          <text class="city-name">{{weatherData.city}}</text>
+          <text class="current-time">{{currentTime}}</text>
+        </view>
+        <view class="refresh-weather-btn {{weatherRefreshing ? 'loading' : ''}}" bindtap="refreshWeatherData">
+
+          <text class="refresh-text">{{weatherRefreshing ? '更新中' : '刷新天气'}}</text>
+        </view>
       </view>
       
       <view class="weather-info">
@@ -777,14 +783,33 @@
         <view class="header-center">
           <view class="date-main">
             <view class="solar-info">
-              <text class="solar-text">公历 {{lunarCalendar.solarYear}}年{{lunarCalendar.solarMonth}}月{{lunarCalendar.solarDay}}日 {{lunarCalendar.weekday}} {{lunarCalendar.zodiacSign}}座 (阳历)</text>
+              <text class="solar-text">公历 {{lunarCalendar.solarYear}}年{{lunarCalendar.solarMonth}}月{{lunarCalendar.solarDay}}日 {{lunarCalendar.weekday}} {{lunarCalendar.zodiacSign}} (阳历)</text>
             </view>
             <view class="date-display">
               <text class="month-year">【{{lunarCalendar.solarYear}}】</text>
               <text class="day-large">{{lunarCalendar.solarMonth}}月{{lunarCalendar.solarDay}}日</text>
             </view>
             <view class="weekday">{{lunarCalendar.weekday}}</view>
-            <view class="lunar-info">农历 {{lunarCalendar.lunarDate}} (阴历)</view>
+            <view class="lunar-info">农历 
+              <block wx:if="{{lunarCalendar.lunarDate && lunarCalendar.lunarDate.displayDate}}">
+                {{lunarCalendar.lunarDate.year || ''}}{{lunarCalendar.lunarDate.zodiac || ''}}年 {{lunarCalendar.lunarDate.displayDate}}
+              </block>
+              <block wx:elif="{{lunarCalendar.lunarDate && lunarCalendar.lunarDate.monthName && lunarCalendar.lunarDate.dayName}}">
+                {{lunarCalendar.lunarDate.monthName}}{{lunarCalendar.lunarDate.dayName}}
+              </block>
+              <block wx:elif="{{lunarCalendar.lunarDate && !lunarCalendar.lunarDate.displayDate && !lunarCalendar.lunarDate.monthName}}">
+                {{lunarCalendar.lunarDate}}
+              </block>
+              <block wx:else>
+                农历信息加载中
+              </block>
+              (阴历)
+              <!-- 农历数据校验状态提示 -->
+              <view class="lunar-validation-status" wx:if="{{lunarCalendar._corrected || lunarCalendar._isLocalGenerated}}">
+                <text class="validation-badge corrected" wx:if="{{lunarCalendar._corrected}}">已纠正</text>
+                <text class="validation-badge local" wx:if="{{lunarCalendar._isLocalGenerated}}">本地计算</text>
+              </view>
+            </view>
           </view>
         </view>
         
@@ -880,6 +905,27 @@
         <!-- 每日提示 -->
         <view class="daily-tips">
           <view class="tips-content">{{lunarCalendar.tips}}</view>
+        </view>
+        
+        <!-- 黄历刷新按钮 -->
+        <view class="lunar-refresh-section">
+          <view class="refresh-lunar-btn {{lunarRefreshing ? 'loading' : ''}}" bindtap="refreshLunarData">
+            <text class="refresh-text">{{lunarRefreshing ? '更新中' : '刷新黄历'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 黄历数据获取失败时的提示 -->
+    <view class="lunar-calendar-error" wx:if="{{!lunarCalendar}}">
+      <view class="error-content">
+        <view class="error-icon">📅</view>
+        <view class="error-title">黄历数据获取失败</view>
+        <view class="error-desc">网络异常，无法获取准确的农历信息</view>
+        <view class="error-retry">
+          <view class="refresh-lunar-btn" bindtap="refreshLunarData">
+            <text class="refresh-text">{{lunarRefreshing ? '重新获取中...' : '重新获取'}}</text>
+          </view>
         </view>
       </view>
     </view>

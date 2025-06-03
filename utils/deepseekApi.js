@@ -1,5 +1,6 @@
 // utils/deepseekApi.js
 const API_CONFIG = require('./config');
+const lunar = require('./lunar'); // 导入本地农历计算库
 
 // DeepSeek API配置
 const DEEPSEEK_API_KEY = API_CONFIG.DEEPSEEK.API_KEY;
@@ -423,6 +424,215 @@ function callDeepseek(messages, model = 'deepseek-chat') {
   });
 }
 
+/**
+ * 验证并纠正AI返回的农历数据
+ * @param {Object} aiLunarData - AI返回的农历数据
+ * @param {Date} currentDate - 当前公历日期
+ * @returns {Object} - 验证和纠正后的农历数据
+ */
+function validateAndCorrectLunarData(aiLunarData, currentDate) {
+  console.log('========== 农历数据校验开始 ==========');
+  console.log('当前公历日期:', `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月${currentDate.getDate()}日`);
+  
+  if (!aiLunarData || !aiLunarData.lunarDate) {
+    console.warn('AI未返回农历数据，使用本地计算作为后备');
+    return generateLocalLunarData(currentDate);
+  }
+  
+  try {
+    // 使用本地农历库计算正确的农历日期
+    const correctLunar = lunar.solarToLunar(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      currentDate.getDate()
+    );
+    
+    console.log('AI返回的农历数据:', {
+      年份: aiLunarData.lunarDate?.year,
+      月份: aiLunarData.lunarDate?.month,
+      日期: aiLunarData.lunarDate?.day,
+      生肖: aiLunarData.lunarDate?.zodiac
+    });
+    
+    console.log('本地计算的正确农历数据:', {
+      年份: correctLunar.lunarYearText,
+      月份: correctLunar.lunarMonthText,
+      日期: correctLunar.lunarDayText,
+      生肖: correctLunar.lunarYearText ? correctLunar.lunarYearText.replace('年', '').slice(-1) : '未知',
+      完整信息: correctLunar
+    });
+    
+    // 校验标志
+    let needsCorrection = false;
+    const corrections = [];
+    
+    // 验证农历年份（只比较干支部分，如"甲辰"）
+    if (aiLunarData.lunarDate?.year && correctLunar.lunarYearText) {
+      const aiYearStem = extractYearStem(aiLunarData.lunarDate.year);
+      const correctYearStem = extractYearStem(correctLunar.lunarYearText);
+      
+      if (aiYearStem && correctYearStem && aiYearStem !== correctYearStem) {
+        needsCorrection = true;
+        corrections.push(`农历年份: AI返回"${aiLunarData.lunarDate.year}" -> 纠正为"${correctLunar.lunarYearText}"`);
+      }
+    }
+    
+    // 验证农历月份
+    if (aiLunarData.lunarDate?.month && correctLunar.lunarMonthText) {
+      const aiMonth = normalizeMonthName(aiLunarData.lunarDate.month);
+      const correctMonth = normalizeMonthName(correctLunar.lunarMonthText);
+      
+      if (aiMonth !== correctMonth) {
+        needsCorrection = true;
+        corrections.push(`农历月份: AI返回"${aiLunarData.lunarDate.month}" -> 纠正为"${correctLunar.lunarMonthText}"`);
+      }
+    }
+    
+    // 验证农历日期
+    if (aiLunarData.lunarDate?.day && correctLunar.lunarDayText) {
+      const aiDay = aiLunarData.lunarDate.day;
+      const correctDay = correctLunar.lunarDayText;
+      
+      if (aiDay !== correctDay) {
+        needsCorrection = true;
+        corrections.push(`农历日期: AI返回"${aiDay}" -> 纠正为"${correctDay}"`);
+      }
+    }
+    
+    // 如果需要纠正，使用本地计算的正确数据
+    if (needsCorrection) {
+      console.warn('🚨 AI返回的农历数据有误，使用本地计算纠正:');
+      corrections.forEach(correction => console.warn('  ✓', correction));
+      
+      // 构建纠正后的农历数据
+      const correctedLunarData = {
+        ...aiLunarData,
+        lunarDate: {
+          year: correctLunar.lunarYearText || aiLunarData.lunarDate?.year,
+          month: correctLunar.lunarMonthText || aiLunarData.lunarDate?.month,
+          day: correctLunar.lunarDayText || aiLunarData.lunarDate?.day,
+          monthName: correctLunar.lunarMonthText || aiLunarData.lunarDate?.monthName,
+          dayName: correctLunar.lunarDayText || aiLunarData.lunarDate?.dayName,
+          zodiac: getZodiacAnimal(currentDate.getFullYear())
+        },
+        // 保留AI的其他数据（干支、宜忌等）
+        _corrected: true,
+        _corrections: corrections,
+        _originalAiData: aiLunarData.lunarDate
+      };
+      
+      console.log('✅ 农历数据纠正完成:', {
+        纠正后年份: correctedLunarData.lunarDate.year,
+        纠正后月份: correctedLunarData.lunarDate.month,
+        纠正后日期: correctedLunarData.lunarDate.day
+      });
+      
+      return correctedLunarData;
+    }
+    
+    console.log('✅ AI返回的农历数据验证通过，无需纠正');
+    return aiLunarData;
+    
+  } catch (error) {
+    console.error('农历数据校验过程中出错:', error);
+    console.warn('使用本地计算作为后备方案');
+    return generateLocalLunarData(currentDate);
+  }
+}
+
+/**
+ * 提取年份干支（如从"甲辰年"提取"甲辰"）
+ */
+function extractYearStem(yearText) {
+  if (!yearText) return null;
+  return yearText.replace('年', '').trim();
+}
+
+/**
+ * 标准化月份名称（处理"五月"和"五"的差异）
+ */
+function normalizeMonthName(monthText) {
+  if (!monthText) return null;
+  // 移除"月"字，统一比较
+  return monthText.replace('月', '').trim();
+}
+
+/**
+ * 使用本地农历库生成农历数据（当AI数据不可用时）
+ */
+function generateLocalLunarData(currentDate) {
+  try {
+    const correctLunar = lunar.solarToLunar(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      currentDate.getDate()
+    );
+    
+    return {
+      solarDate: {
+        year: currentDate.getFullYear(),
+        month: currentDate.getMonth() + 1,
+        day: currentDate.getDate(),
+        weekday: ['日', '一', '二', '三', '四', '五', '六'][currentDate.getDay()]
+      },
+      lunarDate: {
+        year: correctLunar.lunarYearText,
+        month: correctLunar.lunarMonthText,
+        day: correctLunar.lunarDayText,
+        monthName: correctLunar.lunarMonthText,
+        dayName: correctLunar.lunarDayText,
+        zodiac: getZodiacAnimal(currentDate.getFullYear())
+      },
+      ganzhi: {
+        year: extractYearStem(correctLunar.lunarYearText),
+        month: '月干支',
+        day: '日干支'
+      },
+      nayin: '五行纳音',
+      suitable: ['本地生成的宜事'],
+      avoid: ['本地生成的忌事'],
+      directions: {
+        caishen: '正北',
+        xishen: '西北',
+        fushen: '西南',
+        taishen: '厨灶床'
+      },
+      chongsha: {
+        chong: '冲煞',
+        sha: '煞方'
+      },
+      gods: {
+        lucky: ['吉神'],
+        unlucky: ['凶神']
+      },
+      times: {
+        lucky: ['吉时'],
+        unlucky: ['凶时']
+      },
+      pengzu: '彭祖百忌',
+      dailyWords: '每日一言',
+      tips: '温馨提示',
+      _isLocalGenerated: true
+    };
+  } catch (error) {
+    console.error('生成本地农历数据失败:', error);
+    return null;
+  }
+}
+
+/**
+ * 根据年份获取生肖
+ * @param {number} year - 公历年份
+ * @returns {string} - 生肖名称
+ */
+function getZodiacAnimal(year) {
+  const zodiacAnimals = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+  // 生肖以立春为界，这里简化处理，使用年份计算
+  const baseYear = 1900; // 1900年为鼠年
+  const index = (year - baseYear) % 12;
+  return zodiacAnimals[index];
+}
+
 // 获取天气预报和穿衣建议
 export const getWeatherAndAdvice = async (location, userInfo) => {
   // 构建用户信息文本
@@ -455,9 +665,14 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
     }
   });
 
-  const prompt = `基于以下信息生成今日（${dateStr} ${weekday}）的天气预报、穿衣建议和完整黄历信息:
-  地点: ${location.city}
+  const prompt = `请为以下位置和用户提供准确的天气预报和黄历信息:
+  地点：${location.city || '杭州'}
+  日期：${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日 ${weekday}
+ 
   用户信息：${userInfoText}
+  
+  **重要说明：为确保同一天的黄历信息保持一致，请基于以下固定日期种子生成宜忌内容：**
+  日期种子：${today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate()}
   
   请提供完整的今日信息包括:
   
@@ -466,11 +681,11 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
   3. 基于个人信息结合天气的穿衣建议
   4. 运势提示
   5. 完整的传统黄历信息，包括：
-     - 农历日期
+     - 农历日期 
      - 年月日干支
      - 五行纳音
-     - 今日宜事（6-8项具体活动）
-     - 今日忌事（6-8项具体活动）
+     - 今日宜事（基于传统黄历，6-8项具体活动，请根据日期种子确保一致性）
+     - 今日忌事（基于传统黄历，6-8项具体活动，请根据日期种子确保一致性）
      - 财神方位
      - 喜神方位
      - 福神方位
@@ -483,6 +698,8 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
      - 彭祖百忌
      - 今日一言（传统格言）
      - 温馨提示
+  
+  **注意：宜事和忌事必须基于传统黄历理论，并使用提供的日期种子确保同一天的结果完全一致。**
   
   请以JSON格式返回，包含以下字段：
   {
@@ -518,9 +735,7 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
       "lunarDate": {
         "year": "农历年份",
         "month": "农历月份", 
-        "day": "农历日期",
-        "monthName": "农历月份名称",
-        "dayName": "农历日期名称"
+        "day": "农历日期"
       },
       "ganzhi": {
         "year": "年干支",
@@ -545,15 +760,15 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
         "unlucky": ["凶神1", "凶神2", "凶神3", "凶神4"]
       },
       "times": {
-        "lucky": ["子时", "寅时", "申时"],
-        "unlucky": ["丑时", "卯时", "酉时"]
+        "lucky": ["吉时1", "吉时2", "吉时3"], 
+        "unlucky": ["凶时1", "凶时2", "凶时3"]
       },
       "pengzu": "彭祖百忌内容",
-      "dailyWords": "今日一言格言",
+      "dailyWords": "今日一言内容",
       "tips": "温馨提示内容"
     }
   }`;
-  
+  console.log('发送的 prompt是:'+prompt);
   const messages = [
     {
       role: 'system',
@@ -588,7 +803,13 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
         throw new Error('返回的数据结构不完整');
       }
 
-      // 确保返回默认值
+      // 验证农历数据的完整性
+      if (!result.lunarCalendar.lunarDate || !result.lunarCalendar.ganzhi) {
+        console.error('农历数据不完整:', result.lunarCalendar);
+        throw new Error('农历数据不完整，无法使用默认值');
+      }
+
+      // 仅对天气和穿衣建议提供默认值，农历数据必须从AI获取
       const formattedResult = {
         weather: {
           city: location.city,
@@ -607,50 +828,8 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
           tips: result.clothingAdvice.tips || '暂无提示',
           zodiacAdvice: result.clothingAdvice.zodiacAdvice || '暂无星座建议'
         },
-        lunarCalendar: {
-          solarDate: result.lunarCalendar.solarDate || {
-            year: today.getFullYear(),
-            month: today.getMonth() + 1,
-            day: today.getDate(),
-            weekday: weekday
-          },
-          lunarDate: result.lunarCalendar.lunarDate || {
-            year: '甲辰',
-            month: '腊月',
-            day: '十五',
-            monthName: '腊月',
-            dayName: '十五'
-          },
-          ganzhi: result.lunarCalendar.ganzhi || {
-            year: '甲辰',
-            month: '丁丑',
-            day: '庚申'
-          },
-          nayin: result.lunarCalendar.nayin || '白蜡金',
-          suitable: result.lunarCalendar.suitable || ['祭祀', '祈福', '出行', '纳财', '开市', '交易'],
-          avoid: result.lunarCalendar.avoid || ['动土', '破土', '安葬', '修造', '嫁娶', '入宅'],
-          directions: result.lunarCalendar.directions || {
-            caishen: '正北',
-            xishen: '西北',
-            fushen: '西南',
-            taishen: '厨灶床'
-          },
-          chongsha: result.lunarCalendar.chongsha || {
-            chong: '冲虎',
-            sha: '煞南'
-          },
-          gods: result.lunarCalendar.gods || {
-            lucky: ['天德', '月德', '时德', '民日'],
-            unlucky: ['月煞', '月虚', '血支', '天贼']
-          },
-          times: result.lunarCalendar.times || {
-            lucky: ['子时', '寅时', '申时'],
-            unlucky: ['丑时', '卯时', '酉时']
-          },
-          pengzu: result.lunarCalendar.pengzu || '庚不经络织机虚张，申不安床鬼祟入房',
-          dailyWords: result.lunarCalendar.dailyWords || '天道酬勤，厚德载物',
-          tips: result.lunarCalendar.tips || '今日宜静不宜动，保持内心平和'
-        }
+        // 农历数据完全来自AI，不提供任何默认值
+        lunarCalendar: validateAndCorrectLunarData(result.lunarCalendar, today)
       };
 
       console.log('成功格式化天气和黄历数据:', {
@@ -669,71 +848,28 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
     }
   } catch (error) {
     console.error('获取天气和黄历数据失败:', error);
-    // 返回默认数据而不是抛出错误
+    // 接口失败时不提供假的农历数据，而是明确说明获取失败
     const defaultResult = {
       weather: {
         city: location.city,
         currentTemp: '--',
         maxTemp: '--',
         minTemp: '--',
-        condition: '未知',
+        condition: '获取失败',
         humidity: '--',
         windSpeed: '--',
         airQuality: '--',
         hourlyForecast: []
       },
       clothingAdvice: {
-        index: '舒适',
-        recommendation: '暂无建议',
-        tips: '获取数据失败，请稍后再试',
-        zodiacAdvice: '暂无星座建议'
+        index: '无法获取',
+        recommendation: '网络异常，无法获取穿衣建议',
+        tips: '请检查网络连接后重试',
+        zodiacAdvice: '获取失败'
       },
-      lunarCalendar: {
-        solarDate: {
-          year: today.getFullYear(),
-          month: today.getMonth() + 1,
-          day: today.getDate(),
-          weekday: weekday
-        },
-        lunarDate: {
-          year: '甲辰',
-          month: '腊月',
-          day: '十五',
-          monthName: '腊月',
-          dayName: '十五'
-        },
-        ganzhi: {
-          year: '甲辰',
-          month: '丁丑',
-          day: '庚申'
-        },
-        nayin: '白蜡金',
-        suitable: ['祭祀', '祈福', '出行', '纳财', '开市', '交易'],
-        avoid: ['动土', '破土', '安葬', '修造', '嫁娶', '入宅'],
-        directions: {
-          caishen: '正北',
-          xishen: '西北',
-          fushen: '西南',
-          taishen: '厨灶床'
-        },
-        chongsha: {
-          chong: '冲虎',
-          sha: '煞南'
-        },
-        gods: {
-          lucky: ['天德', '月德', '时德', '民日'],
-          unlucky: ['月煞', '月虚', '血支', '天贼']
-        },
-        times: {
-          lucky: ['子时', '寅时', '申时'],
-          unlucky: ['丑时', '卯时', '酉时']
-        },
-        pengzu: '庚不经络织机虚张，申不安床鬼祟入房',
-        dailyWords: '天道酬勤，厚德载物',
-        tips: '今日宜静不宜动，保持内心平和'
-      }
+      lunarCalendar: null // 不提供错误的默认农历数据
     };
-    console.log('返回默认天气和黄历数据:', defaultResult);
+    console.log('AI接口失败，返回有限的默认数据（不包含农历）:', defaultResult);
     return defaultResult;
   }
 };
@@ -991,6 +1127,5 @@ module.exports = {
   getMbtiAiAdvice,
   callDeepseek,
   getWeatherAndAdvice,
-  getCharacterAnalysis,
   getBaziAnalysis
 }; 
