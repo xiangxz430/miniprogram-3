@@ -30,22 +30,10 @@ Component({
       // 静态TabBar配置
       const staticConfig = [
         {
-          "pagePath": "pages/index/index",
+          "pagePath": "pages/home/index",
           "text": "首页",
           "iconClass": "icon-home",
           "selectedIconClass": "icon-home-active"
-        },
-        {
-          "pagePath": "pages/daily_divination/index",
-          "text": "每日一挂",
-          "iconClass": "icon-hexagram",
-          "selectedIconClass": "icon-hexagram-active"
-        },
-        {
-          "pagePath": "pages/bazi_forecast/index",
-          "text": "八字总运",
-          "iconClass": "icon-bazi",
-          "selectedIconClass": "icon-bazi-active"
         },
         {
           "pagePath": "pages/mbti_personality/index",
@@ -54,7 +42,13 @@ Component({
           "selectedIconClass": "icon-mbti-active"
         },
         {
-          "pagePath": "pages/user/index",
+          "pagePath": "pages/mental_test/index",
+          "text": "心理测试",
+          "iconClass": "icon-mental",
+          "selectedIconClass": "icon-mental-active"
+        },
+        {
+          "pagePath": "pages/user_profile/index",
           "text": "我的",
           "iconClass": "icon-user",
           "selectedIconClass": "icon-user-active"
@@ -63,6 +57,8 @@ Component({
       
       // 首先尝试获取本地缓存的配置
       const cachedConfig = wx.getStorageSync('tabConfig');
+      // 暂时注释掉缓存逻辑，强制使用静态配置
+      /*
       if (cachedConfig && cachedConfig.length > 0) {
         console.log('自定义TabBar从本地缓存加载配置');
         // 使用缓存配置
@@ -72,6 +68,7 @@ Component({
           loaded: true
         });
       } else {
+      */
         // 使用静态配置
         console.log('使用静态TabBar配置');
         app.globalData.tabConfig = staticConfig;
@@ -82,7 +79,7 @@ Component({
           tabConfig: staticConfig,
           loaded: true
         });
-      }
+      // }
       
       // 更新当前选中的Tab
       setTimeout(() => {
@@ -124,17 +121,23 @@ Component({
       if (!current) return;
       
       const route = current.route;
+      console.log('TabBar匹配 - 当前页面路径:', route);
       
       // 查找当前页面在tabConfig中的索引
       const tabConfig = this.data.tabConfig;
+      console.log('TabBar匹配 - 配置:', tabConfig.map(item => item.pagePath));
+      
       for (let i = 0; i < tabConfig.length; i++) {
         const path = tabConfig[i].pagePath;
+        console.log(`TabBar匹配 - 检查索引${i}: ${path} vs ${route}`);
         // 考虑到pagePath可能带不带前导"/"
         if (path === route || path === `/${route}` || `/${path}` === route) {
+          console.log(`TabBar匹配 - 匹配成功，设置索引为: ${i}`);
           this.setData({ selected: i });
           break;
         }
       }
+      console.log('TabBar匹配 - 最终选中索引:', this.data.selected);
     },
     // 切换TabBar
     switchTab(e) {

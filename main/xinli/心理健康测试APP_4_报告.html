@@ -1,0 +1,342 @@
+<section id="process" class="py-20 bg-gray-50" data-section="test-execution">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">测试执行页设计</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">精心设计的测试执行界面，确保用户在答题过程中感到舒适、安心，同时保持专注和参与度。</p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8 mb-16">
+            <div class="lg:w-1/2">
+                <div class="glassmorphism p-8 h-full">
+                    <h3 class="text-2xl font-semibold mb-6 gradient-text">题目展示界面</h3>
+                    <p class="mb-6 text-gray-700">我们的题目展示界面采用简洁明了的设计，确保用户能够专注于问题内容，而不被无关元素干扰。</p>
+                    
+                    <div class="bg-white rounded-xl shadow-md p-6 mb-6 border-l-4" style="border-color: var(--primary-color);">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">情绪健康测试</span>
+                            <span class="text-sm text-gray-500">问题 7/21</span>
+                        </div>
+                        <h4 class="text-xl font-medium mb-6">在过去的两周内，您是否经常感到做事情毫无兴趣或乐趣？</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-all">
+                                <input id="option1" type="radio" name="question7" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+                                <label for="option1" class="ml-2 w-full text-gray-700 cursor-pointer">完全没有</label>
+                            </div>
+                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-all">
+                                <input id="option2" type="radio" name="question7" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+                                <label for="option2" class="ml-2 w-full text-gray-700 cursor-pointer">有几天</label>
+                            </div>
+                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-all">
+                                <input id="option3" type="radio" name="question7" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+                                <label for="option3" class="ml-2 w-full text-gray-700 cursor-pointer">一半以上的天数</label>
+                            </div>
+                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-all">
+                                <input id="option4" type="radio" name="question7" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+                                <label for="option4" class="ml-2 w-full text-gray-700 cursor-pointer">几乎每天</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-6">
+                        <button class="px-6 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all">
+                            <i class="fas fa-arrow-left mr-2"></i>上一题
+                        </button>
+                        <button class="px-6 py-2 bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-full hover:shadow-lg transition-all">
+                            下一题<i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:w-1/2">
+                <div class="glassmorphism p-8 h-full">
+                    <h3 class="text-2xl font-semibold mb-6 gradient-text">进度指示器设计</h3>
+                    <p class="mb-6 text-gray-700">清晰的进度指示让用户了解自己在测试中的位置，增强完成测试的动力。</p>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-lg font-medium mb-3">线性进度条</h4>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                            <div class="progress-bar h-2.5 rounded-full" style="width: 33%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>开始</span>
+                            <span>7/21题</span>
+                            <span>完成</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-lg font-medium mb-3">步骤指示器</h4>
+                        <div class="flex items-center justify-between w-full">
+                            <div class="flex flex-col items-center">
+                                <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center">1</div>
+                                <span class="text-xs mt-1">基本信息</span>
+                            </div>
+                            <div class="flex-1 h-1 mx-2 bg-blue-500"></div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center">2</div>
+                                <span class="text-xs mt-1">情绪评估</span>
+                            </div>
+                            <div class="flex-1 h-1 mx-2 bg-gray-300"></div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center">3</div>
+                                <span class="text-xs mt-1">行为模式</span>
+                            </div>
+                            <div class="flex-1 h-1 mx-2 bg-gray-300"></div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center">4</div>
+                                <span class="text-xs mt-1">结果分析</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-lg font-medium mb-3">圆形进度指示器</h4>
+                        <div class="flex justify-center">
+                            <div class="relative w-32 h-32">
+                                <svg class="w-full h-full" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e6e6e6" stroke-width="8"></circle>
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gradient)" stroke-width="8" stroke-dasharray="282.7" stroke-dashoffset="189.4" transform="rotate(-90 50 50)"></circle>
+                                    <defs>
+                                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#5b8ef2" />
+                                            <stop offset="100%" stop-color="#64d6c8" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center flex-col">
+                                    <span class="text-2xl font-bold">33%</span>
+                                    <span class="text-xs text-gray-500">已完成</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800">测试进度已自动保存</h3>
+                                <div class="text-sm text-blue-700 mt-1">
+                                    您可以随时暂停测试，系统会自动保存您的进度，下次可以从当前位置继续。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glassmorphism p-8">
+            <h3 class="text-2xl font-semibold mb-6 gradient-text">答题选项交互设计</h3>
+            <p class="mb-8 text-gray-700">我们设计了多种答题选项样式，适应不同类型的心理测试问题，提供直观、友好的用户体验。</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <h4 class="text-lg font-medium mb-4">李克特量表（Likert Scale）</h4>
+                    <p class="text-gray-600 mb-4">我经常感到焦虑或紧张。</p>
+                    <div class="flex flex-wrap justify-between gap-2">
+                        <div class="option-card">
+                            <input type="radio" id="likert1" name="likert" class="hidden peer">
+                            <label for="likert1" class="flex flex-col items-center justify-center p-3 w-16 h-16 text-center bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                                <i class="fas fa-times-circle text-red-500 text-xl"></i>
+                                <span class="text-xs mt-1">强烈不同意</span>
+                            </label>
+                        </div>
+                        <div class="option-card">
+                            <input type="radio" id="likert2" name="likert" class="hidden peer">
+                            <label for="likert2" class="flex flex-col items-center justify-center p-3 w-16 h-16 text-center bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                                <i class="fas fa-minus-circle text-orange-400 text-xl"></i>
+                                <span class="text-xs mt-1">不同意</span>
+                            </label>
+                        </div>
+                        <div class="option-card">
+                            <input type="radio" id="likert3" name="likert" class="hidden peer">
+                            <label for="likert3" class="flex flex-col items-center justify-center p-3 w-16 h-16 text-center bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                                <i class="fas fa-dot-circle text-gray-400 text-xl"></i>
+                                <span class="text-xs mt-1">中立</span>
+                            </label>
+                        </div>
+                        <div class="option-card">
+                            <input type="radio" id="likert4" name="likert" class="hidden peer">
+                            <label for="likert4" class="flex flex-col items-center justify-center p-3 w-16 h-16 text-center bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                                <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                                <span class="text-xs mt-1">同意</span>
+                            </label>
+                        </div>
+                        <div class="option-card">
+                            <input type="radio" id="likert5" name="likert" class="hidden peer">
+                            <label for="likert5" class="flex flex-col items-center justify-center p-3 w-16 h-16 text-center bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                                <i class="fas fa-check-double text-green-600 text-xl"></i>
+                                <span class="text-xs mt-1">强烈同意</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <h4 class="text-lg font-medium mb-4">情绪滑块（Emotion Slider）</h4>
+                    <p class="text-gray-600 mb-4">目前您的心情如何？</p>
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-1 text-sm">
+                            <span>非常糟糕</span>
+                            <span>非常好</span>
+                        </div>
+                        <div class="relative">
+                            <input type="range" min="1" max="10" value="7" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="absolute -bottom-8 left-0 right-0 flex justify-between px-1">
+                                <i class="fas fa-frown text-red-500"></i>
+                                <i class="fas fa-meh text-yellow-500"></i>
+                                <i class="fas fa-smile text-green-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <h4 class="text-lg font-medium mb-4">多选题（Multiple Choice）</h4>
+                    <p class="text-gray-600 mb-4">您最近经历了哪些情绪？（可多选）</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="flex items-center">
+                            <input id="emotion1" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="emotion1" class="ml-2 text-sm text-gray-700">焦虑</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="emotion2" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="emotion2" class="ml-2 text-sm text-gray-700">快乐</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="emotion3" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="emotion3" class="ml-2 text-sm text-gray-700">悲伤</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="emotion4" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="emotion4" class="ml-2 text-sm text-gray-700">愤怒</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="emotion5" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="emotion5" class="ml-2 text-sm text-gray-700">平静</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="emotion6" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="emotion6" class="ml-2 text-sm text-gray-700">恐惧</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <h4 class="text-lg font-medium mb-4">图像选择题</h4>
+                    <p class="text-gray-600 mb-4">选择一个最能代表您当前心情的图像：</p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="image-option">
+                            <input type="radio" id="image1" name="image-choice" class="hidden peer">
+                            <label for="image1" class="flex flex-col items-center justify-center p-2 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 hover:bg-gray-50">
+                                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-smile text-yellow-500 text-2xl"></i>
+                                </div>
+                                <span class="text-xs mt-1">开心</span>
+                            </label>
+                        </div>
+                        <div class="image-option">
+                            <input type="radio" id="image2" name="image-choice" class="hidden peer">
+                            <label for="image2" class="flex flex-col items-center justify-center p-2 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 hover:bg-gray-50">
+                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-sad-tear text-blue-500 text-2xl"></i>
+                                </div>
+                                <span class="text-xs mt-1">悲伤</span>
+                            </label>
+                        </div>
+                        <div class="image-option">
+                            <input type="radio" id="image3" name="image-choice" class="hidden peer">
+                            <label for="image3" class="flex flex-col items-center justify-center p-2 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 hover:bg-gray-50">
+                                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-angry text-red-500 text-2xl"></i>
+                                </div>
+                                <span class="text-xs mt-1">愤怒</span>
+                            </label>
+                        </div>
+                        <div class="image-option">
+                            <input type="radio" id="image4" name="image-choice" class="hidden peer">
+                            <label for="image4" class="flex flex-col items-center justify-center p-2 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 hover:bg-gray-50">
+                                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-tired text-purple-500 text-2xl"></i>
+                                </div>
+                                <span class="text-xs mt-1">疲惫</span>
+                            </label>
+                        </div>
+                        <div class="image-option">
+                            <input type="radio" id="image5" name="image-choice" class="hidden peer">
+                            <label for="image5" class="flex flex-col items-center justify-center p-2 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 hover:bg-gray-50">
+                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-meh text-green-500 text-2xl"></i>
+                                </div>
+                                <span class="text-xs mt-1">平静</span>
+                            </label>
+                        </div>
+                        <div class="image-option">
+                            <input type="radio" id="image6" name="image-choice" class="hidden peer">
+                            <label for="image6" class="flex flex-col items-center justify-center p-2 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 hover:bg-gray-50">
+                                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-surprise text-orange-500 text-2xl"></i>
+                                </div>
+                                <span class="text-xs mt-1">惊讶</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 bg-blue-50 p-6 rounded-lg">
+                <h4 class="text-lg font-medium mb-3 flex items-center">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                    交互设计要点
+                </h4>
+                <ul class="space-y-2 text-gray-700">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>所有选项都提供即时视觉反馈，让用户知道自己的选择已被记录</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>选项设计符合直觉，使用图标和颜色增强可识别性</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>触摸区域足够大，确保在移动设备上易于操作</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>提供多种答题方式，适应不同类型的心理测试问题</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                        <span>界面设计温和友好，减轻用户在心理测试过程中的压力</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟滑块值变化时的效果
+        document.querySelector('input[type="range"]').addEventListener('input', function() {
+            const value = this.value;
+            let color;
+            
+            if (value <= 3) {
+                color = '#ef4444'; // red-500
+            } else if (value <= 7) {
+                color = '#f59e0b'; // yellow-500
+            } else {
+                color = '#10b981'; // green-500
+            }
+            
+            this.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${(value-1)*11.1}%, #e5e7eb ${(value-1)*11.1}%, #e5e7eb 100%)`;
+        });
+        
+        // 触发一次事件以设置初始颜色
+        document.querySelector('input[type="range"]').dispatchEvent(new Event('input'));
+    </script>
+</section>

@@ -1,10 +1,5 @@
 <!-- MBTI人格测试页面 -->
 <view class="container">
-  <!-- 页面头部 -->
-  <view class="header">
-    <text class="title">MBTI人格系统</text>
-    <text class="subtitle">探索你的人格特质与潜能</text>
-  </view>
   
   <!-- 标签页导航 -->
   <view class="tab-nav">
@@ -22,1112 +17,1045 @@
     </view>
   </view>
   
-  <!-- 测试内容标签页 -->
-  <view class="tab-content" hidden="{{activeTab != 0}}">
-    <!-- 测试模式选择界面 -->
-    <block wx:if="{{showTestModeSelection}}">
-      <view class="mode-selection">
-        <view class="mode-title">选择测试版本</view>
-        <view class="mode-description">请选择适合您的测试版本</view>
-        
-        <view class="mode-options">
-          <view class="mode-option" bindtap="selectTestMode" data-mode="standard">
-            <view class="mode-icon">📝</view>
-            <view class="mode-name">标准版</view>
-            <view class="mode-detail">141题完整测试，约需15-20分钟</view>
+  <!-- 标签页内容包装器 -->
+  <view class="tabs-container">
+    <!-- 测试内容标签页 -->
+    <view class="tab-content" hidden="{{activeTab != 0}}">
+      <!-- 欢迎界面 - 当没有测试结果且不显示测试模式选择时显示 -->
+      <block wx:if="{{!hasTestResult && !showTestModeSelection && !isTestActive}}">
+        <view class="welcome-section">
+          <view class="welcome-header">
+            <view class="welcome-title">MBTI人格测试</view>
+            <view class="welcome-subtitle">探索你的内在人格特质</view>
           </view>
           
-          <view class="mode-option" bindtap="selectTestMode" data-mode="short">
-            <view class="mode-icon">⚡️</view>
-            <view class="mode-name">简化版</view>
-            <view class="mode-detail">31题精简测试，约需5-8分钟</view>
+          <view class="welcome-description">
+            <text class="desc-text">MBTI是基于荣格心理学理论的人格类型指标，通过四个维度的偏好来识别你的人格类型：</text>
+            <view class="dimension-list">
+              <view class="dimension-item">
+                <text class="dimension-name">外向(E) vs 内向(I)</text>
+                <text class="dimension-desc">能量来源和注意力方向</text>
+              </view>
+              <view class="dimension-item">
+                <text class="dimension-name">实感(S) vs 直觉(N)</text>
+                <text class="dimension-desc">信息收集和处理方式</text>
+              </view>
+              <view class="dimension-item">
+                <text class="dimension-name">思考(T) vs 情感(F)</text>
+                <text class="dimension-desc">决策制定的依据</text>
+              </view>
+              <view class="dimension-item">
+                <text class="dimension-name">判断(J) vs 感知(P)</text>
+                <text class="dimension-desc">生活方式和工作风格</text>
+              </view>
+            </view>
+          </view>
+          
+          <view class="welcome-features">
+            <view class="feature-item">
+              <view class="feature-icon">📊</view>
+              <view class="feature-text">科学准确的测试结果</view>
+            </view>
+            <view class="feature-item">
+              <view class="feature-icon">🎯</view>
+              <view class="feature-text">个性化职业建议</view>
+            </view>
+            <view class="feature-item">
+              <view class="feature-icon">💡</view>
+              <view class="feature-text">深度人格分析</view>
+            </view>
+          </view>
+          
+          <view class="welcome-actions">
+            <button class="start-test-btn" bindtap="startTest">开始测试</button>
+            <view class="test-info">
+              <text class="info-text">测试约需5-20分钟，请在安静环境下完成</text>
+            </view>
           </view>
         </view>
-      </view>
-    </block>
-    
-    <!-- 测试未完成时显示题目 -->
-    <block wx:elif="{{!testCompleted}}">
-      <view class="progress-container">
-        <view class="progress-text">问题 {{currentQuestion + 1}}/{{questions.length}}</view>
-        <view class="progress-bar">
-          <view class="progress-value" style="width: {{(currentQuestion + 1) / questions.length * 100}}%;"></view>
-        </view>
-      </view>
+      </block>
       
-      <view class="question-card">
-        <view class="question-number">第{{currentQuestion + 1}}题</view>
-        <view class="question-text">{{questions[currentQuestion].text || questions[currentQuestion].question}}</view>
-        <view class="options-container">
-          <view class="option {{selectedOption === 'A' ? 'active' : ''}}" bindtap="selectOption" data-value="A">
-            <view class="radio {{selectedOption === 'A' ? 'checked' : ''}}"></view>
-            <text>{{questions[currentQuestion].options.A || questions[currentQuestion].optionA}}</text>
-          </view>
-          <view class="option {{selectedOption === 'B' ? 'active' : ''}}" bindtap="selectOption" data-value="B">
-            <view class="radio {{selectedOption === 'B' ? 'checked' : ''}}"></view>
-            <text>{{questions[currentQuestion].options.B || questions[currentQuestion].optionB}}</text>
+      <!-- 测试模式选择界面 -->
+      <block wx:elif="{{showTestModeSelection}}">
+        <view class="mode-selection">
+          <view class="mode-title">选择测试版本</view>
+          <view class="mode-description">请选择适合您的测试版本</view>
+          
+          <view class="mode-options">
+            <view class="mode-option" bindtap="selectTestMode" data-mode="standard">
+              <view class="mode-icon">📝</view>
+              <view class="mode-name">标准版</view>
+              <view class="mode-detail">141题完整测试，约需15-20分钟</view>
+            </view>
+            
+            <view class="mode-option" bindtap="selectTestMode" data-mode="short">
+              <view class="mode-icon">⚡️</view>
+              <view class="mode-name">简化版</view>
+              <view class="mode-detail">31题精简测试，约需5-8分钟</view>
+            </view>
           </view>
         </view>
-      </view>
+      </block>
       
-      <!-- 导航按钮 -->
-      <view class="navigation-buttons">
-        <view class="question-nav">
-          <button class="prev-btn" bindtap="prevQuestion" disabled="{{currentQuestion === 0}}">上一题</button>
-          <button class="next-btn" bindtap="nextQuestion" disabled="{{!selectedOption}}">{{currentQuestion === questions.length - 1 ? '完成测试' : '下一题'}}</button>
+      <!-- 测试未完成时显示题目 -->
+      <block wx:elif="{{!testCompleted}}">
+        <view class="progress-container">
+          <view class="progress-text">问题 {{currentQuestion + 1}}/{{questions.length}}</view>
+          <view class="progress-bar">
+            <view class="progress-value" style="width: {{(currentQuestion + 1) / questions.length * 100}}%;"></view>
+          </view>
         </view>
-        <button class="back-to-mode-btn" bindtap="backToTestMode">返回选择测试版本</button>
-      </view>
+        
+        <view class="question-card">
+          <view class="question-number">第{{currentQuestion + 1}}题</view>
+          <view class="question-text">{{questions[currentQuestion].text || questions[currentQuestion].question}}</view>
+          <view class="options-container">
+            <view class="option {{selectedOption === 'A' ? 'active' : ''}}" bindtap="selectOption" data-value="A">
+              <view class="radio {{selectedOption === 'A' ? 'checked' : ''}}"></view>
+              <text>{{questions[currentQuestion].options.A || questions[currentQuestion].optionA}}</text>
+            </view>
+            <view class="option {{selectedOption === 'B' ? 'active' : ''}}" bindtap="selectOption" data-value="B">
+              <view class="radio {{selectedOption === 'B' ? 'checked' : ''}}"></view>
+              <text>{{questions[currentQuestion].options.B || questions[currentQuestion].optionB}}</text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 导航按钮 -->
+        <view class="navigation-buttons">
+          <view class="question-nav">
+            <button class="prev-btn" bindtap="prevQuestion" disabled="{{currentQuestion === 0}}">上一题</button>
+            <button class="next-btn" bindtap="nextQuestion" disabled="{{!selectedOption}}">{{currentQuestion === questions.length - 1 ? '完成测试' : '下一题'}}</button>
+          </view>
+          <button class="back-to-mode-btn" bindtap="backToTestMode">返回选择测试版本</button>
+        </view>
+        
+        <view class="test-tips">
+          <text class="tip-text">请根据您的第一反应选择最符合的选项</text>
+          <text class="tip-text">答案没有对错之分，选择最适合您的选项即可</text>
+        </view>
+      </block>
       
-      <view class="test-tips">
-        <text class="tip-text">请根据您的第一反应选择最符合的选项</text>
-        <text class="tip-text">答案没有对错之分，选择最适合您的选项即可</text>
-      </view>
-    </block>
-    
-    <!-- 测试完成后显示结果 -->
-    <block wx:else>
-      <view class="result-section">
-        <view class="result-header">
-          <view class="result-title">你的MBTI类型</view>
-          <text class="result-time">{{result.timeStr || '刚刚'}}</text>
-        </view>
-        
-        <view class="personality-card">
-          <view class="flex justify-between items-center">
-            <view class="personality-type">{{result.type}}</view>
-            <view class="personality-percentage">占比 {{result.percentage}}</view>
-          </view>
-          <view class="personality-name">{{result.name}}</view>
-          <view class="personality-alias">{{result.alias || '思想家'}}</view>
-        </view>
-        
-        <view class="personality-description-box">
-          <view class="personality-description">{{result.description}}</view>
-        </view>
-        
-        <!-- 完整描述 -->
-        <view class="section-title">完整性格描述</view>
-        <view class="full-description-box">
-          <view class="full-description">{{result.fullDescription || result.description}}</view>
-        </view>
-        
-        <!-- 性格优势和劣势 -->
-        <view class="strengths-weaknesses">
-          <view class="sw-container">
-            <view class="section-title">性格优势</view>
-            <view class="sw-list">
-              <view class="sw-item" wx:for="{{result.strengths}}" wx:key="index">
-                <view class="sw-bullet">✓</view>
-                <view class="sw-text">{{item}}</view>
-              </view>
-            </view>
+      <!-- 测试完成后显示结果 -->
+      <block wx:else>
+        <view class="result-section">
+          <view class="result-header">
+            <view class="result-title">你的MBTI类型</view>
+            <text class="result-time">{{result.timeStr || '刚刚'}}</text>
           </view>
           
-          <view class="sw-container">
-            <view class="section-title">性格劣势</view>
-            <view class="sw-list">
-              <view class="sw-item" wx:for="{{result.weaknesses}}" wx:key="index">
-                <view class="sw-bullet">!</view>
-                <view class="sw-text">{{item}}</view>
-              </view>
+          <view class="personality-card">
+            <view class="flex justify-between items-center">
+              <view class="personality-type">{{result.type}}</view>
+              <view class="personality-percentage">占比 {{result.percentage}}</view>
             </view>
-          </view>
-        </view>
-        
-        <view class="section-title">性格偏好分析</view>
-        <view class="preference-container">
-          <block wx:if="{{result.scores}}">
-            <view class="preference-item">
-              <view class="preference-header">
-                <view class="preference-name">内向 (I)</view>
-                <view class="preference-vs">vs</view>
-                <view class="preference-name">外向 (E)</view>
-              </view>
-              <view class="preference-bar">
-                <view class="preference-value" style="width: {{result.scores.I || 0}}%;"></view>
-              </view>
-              <view class="preference-percentage">{{result.scores.I || 0}}%</view>
-            </view>
-            
-            <view class="preference-item">
-              <view class="preference-header">
-                <view class="preference-name">直觉 (N)</view>
-                <view class="preference-vs">vs</view>
-                <view class="preference-name">实感 (S)</view>
-              </view>
-              <view class="preference-bar">
-                <view class="preference-value" style="width: {{result.scores.N || 0}}%;"></view>
-              </view>
-              <view class="preference-percentage">{{result.scores.N || 0}}%</view>
-            </view>
-            
-            <view class="preference-item">
-              <view class="preference-header">
-                <view class="preference-name">情感 (F)</view>
-                <view class="preference-vs">vs</view>
-                <view class="preference-name">思考 (T)</view>
-              </view>
-              <view class="preference-bar">
-                <view class="preference-value" style="width: {{result.scores.F || 0}}%;"></view>
-              </view>
-              <view class="preference-percentage">{{result.scores.F || 0}}%</view>
-            </view>
-            
-            <view class="preference-item">
-              <view class="preference-header">
-                <view class="preference-name">判断 (J)</view>
-                <view class="preference-vs">vs</view>
-                <view class="preference-name">感知 (P)</view>
-              </view>
-              <view class="preference-bar">
-                <view class="preference-value" style="width: {{result.scores.P || 0}}%;"></view>
-              </view>
-              <view class="preference-percentage">{{result.scores.P || 0}}%</view>
-            </view>
-          </block>
-          <block wx:else>
-            <view class="no-data-message">暂无偏好分析数据</view>
-          </block>
-        </view>
-        
-        <view class="section-title">认知功能栈</view>
-        <view class="cognitive-functions">
-          <block wx:if="{{result.functions && result.functions.length >= 4}}">
-            <view class="function-item primary">
-              <view class="function-header">
-                <text class="function-name">{{result.functions[0].code}} - {{result.functions[0].name}}</text>
-                <text class="function-role">主导功能</text>
-              </view>
-              <text class="function-description">{{result.functions[0].description}}</text>
-            </view>
-            
-            <view class="function-item secondary">
-              <view class="function-header">
-                <text class="function-name">{{result.functions[1].code}} - {{result.functions[1].name}}</text>
-                <text class="function-role">辅助功能</text>
-              </view>
-              <text class="function-description">{{result.functions[1].description}}</text>
-            </view>
-            
-            <view class="function-item tertiary">
-              <view class="function-header">
-                <text class="function-name">{{result.functions[2].code}} - {{result.functions[2].name}}</text>
-                <text class="function-role">第三功能</text>
-              </view>
-              <text class="function-description">{{result.functions[2].description}}</text>
-            </view>
-            
-            <view class="function-item inferior">
-              <view class="function-header">
-                <text class="function-name">{{result.functions[3].code}} - {{result.functions[3].name}}</text>
-                <text class="function-role">劣势功能</text>
-              </view>
-              <text class="function-description">{{result.functions[3].description}}</text>
-            </view>
-          </block>
-          <block wx:else>
-            <view class="no-data-message">暂无认知功能数据</view>
-          </block>
-        </view>
-        
-        <!-- 职业建议 -->
-        <view class="section-title">适合的职业</view>
-        <view class="careers-container">
-          <view class="careers-list">
-            <view class="career-item" wx:for="{{result.careers}}" wx:key="index">
-              <view class="career-icon">💼</view>
-              <view class="career-name">{{item}}</view>
-            </view>
-          </view>
-        </view>
-        
-        <!-- 人际关系特点 -->
-        <view class="section-title">人际关系</view>
-        <view class="relationship-box">
-          <view class="relationship-section">
-            <view class="relationship-title">优势</view>
-            <view class="relationship-content">{{result.relationshipStrengths}}</view>
-          </view>
-          <view class="relationship-section">
-            <view class="relationship-title">挑战</view>
-            <view class="relationship-content">{{result.relationshipChallenges}}</view>
-          </view>
-        </view>
-        
-        <!-- 沟通与工作风格 -->
-        <view class="section-title">沟通与工作</view>
-        <view class="style-container">
-          <view class="style-item">
-            <view class="style-title">沟通风格</view>
-            <view class="style-content">{{result.communicationStyle}}</view>
-          </view>
-          <view class="style-item">
-            <view class="style-title">工作风格</view>
-            <view class="style-content">{{result.workStyle}}</view>
-          </view>
-        </view>
-        
-        <!-- 成长与发展 -->
-        <view class="section-title">成长与发展</view>
-        <view class="growth-container">
-          <view class="growth-item">
-            <view class="growth-title">压力下反应</view>
-            <view class="growth-content">{{result.stressReactions}}</view>
-          </view>
-          <view class="growth-item">
-            <view class="growth-title">成长方向</view>
-            <view class="growth-content">{{result.growthAreas}}</view>
-          </view>
-        </view>
-        
-        <!-- 著名人物 -->
-        <view class="section-title">相同类型的名人</view>
-        <view class="famous-people">
-          <view class="people-item" wx:for="{{result.famousPeople}}" wx:key="index">
-            <view class="people-icon">👤</view>
-            <view class="people-name">{{item}}</view>
-          </view>
-        </view>
-        
-        <button class="restart-btn" bindtap="restartTest">重新测试</button>
-      </view>
-    </block>
-  </view>
-  
-  <!-- 人格模型标签页 -->
-  <view class="tab-content" hidden="{{activeTab != 1}}">
-    <block wx:if="{{result && result.type}}">
-      <view class="model-section">
-        <view class="section-title">人格模型</view>
-        <!-- 人格模型
-        <view class="model-card">
-          <view class="model-header">
-            <view class="model-icon">☯</view>
-            <view class="model-title">
-              <text class="model-name">个人数据与MBTI转化</text>
-              <text class="model-subtitle">将个人数据对应MBTI功能轴</text>
-            </view>
+            <view class="personality-name">{{result.name}}</view>
+            <view class="personality-alias">{{result.alias || '思想家'}}</view>
           </view>
           
-          <view class="model-content">
-            <view class="connection-item">
-              <text class="connection-left">正官</text>
-              <view class="connection-line"></view>
-              <text class="connection-right">Te</text>
-            </view>
-            <view class="connection-item">
-              <text class="connection-left">伤官</text>
-              <view class="connection-line"></view>
-              <text class="connection-right">Ne</text>
-            </view>
-            <view class="connection-item">
-              <text class="connection-left">食神</text>
-              <view class="connection-line"></view>
-              <text class="connection-right">Fe</text>
-            </view>
-            <view class="connection-item">
-              <text class="connection-left">偏印</text>
-              <view class="connection-line"></view>
-              <text class="connection-right">Ni</text>
-            </view>
-          </view>
-        </view>
-         -->
-        <view class="personality-grid">
-          <view class="personality-grid-item">
-            <view class="grid-title">原生人格</view>
-            <view class="grid-type">{{modelData.nativeType}}</view>
-            <view class="grid-name">{{modelData.nativeName}}</view>
-            <view class="grid-description">{{modelData.nativeDescription}}</view>
+          <view class="personality-description-box">
+            <view class="personality-description">{{result.description}}</view>
           </view>
           
-          <view class="personality-grid-item">
-            <view class="grid-title">社会面具</view>
-            <view class="grid-type">{{modelData.socialType}}</view>
-            <view class="grid-name">{{modelData.socialName}}</view>
-            <view class="grid-description">{{modelData.socialDescription}}</view>
-          </view>
-        </view>
-        
-        <view class="radar-section">
-          <view class="section-title">人格能量雷达</view>
-          <view class="radar-chart">
-            <view class="radar-axis">
-              <view class="radar-axis-line"></view>
-              <view class="radar-axis-line"></view>
-              <view class="radar-axis-line"></view>
-              <view class="radar-axis-line"></view>
-            </view>
-            <view class="radar-value" style="--thinking: {{modelData.radarData.thinking}}; --creativity: {{modelData.radarData.creativity}}; --execution: {{modelData.radarData.execution}}; --perception: {{modelData.radarData.perception}};"></view>
-            <view class="radar-point radar-point-thinking"></view>
-            <view class="radar-point radar-point-creativity"></view>
-            <view class="radar-point radar-point-execution"></view>
-            <view class="radar-point radar-point-perception"></view>
-          </view>
-          <view class="radar-labels">
-            <text class="radar-label">思考力
-              <text class="radar-value-label">{{modelData.radarData.thinking}}%</text>
-            </text>
-            <text class="radar-label">创造力
-              <text class="radar-value-label">{{modelData.radarData.creativity}}%</text>
-            </text>
-            <text class="radar-label">执行力
-              <text class="radar-value-label">{{modelData.radarData.execution}}%</text>
-            </text>
-            <text class="radar-label">感知力
-              <text class="radar-value-label">{{modelData.radarData.perception}}%</text>
-            </text>
-          </view>
-        </view>
-        
-        <!-- 关系匹配部分 -->
-        <view class="relationship-match-section">
-          <view class="section-title">关系匹配</view>
-          
-          <view class="relationship-header">
-            <view class="icon icon-heart">💖</view>
-            <view class="relationship-title">适合的人格匹配</view>
+          <!-- 完整描述 -->
+          <view class="section-title">完整性格描述</view>
+          <view class="full-description-box">
+            <view class="full-description">{{result.fullDescription || result.description}}</view>
           </view>
           
-          <view class="relationship-description">基于MBTI特质和人格互补原则，以下人格类型与你最为匹配：</view>
-          
-          <view class="relationship-categories">
-            <view class="relationship-category">
-              <view class="category-header">
-                <view class="category-icon">🤝</view>
-                <view class="category-title">理想朋友</view>
-              </view>
-              
-              <view class="relationship-items">
-                <view class="relationship-item" wx:for="{{modelData.relationships.friends}}" wx:key="type">
-                  <view class="relationship-type">
-                    <text class="type-code">{{item.type}}</text>
-                    <text class="type-name">{{item.typeName || ''}}</text>
-                  </view>
-                  <view class="relationship-score">
-                    <view class="score-bar">
-                      <view class="score-value" style="width: {{item.score}}%;"></view>
-                    </view>
-                    <view class="score-text">{{item.score}}%</view>
-                  </view>
-                  <view class="relationship-reason">{{item.reason}}</view>
+          <!-- 性格优势和劣势 -->
+          <view class="strengths-weaknesses">
+            <view class="sw-container">
+              <view class="section-title">性格优势</view>
+              <view class="sw-list">
+                <view class="sw-item" wx:for="{{result.strengths}}" wx:key="index">
+                  <view class="sw-bullet">✓</view>
+                  <view class="sw-text">{{item}}</view>
                 </view>
               </view>
             </view>
             
-            <view class="relationship-category">
-              <view class="category-header">
-                <view class="category-icon">❤️</view>
-                <view class="category-title">理想伴侣</view>
-              </view>
-              
-              <view class="relationship-items">
-                <view class="relationship-item" wx:for="{{modelData.relationships.partners}}" wx:key="type">
-                  <view class="relationship-type">
-                    <text class="type-code">{{item.type}}</text>
-                    <text class="type-name">{{item.typeName || ''}}</text>
-                  </view>
-                  <view class="relationship-score">
-                    <view class="score-bar">
-                      <view class="score-value" style="width: {{item.score}}%;"></view>
-                    </view>
-                    <view class="score-text">{{item.score}}%</view>
-                  </view>
-                  <view class="relationship-reason">{{item.reason}}</view>
+            <view class="sw-container">
+              <view class="section-title">性格劣势</view>
+              <view class="sw-list">
+                <view class="sw-item" wx:for="{{result.weaknesses}}" wx:key="index">
+                  <view class="sw-bullet">!</view>
+                  <view class="sw-text">{{item}}</view>
                 </view>
               </view>
             </view>
           </view>
           
-          <view class="relationship-tip">
-            <view class="tip-icon">ℹ️</view>
-            <text class="tip-text">人格类型仅作为参考，真实关系中还受到个人成长、价值观和生活经历等多种因素影响。</text>
-          </view>
-        </view>
-      </view>
-      
-      <view class="career-section">
-        <view class="section-title">职业罗盘</view>
-        
-        <view class="career-traits">
-          <view class="career-traits-header">
-            <view class="icon icon-purple">🧠</view>
-            <view class="career-traits-title">职业特质分析</view>
-          </view>
-          
-          <view class="traits-grid">
-            <view class="trait-item">
-              <view class="trait-title">工作风格</view>
-              <view class="trait-content">{{modelData.careerTraits.workStyle}}</view>
-            </view>
-            
-            <view class="trait-item">
-              <view class="trait-title">团队角色</view>
-              <view class="trait-content">{{modelData.careerTraits.teamRole}}</view>
-            </view>
-          </view>
-          
-          <view class="trait-strength-weakness">
-            <view class="trait-sw-item advantage">
-              <view class="trait-sw-header">
-                <view class="trait-sw-icon">💪</view>
-                <view class="trait-sw-title">职场优势</view>
+          <view class="section-title">性格偏好分析</view>
+          <view class="preference-container">
+            <block wx:if="{{result.scores}}">
+              <view class="preference-item">
+                <view class="preference-header">
+                  <view class="preference-name">内向 (I)</view>
+                  <view class="preference-vs">vs</view>
+                  <view class="preference-name">外向 (E)</view>
+                </view>
+                <view class="preference-bar">
+                  <view class="preference-value" style="width: {{result.scores.I || 0}}%;"></view>
+                </view>
+                <view class="preference-percentage">{{result.scores.I || 0}}%</view>
               </view>
-              <view class="trait-sw-content">{{modelData.careerTraits.advantage}}</view>
-            </view>
-            
-            <view class="trait-sw-item challenge">
-              <view class="trait-sw-header">
-                <view class="trait-sw-icon">⚠️</view>
-                <view class="trait-sw-title">潜在挑战</view>
+              
+              <view class="preference-item">
+                <view class="preference-header">
+                  <view class="preference-name">直觉 (N)</view>
+                  <view class="preference-vs">vs</view>
+                  <view class="preference-name">实感 (S)</view>
+                </view>
+                <view class="preference-bar">
+                  <view class="preference-value" style="width: {{result.scores.N || 0}}%;"></view>
+                </view>
+                <view class="preference-percentage">{{result.scores.N || 0}}%</view>
               </view>
-              <view class="trait-sw-content">{{modelData.careerTraits.challenge}}</view>
-            </view>
-          </view>
-          
-          <view class="trait-development">
-            <view class="trait-dev-header">
-              <view class="trait-dev-icon">🌱</view>
-              <view class="trait-dev-title">成长建议</view>
-            </view>
-            <view class="trait-dev-content">{{modelData.careerTraits.development}}</view>
-          </view>
-        </view>
-        
-        <view class="industry-match">
-          <view class="industry-header">
-            <view class="icon icon-blue">💼</view>
-            <view class="industry-title">行业匹配</view>
-          </view>
-          
-          <view class="industry-description">根据你的五行喜用神和MBTI特质，以下行业最适合你：</view>
-          
-          <view class="industry-grid">
-            <view class="industry-item" wx:for="{{modelData.industries}}" wx:key="index">
-              <view class="icon {{item.icon}} icon-blue"></view>
-              <text class="industry-item-name">{{item.name}}</text>
-            </view>
-          </view>
-        </view>
-        
-        <view class="direction-match">
-          <view class="direction-header">
-            <view class="icon icon-blue">🧭</view>
-            <view class="direction-title">工作方位</view>
-          </view>
-          
-          <view class="direction-grid">
-            <view class="direction-item {{item.type}}" wx:for="{{modelData.directions}}" wx:key="index">
-              <text class="direction-item-name">{{item.name}} ({{item.type === 'good' ? '吉' : '忌'}})</text>
-            </view>
-          </view>
-          
-          <view class="direction-tip">
-            <view class="tip-icon">ℹ️</view>
-            <text class="tip-text">{{modelData.directionTip}}</text>
-          </view>
-        </view>
-      </view>
-    </block>
-    <block wx:else>
-      <view class="no-result-prompt">
-        <view class="prompt-icon">🧭</view>
-        <view class="prompt-title">请先完成MBTI测试</view>
-        <view class="prompt-description">完成测试后，将根据您的人格类型为您提供量身定制的人格模型和职业建议</view>
-        <button class="switch-to-test-btn" bindtap="switchToTestTab">去测试</button>
-      </view>
-    </block>
-  </view>
-
-  <!-- AI建议标签页 -->
-  <view class="tab-content" hidden="{{activeTab != 2}}">
-    <block wx:if="{{!testCompleted}}">
-      <view class="ai-advice-placeholder">
-        <view class="placeholder-icon">🤖</view>
-        <view class="placeholder-text">请先完成MBTI测试，才能获取个性化AI建议</view>
-        <button class="primary-btn" bindtap="switchToTestTab">开始测试</button>
-      </view>
-    </block>
-    <block wx:elif="{{!aiAdviceLoaded}}">
-      <view class="ai-loading">
-        <view class="loading-icon">⏳</view>
-        <view class="loading-text">正在生成您的个性化AI建议...</view>
-        <view class="loading-spinner"></view>
-      </view>
-      
-      <!-- 骨架屏占位内容 -->
-      <view class="ai-advice-skeleton">
-        <view class="ai-advice-header skeleton-header">
-          <view class="ai-avatar skeleton-avatar"></view>
-          <view class="ai-header-text">
-            <view class="ai-title skeleton-text-long"></view>
-            <view class="ai-subtitle skeleton-text-short"></view>
-          </view>
-        </view>
-        
-        <!-- 个性化发展建议占位 -->
-        <view class="advice-section skeleton-section">
-          <view class="section-title skeleton-title"></view>
-          <view class="advice-content">
-            <view class="skeleton-text-line"></view>
-            <view class="skeleton-text-line"></view>
-            <view class="skeleton-text-line"></view>
-            <view class="skeleton-text-line"></view>
-          </view>
-        </view>
-        
-        <!-- 职业发展指导占位 -->
-        <view class="advice-section skeleton-section">
-          <view class="section-title skeleton-title"></view>
-          <view class="advice-content">
-            <view class="skeleton-text-line"></view>
-            <view class="skeleton-text-line"></view>
-            <view class="skeleton-text-line"></view>
-          </view>
-        </view>
-        
-        <!-- 人际关系与沟通占位 -->
-        <view class="advice-section skeleton-section">
-          <view class="section-title skeleton-title"></view>
-          <view class="advice-content">
-            <view class="skeleton-text-line"></view>
-            <view class="skeleton-text-line"></view>
-            <view class="skeleton-text-line"></view>
-          </view>
-        </view>
-        
-        <!-- 压力管理策略占位 -->
-        <view class="advice-section skeleton-section">
-          <view class="section-title skeleton-title"></view>
-          <view class="advice-content">
-            <view class="skeleton-text-line"></view>
-            <view class="skeleton-text-line"></view>
-          </view>
-        </view>
-        
-        <!-- 列表占位 -->
-        <view class="advice-lists-container">
-          <view class="advice-list skeleton-list">
-            <view class="list-title skeleton-title"></view>
-            <view class="list-items">
-              <view class="list-item skeleton-list-item">
-                <view class="item-bullet skeleton-bullet"></view>
-                <view class="item-text skeleton-text-short"></view>
+              
+              <view class="preference-item">
+                <view class="preference-header">
+                  <view class="preference-name">情感 (F)</view>
+                  <view class="preference-vs">vs</view>
+                  <view class="preference-name">思考 (T)</view>
+                </view>
+                <view class="preference-bar">
+                  <view class="preference-value" style="width: {{result.scores.F || 0}}%;"></view>
+                </view>
+                <view class="preference-percentage">{{result.scores.F || 0}}%</view>
               </view>
-              <view class="list-item skeleton-list-item">
-                <view class="item-bullet skeleton-bullet"></view>
-                <view class="item-text skeleton-text-short"></view>
+              
+              <view class="preference-item">
+                <view class="preference-header">
+                  <view class="preference-name">判断 (J)</view>
+                  <view class="preference-vs">vs</view>
+                  <view class="preference-name">感知 (P)</view>
+                </view>
+                <view class="preference-bar">
+                  <view class="preference-value" style="width: {{result.scores.P || 0}}%;"></view>
+                </view>
+                <view class="preference-percentage">{{result.scores.P || 0}}%</view>
               </view>
-              <view class="list-item skeleton-list-item">
-                <view class="item-bullet skeleton-bullet"></view>
-                <view class="item-text skeleton-text-short"></view>
+            </block>
+            <block wx:else>
+              <view class="no-data-message">暂无偏好分析数据</view>
+            </block>
+          </view>
+          
+          <view class="section-title">认知功能栈</view>
+          <view class="cognitive-functions">
+            <block wx:if="{{result.functions && result.functions.length >= 4}}">
+              <view class="function-item primary">
+                <view class="function-header">
+                  <text class="function-name">{{result.functions[0].code}} - {{result.functions[0].name}}</text>
+                  <text class="function-role">主导功能</text>
+                </view>
+                <text class="function-description">{{result.functions[0].description}}</text>
+              </view>
+              
+              <view class="function-item secondary">
+                <view class="function-header">
+                  <text class="function-name">{{result.functions[1].code}} - {{result.functions[1].name}}</text>
+                  <text class="function-role">辅助功能</text>
+                </view>
+                <text class="function-description">{{result.functions[1].description}}</text>
+              </view>
+              
+              <view class="function-item tertiary">
+                <view class="function-header">
+                  <text class="function-name">{{result.functions[2].code}} - {{result.functions[2].name}}</text>
+                  <text class="function-role">第三功能</text>
+                </view>
+                <text class="function-description">{{result.functions[2].description}}</text>
+              </view>
+              
+              <view class="function-item inferior">
+                <view class="function-header">
+                  <text class="function-name">{{result.functions[3].code}} - {{result.functions[3].name}}</text>
+                  <text class="function-role">劣势功能</text>
+                </view>
+                <text class="function-description">{{result.functions[3].description}}</text>
+              </view>
+            </block>
+            <block wx:else>
+              <view class="no-data-message">暂无认知功能数据</view>
+            </block>
+          </view>
+          
+          <!-- 职业建议 -->
+          <view class="section-title">适合的职业</view>
+          <view class="careers-container">
+            <view class="careers-list">
+              <view class="career-item" wx:for="{{result.careers}}" wx:key="index">
+                <view class="career-icon">💼</view>
+                <view class="career-name">{{item}}</view>
               </view>
             </view>
           </view>
           
-          <view class="advice-list skeleton-list">
-            <view class="list-title skeleton-title"></view>
-            <view class="list-items">
-              <view class="list-item skeleton-list-item">
-                <view class="item-bullet skeleton-bullet"></view>
-                <view class="item-text skeleton-text-short"></view>
-              </view>
-              <view class="list-item skeleton-list-item">
-                <view class="item-bullet skeleton-bullet"></view>
-                <view class="item-text skeleton-text-short"></view>
-              </view>
-              <view class="list-item skeleton-list-item">
-                <view class="item-bullet skeleton-bullet"></view>
-                <view class="item-text skeleton-text-short"></view>
-              </view>
+          <!-- 人际关系特点 -->
+          <view class="section-title">人际关系</view>
+          <view class="relationship-box">
+            <view class="relationship-section">
+              <view class="relationship-title">优势</view>
+              <view class="relationship-content">{{result.relationshipStrengths}}</view>
             </view>
-          </view>
-        </view>
-      </view>
-    </block>
-    <block wx:elif="{{aiAdviceError}}">
-      <view class="ai-error">
-        <view class="error-icon">❌</view>
-        <view class="error-text">{{aiAdviceErrorMsg || '获取AI建议失败，请稍后再试'}}</view>
-        <button class="retry-btn" bindtap="loadAiAdvice">重试</button>
-      </view>
-    </block>
-    <block wx:else>
-      <view class="ai-advice-container">
-        <view class="ai-advice-header">
-          <view class="ai-avatar">🤖</view>
-          <view class="ai-header-text">
-            <view class="ai-title">AI个性化建议</view>
-            <view class="ai-subtitle">基于{{result.type}} ({{result.name}})人格特质</view>
-          </view>
-        </view>
-        
-        <view class="advice-section">
-          <view class="section-title">个性化发展建议</view>
-          <view class="advice-content">{{aiAdvice.overallAdvice}}</view>
-        </view>
-        
-        <view class="advice-section">
-          <view class="section-title">职业发展指导</view>
-          <view class="advice-content">{{aiAdvice.careerAdvice}}</view>
-        </view>
-        
-        <view class="advice-section">
-          <view class="section-title">人际关系与沟通</view>
-          <view class="advice-content">{{aiAdvice.relationshipAdvice}}</view>
-        </view>
-        
-        <view class="advice-section">
-          <view class="section-title">压力管理策略</view>
-          <view class="advice-content">{{aiAdvice.stressManagement}}</view>
-        </view>
-        
-        <view class="advice-lists-container">
-          <view class="advice-list">
-            <view class="list-title">个人成长方向</view>
-            <view class="list-items">
-              <view class="list-item" wx:for="{{aiAdvice.growthAreas}}" wx:key="index">
-                <view class="item-bullet">✓</view>
-                <view class="item-text">{{item}}</view>
-              </view>
+            <view class="relationship-section">
+              <view class="relationship-title">挑战</view>
+              <view class="relationship-content">{{result.relationshipChallenges}}</view>
             </view>
           </view>
           
-          <view class="advice-list">
-            <view class="list-title">需要避免的陷阱</view>
-            <view class="list-items">
-              <view class="list-item" wx:for="{{aiAdvice.pitfalls}}" wx:key="index">
-                <view class="item-bullet">⚠️</view>
-                <view class="item-text">{{item}}</view>
-              </view>
+          <!-- 沟通与工作风格 -->
+          <view class="section-title">沟通与工作</view>
+          <view class="style-container">
+            <view class="style-item">
+              <view class="style-title">沟通风格</view>
+              <view class="style-content">{{result.communicationStyle}}</view>
+            </view>
+            <view class="style-item">
+              <view class="style-title">工作风格</view>
+              <view class="style-content">{{result.workStyle}}</view>
             </view>
           </view>
-        </view>
-        
-        <view class="advice-footer">
-          <view class="refresh-hint">需要更新建议？</view>
-          <button class="refresh-btn" bindtap="refreshAiAdvice">刷新AI建议</button>
-        </view>
-      </view>
-    </block>
-  </view>
-
-  <!-- 每日分析标签页 -->
-  <view class="tab-content" hidden="{{activeTab != 3}}">
-    <!-- 天气卡片 -->
-    <view class="weather-card">
-      <view class="weather-header">
-        <view class="location-info">
-          <text class="city-name">{{weatherData.city}}</text>
-          <text class="current-time">{{currentTime}}</text>
-        </view>
-        <view class="refresh-weather-btn {{weatherRefreshing ? 'loading' : ''}}" bindtap="refreshWeatherData">
-
-          <text class="refresh-text">{{weatherRefreshing ? '更新中' : '刷新天气'}}</text>
-        </view>
-      </view>
-      
-      <view class="weather-info">
-        <view class="current-weather">
-          <text class="temperature">{{weatherData.currentTemp}}°</text>
-          <view class="temp-range">
-            <text>最高 {{weatherData.maxTemp}}°</text>
-            <text>最低 {{weatherData.minTemp}}°</text>
+          
+          <!-- 成长与发展 -->
+          <view class="section-title">成长与发展</view>
+          <view class="growth-container">
+            <view class="growth-item">
+              <view class="growth-title">压力下反应</view>
+              <view class="growth-content">{{result.stressReactions}}</view>
+            </view>
+            <view class="growth-item">
+              <view class="growth-title">成长方向</view>
+              <view class="growth-content">{{result.growthAreas}}</view>
+            </view>
           </view>
+          
+          <!-- 著名人物 -->
+          <view class="section-title">相同类型的名人</view>
+          <view class="famous-people">
+            <view class="people-item" wx:for="{{result.famousPeople}}" wx:key="index">
+              <view class="people-icon">👤</view>
+              <view class="people-name">{{item}}</view>
+            </view>
+          </view>
+          
+          <button class="restart-btn" bindtap="restartTest">重新测试</button>
         </view>
-        
-        <view class="weather-details">
-          <view class="detail-item">
-            <text class="label">天气</text>
-            <text class="value">{{weatherData.condition}}</text>
-          </view>
-          <view class="detail-item">
-            <text class="label">湿度</text>
-            <text class="value">{{weatherData.humidity}}%</text>
-          </view>
-          <view class="detail-item">
-            <text class="label">风速</text>
-            <text class="value">{{weatherData.windSpeed}}</text>
-          </view>
-          <view class="detail-item">
-            <text class="label">空气质量</text>
-            <text class="value">{{weatherData.airQuality}}</text>
-          </view>
-        </view>
-      </view>
-      
-      <!-- 24小时天气预报 -->
-      <view class="hourly-forecast">
-        <scroll-view scroll-x="true" class="forecast-scroll">
-          <view class="forecast-item" wx:for="{{weatherData.hourlyForecast}}" wx:key="time">
-            <text class="time">{{item.time}}</text>
-            <text class="temp">{{item.temp}}°</text>
-            <text class="rain-prob" wx:if="{{item.rainProb}}">{{item.rainProb}}%</text>
-          </view>
-        </scroll-view>
-      </view>
+      </block>
     </view>
     
-    <!-- 今日黄历 -->
-    <view class="lunar-calendar" wx:if="{{lunarCalendar}}">
-      <!-- 黄历头部 -->
-      <view class="calendar-header">
-        <view class="header-left">
-          <view class="suitable-title">宜</view>
-          <view class="suitable-list">
-            <text wx:for="{{lunarCalendar.suitable || lunarCalendar.activities.suitable}}" wx:key="index" class="activity-item">{{item}}</text>
-          </view>
-        </view>
-        
-        <view class="header-center">
-          <view class="date-main">
-            <view class="solar-info">
-              <text class="solar-text">公历 {{lunarCalendar.solarYear}}年{{lunarCalendar.solarMonth}}月{{lunarCalendar.solarDay}}日 {{lunarCalendar.weekday}} {{lunarCalendar.zodiacSign}} (阳历)</text>
+    <!-- 人格模型标签页 -->
+    <view class="tab-content" hidden="{{activeTab != 1}}">
+      <block wx:if="{{result && result.type}}">
+        <view class="model-section">
+          <view class="section-title">人格模型</view>
+          <!-- 人格模型
+          <view class="model-card">
+            <view class="model-header">
+              <view class="model-icon">☯</view>
+              <view class="model-title">
+                <text class="model-name">个人数据与MBTI转化</text>
+                <text class="model-subtitle">将个人数据对应MBTI功能轴</text>
+              </view>
             </view>
-            <view class="date-display">
-              <text class="month-year">【{{lunarCalendar.solarYear}}】</text>
-              <text class="day-large">{{lunarCalendar.solarMonth}}月{{lunarCalendar.solarDay}}日</text>
-            </view>
-            <view class="weekday">{{lunarCalendar.weekday}}</view>
-            <view class="lunar-info">农历 
-              <block wx:if="{{lunarCalendar.lunarDate && lunarCalendar.lunarDate.displayDate}}">
-                {{lunarCalendar.lunarDate.year || ''}}{{lunarCalendar.lunarDate.zodiac || ''}}年 {{lunarCalendar.lunarDate.displayDate}}
-              </block>
-              <block wx:elif="{{lunarCalendar.lunarDate && lunarCalendar.lunarDate.monthName && lunarCalendar.lunarDate.dayName}}">
-                {{lunarCalendar.lunarDate.monthName}}{{lunarCalendar.lunarDate.dayName}}
-              </block>
-              <block wx:elif="{{lunarCalendar.lunarDate && !lunarCalendar.lunarDate.displayDate && !lunarCalendar.lunarDate.monthName}}">
-                {{lunarCalendar.lunarDate}}
-              </block>
-              <block wx:else>
-                农历信息加载中
-              </block>
-              (阴历)
-              <!-- 农历数据校验状态提示 -->
-              <view class="lunar-validation-status" wx:if="{{lunarCalendar._corrected || lunarCalendar._isLocalGenerated}}">
-                <text class="validation-badge corrected" wx:if="{{lunarCalendar._corrected}}">已纠正</text>
-                <text class="validation-badge local" wx:if="{{lunarCalendar._isLocalGenerated}}">本地计算</text>
+            
+            <view class="model-content">
+              <view class="connection-item">
+                <text class="connection-left">正官</text>
+                <view class="connection-line"></view>
+                <text class="connection-right">Te</text>
+              </view>
+              <view class="connection-item">
+                <text class="connection-left">伤官</text>
+                <view class="connection-line"></view>
+                <text class="connection-right">Ne</text>
+              </view>
+              <view class="connection-item">
+                <text class="connection-left">食神</text>
+                <view class="connection-line"></view>
+                <text class="connection-right">Fe</text>
+              </view>
+              <view class="connection-item">
+                <text class="connection-left">偏印</text>
+                <view class="connection-line"></view>
+                <text class="connection-right">Ni</text>
               </view>
             </view>
           </view>
-        </view>
-        
-        <view class="header-right">
-          <view class="avoid-title">忌</view>
-          <view class="avoid-list">
-            <text wx:for="{{lunarCalendar.avoid || lunarCalendar.activities.avoid}}" wx:key="index" class="activity-item">{{item}}</text>
-          </view>
-        </view>
-      </view>
-
-      <!-- 黄历内容 -->
-      <view class="calendar-content">
-        <!-- 胎神和五行信息 -->
-        <view class="info-row">
-          <view class="info-section">
-            <view class="info-label">胎神：</view>
-            <view class="info-value">{{lunarCalendar.taishen}}</view>
-          </view>
-          <view class="info-section">
-            <view class="info-label">五行：</view>
-            <view class="info-value">{{lunarCalendar.nayin}} {{lunarCalendar.wuxing}}执位</view>
-          </view>
-        </view>
-
-        <!-- 吉神宜趋 -->
-        <view class="gods-section">
-          <view class="gods-left">
-            <view class="gods-title">吉神宜趋</view>
-            <view class="gods-content">
-              <text wx:for="{{lunarCalendar.jishen}}" wx:key="index" class="gods-item">{{item}}</text>
+           -->
+          <view class="personality-grid">
+            <view class="personality-grid-item">
+              <view class="grid-title">原生人格</view>
+              <view class="grid-type">{{modelData.nativeType}}</view>
+              <view class="grid-name">{{modelData.nativeName}}</view>
+              <view class="grid-description">{{modelData.nativeDescription}}</view>
             </view>
-          </view>
-
-          <!-- 干支信息 -->
-          <view class="ganzhi-center">
-            <view class="ganzhi-box">
-              <text class="ganzhi-text">{{lunarCalendar.yearGanzhi}} {{lunarCalendar.monthGanzhi}} {{lunarCalendar.dayGanzhi}}</text>
-              <view class="pengzu-text">{{lunarCalendar.pengzu || lunarCalendar.dailyWords}}</view>
+            
+            <view class="personality-grid-item">
+              <view class="grid-title">社会面具</view>
+              <view class="grid-type">{{modelData.socialType}}</view>
+              <view class="grid-name">{{modelData.socialName}}</view>
+              <view class="grid-description">{{modelData.socialDescription}}</view>
             </view>
-          </view>
-
-          <!-- 凶神宜忌 -->
-          <view class="gods-right">
-            <view class="gods-title">凶神宜忌</view>
-            <view class="gods-content">
-              <text wx:for="{{lunarCalendar.xiongshen}}" wx:key="index" class="gods-item">{{item}}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 财神方位信息 -->
-        <view class="direction-row">
-          <view class="direction-item">
-            <view class="direction-label">喜神：</view>
-            <view class="direction-value">{{lunarCalendar.xishen}}</view>
-          </view>
-          <view class="direction-item">
-            <view class="direction-label">福神：</view>
-            <view class="direction-value">{{lunarCalendar.fushen}}</view>
-          </view>
-          <view class="direction-item">
-            <view class="direction-label">财神：</view>
-            <view class="direction-value">{{lunarCalendar.caishen}}</view>
-          </view>
-        </view>
-
-        <!-- 冲煞信息 -->
-        <view class="chongsha-row">
-          <view class="chongsha-item">
-            <text class="chongsha-text">{{lunarCalendar.chong}} {{lunarCalendar.sha}}</text>
-          </view>
-        </view>
-
-        <!-- 时辰信息 -->
-        <view class="time-section">
-          <view class="time-row">
-            <view class="time-item lucky-time">
-              <view class="time-label">吉时：</view>
-              <view class="time-value">
-                <text wx:for="{{lunarCalendar.jishi}}" wx:key="index" class="time-text">{{item}}</text>
-              </view>
-            </view>
-            <view class="time-item unlucky-time">
-              <view class="time-label">凶时：</view>
-              <view class="time-value">
-                <text wx:for="{{lunarCalendar.xiongshi}}" wx:key="index" class="time-text">{{item}}</text>
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <!-- 每日提示 -->
-        <view class="daily-tips">
-          <view class="tips-content">{{lunarCalendar.tips}}</view>
-        </view>
-        
-        <!-- 黄历刷新按钮 -->
-        <view class="lunar-refresh-section">
-          <view class="refresh-lunar-btn {{lunarRefreshing ? 'loading' : ''}}" bindtap="refreshLunarData">
-            <text class="refresh-text">{{lunarRefreshing ? '更新中' : '刷新黄历'}}</text>
-          </view>
-        </view>
-      </view>
-    </view>
-    
-    <!-- 黄历数据获取失败时的提示 -->
-    <view class="lunar-calendar-error" wx:if="{{!lunarCalendar}}">
-      <view class="error-content">
-        <view class="error-icon">📅</view>
-        <view class="error-title">黄历数据获取失败</view>
-        <view class="error-desc">网络异常，无法获取准确的农历信息</view>
-        <view class="error-retry">
-          <view class="refresh-lunar-btn" bindtap="refreshLunarData">
-            <text class="refresh-text">{{lunarRefreshing ? '重新获取中...' : '重新获取'}}</text>
-          </view>
-        </view>
-      </view>
-    </view>
-    
-    <!-- AI穿衣建议 -->
-    <view class="clothing-advice">
-      <view class="advice-header">
-        <text class="title">今日穿衣建议</text>
-        <text class="index">指数：{{clothingAdvice.index}}</text>
-      </view>
-      
-      <view class="advice-content">
-        <view class="recommended-clothes">
-          <text class="subtitle">推荐搭配</text>
-          <text class="content">{{clothingAdvice.recommendation}}</text>
-        </view>
-        
-        <view class="special-tips">
-          <text class="subtitle">特别提示</text>
-          <text class="content">{{clothingAdvice.tips}}</text>
-        </view>
-        
-        <view class="zodiac-tips">
-          <text class="subtitle">星座提示</text>
-          <text class="content">{{clothingAdvice.zodiacAdvice}}</text>
-        </view>
-      </view>
-    </view>
-    
-    <!-- 测事部分 -->
-    <view class="divination-analysis">
-      <view class="input-section">
-        <view class="input-header">
-          <view class="title-row">
-            <text class="input-title">伏羲大模型测事[VIP专属]</text>
-            <text class="remaining-count">今日剩余：{{remainingCount === '∞' ? '∞ (无限制)' : remainingCount + '/5次'}}</text>
-          </view>
-          <text class="input-desc">请输入想测的事,建议优先完善个人信息</text>
-        </view>
-        <view class="input-box">
-          <textarea class="matter-input" 
-                    value="{{inputText}}" 
-                    bindinput="onTextInput" 
-                    placeholder="例如：我最近的工作变动是否顺利？" 
-                    maxlength="100" />
-          <text class="input-limit">{{inputText.length}}/100</text>
-        </view>
-        
-        <!-- 推演提示 -->
-        <view class="divination-tip">
-          <text class="tip-text">推演事情过于复杂的情况可能因推演超时而没有结果，可以尝试换个问题</text>
-        </view>
-        
-        <button class="submit-btn" bindtap="submitDivination">开始分析</button>
-        
-        <!-- 历史问题列表 -->
-        <view class="history-section" wx:if="{{divinationHistoryList.length > 0}}">
-          <view class="history-header" bindtap="toggleHistoryList">
-            <text class="history-title">历史问题列表（{{divinationHistoryList.length}}）</text>
-            <text class="toggle-icon">{{showHistoryList ? '▼' : '▶'}}</text>
           </view>
           
-          <view class="history-list" wx:if="{{showHistoryList}}">
-            <view class="history-item" wx:for="{{divinationHistoryList}}" wx:key="index">
-              <view class="history-content" bindtap="viewHistoryResult" data-index="{{index}}">
-                <view class="history-question">{{item.question}}</view>
-                <view class="history-time">{{item.timeString}}</view>
+          <view class="radar-section">
+            <view class="section-title">人格能量雷达</view>
+            <view class="radar-chart">
+              <view class="radar-axis">
+                <view class="radar-axis-line"></view>
+                <view class="radar-axis-line"></view>
+                <view class="radar-axis-line"></view>
+                <view class="radar-axis-line"></view>
               </view>
-              <view class="history-actions">
-                <text class="action-btn view-btn" bindtap="viewHistoryResult" data-index="{{index}}">查看</text>
-                <text class="action-btn delete-btn" bindtap="deleteHistoryItem" data-index="{{index}}">删除</text>
+              <view class="radar-value" style="--thinking: {{modelData.radarData.thinking}}; --creativity: {{modelData.radarData.creativity}}; --execution: {{modelData.radarData.execution}}; --perception: {{modelData.radarData.perception}};"></view>
+              <view class="radar-point radar-point-thinking"></view>
+              <view class="radar-point radar-point-creativity"></view>
+              <view class="radar-point radar-point-execution"></view>
+              <view class="radar-point radar-point-perception"></view>
+            </view>
+            <view class="radar-labels">
+              <text class="radar-label">思考力
+                <text class="radar-value-label">{{modelData.radarData.thinking}}%</text>
+              </text>
+              <text class="radar-label">创造力
+                <text class="radar-value-label">{{modelData.radarData.creativity}}%</text>
+              </text>
+              <text class="radar-label">执行力
+                <text class="radar-value-label">{{modelData.radarData.execution}}%</text>
+              </text>
+              <text class="radar-label">感知力
+                <text class="radar-value-label">{{modelData.radarData.perception}}%</text>
+              </text>
+            </view>
+          </view>
+          
+          <!-- 关系匹配部分 -->
+          <view class="relationship-match-section">
+            <view class="section-title">关系匹配</view>
+            
+            <view class="relationship-header">
+              <view class="icon icon-heart">💖</view>
+              <view class="relationship-title">适合的人格匹配</view>
+            </view>
+            
+            <view class="relationship-description">基于MBTI特质和人格互补原则，以下人格类型与你最为匹配：</view>
+            
+            <view class="relationship-categories">
+              <view class="relationship-category">
+                <view class="category-header">
+                  <view class="category-icon">🤝</view>
+                  <view class="category-title">理想朋友</view>
+                </view>
+                
+                <view class="relationship-items">
+                  <view class="relationship-item" wx:for="{{modelData.relationships.friends}}" wx:key="type">
+                    <view class="relationship-type">
+                      <text class="type-code">{{item.type}}</text>
+                      <text class="type-name">{{item.typeName || ''}}</text>
+                    </view>
+                    <view class="relationship-score">
+                      <view class="score-bar">
+                        <view class="score-value" style="width: {{item.score}}%;"></view>
+                      </view>
+                      <view class="score-text">{{item.score}}%</view>
+                    </view>
+                    <view class="relationship-reason">{{item.reason}}</view>
+                  </view>
+                </view>
               </view>
+              
+              <view class="relationship-category">
+                <view class="category-header">
+                  <view class="category-icon">❤️</view>
+                  <view class="category-title">理想伴侣</view>
+                </view>
+                
+                <view class="relationship-items">
+                  <view class="relationship-item" wx:for="{{modelData.relationships.partners}}" wx:key="type">
+                    <view class="relationship-type">
+                      <text class="type-code">{{item.type}}</text>
+                      <text class="type-name">{{item.typeName || ''}}</text>
+                    </view>
+                    <view class="relationship-score">
+                      <view class="score-bar">
+                        <view class="score-value" style="width: {{item.score}}%;"></view>
+                      </view>
+                      <view class="score-text">{{item.score}}%</view>
+                    </view>
+                    <view class="relationship-reason">{{item.reason}}</view>
+                  </view>
+                </view>
+              </view>
+            </view>
+            
+            <view class="relationship-tip">
+              <view class="tip-icon">ℹ️</view>
+              <text class="tip-text">人格类型仅作为参考，真实关系中还受到个人成长、价值观和生活经历等多种因素影响。</text>
+            </view>
+          </view>
+        </view>
+        
+        <view class="career-section">
+          <view class="section-title">职业罗盘</view>
+          
+          <view class="career-traits">
+            <view class="career-traits-header">
+              <view class="icon icon-purple">🧠</view>
+              <view class="career-traits-title">职业特质分析</view>
+            </view>
+            
+            <view class="traits-grid">
+              <view class="trait-item">
+                <view class="trait-title">工作风格</view>
+                <view class="trait-content">{{modelData.careerTraits.workStyle}}</view>
+              </view>
+              
+              <view class="trait-item">
+                <view class="trait-title">团队角色</view>
+                <view class="trait-content">{{modelData.careerTraits.teamRole}}</view>
+              </view>
+            </view>
+            
+            <view class="trait-strength-weakness">
+              <view class="trait-sw-item advantage">
+                <view class="trait-sw-header">
+                  <view class="trait-sw-icon">💪</view>
+                  <view class="trait-sw-title">职场优势</view>
+                </view>
+                <view class="trait-sw-content">{{modelData.careerTraits.advantage}}</view>
+              </view>
+              
+              <view class="trait-sw-item challenge">
+                <view class="trait-sw-header">
+                  <view class="trait-sw-icon">⚠️</view>
+                  <view class="trait-sw-title">潜在挑战</view>
+                </view>
+                <view class="trait-sw-content">{{modelData.careerTraits.challenge}}</view>
+              </view>
+            </view>
+            
+            <view class="trait-development">
+              <view class="trait-dev-header">
+                <view class="trait-dev-icon">🌱</view>
+                <view class="trait-dev-title">成长建议</view>
+              </view>
+              <view class="trait-dev-content">{{modelData.careerTraits.development}}</view>
+            </view>
+          </view>
+          
+          <view class="industry-match">
+            <view class="industry-header">
+              <view class="icon icon-blue">💼</view>
+              <view class="industry-title">行业匹配</view>
+            </view>
+            
+            <view class="industry-description">根据你的五行喜用神和MBTI特质，以下行业最适合你：</view>
+            
+            <view class="industry-grid">
+              <view class="industry-item" wx:for="{{modelData.industries}}" wx:key="index">
+                <view class="icon {{item.icon}} icon-blue"></view>
+                <text class="industry-item-name">{{item.name}}</text>
+              </view>
+            </view>
+          </view>
+          
+          <view class="direction-match">
+            <view class="direction-header">
+              <view class="icon icon-blue">🧭</view>
+              <view class="direction-title">工作方位</view>
+            </view>
+            
+            <view class="direction-grid">
+              <view class="direction-item {{item.type}}" wx:for="{{modelData.directions}}" wx:key="index">
+                <text class="direction-item-name">{{item.name}} ({{item.type === 'good' ? '吉' : '忌'}})</text>
+              </view>
+            </view>
+            
+            <view class="direction-tip">
+              <view class="tip-icon">ℹ️</view>
+              <text class="tip-text">{{modelData.directionTip}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="no-result-prompt">
+          <view class="prompt-icon">🧭</view>
+          <view class="prompt-title">请先完成MBTI测试</view>
+          <view class="prompt-description">完成测试后，将根据您的人格类型为您提供量身定制的人格模型和职业建议</view>
+          <button class="switch-to-test-btn" bindtap="switchToTestTab">去测试</button>
+        </view>
+      </block>
+    </view>
+
+    <!-- 伏羲建议标签页 -->
+    <view class="tab-content" hidden="{{activeTab != 2}}">
+      <block wx:if="{{testCompleted && result}}">
+        <!-- AI建议内容 -->
+        <view class="ai-advice-section" wx:if="{{aiAdvice && !aiAdvice.error}}">
+          <view class="advice-header">
+            <view class="icon icon-ai">🧠</view>
+            <view class="advice-title">AI个性化建议</view>
+            <view class="advice-subtitle">基于您的{{result.type}}人格类型量身定制</view>
+          </view>
+
+          <!-- 整体发展建议 -->
+          <view class="advice-card" wx:if="{{aiAdvice.overallAdvice}}">
+            <view class="card-header">
+              <view class="card-icon">🌟</view>
+              <view class="card-title">个性化发展建议</view>
+            </view>
+            <view class="card-content">{{aiAdvice.overallAdvice}}</view>
+          </view>
+
+          <!-- 职业发展指导 -->
+          <view class="advice-card" wx:if="{{aiAdvice.careerAdvice}}">
+            <view class="card-header">
+              <view class="card-icon">💼</view>
+              <view class="card-title">职业发展指导</view>
+            </view>
+            <view class="card-content">{{aiAdvice.careerAdvice}}</view>
+          </view>
+
+          <!-- 人际关系建议 -->
+          <view class="advice-card" wx:if="{{aiAdvice.relationshipAdvice}}">
+            <view class="card-header">
+              <view class="card-icon">🤝</view>
+              <view class="card-title">人际关系与沟通</view>
+            </view>
+            <view class="card-content">{{aiAdvice.relationshipAdvice}}</view>
+          </view>
+
+          <!-- 压力管理策略 -->
+          <view class="advice-card" wx:if="{{aiAdvice.stressManagement}}">
+            <view class="card-header">
+              <view class="card-icon">🧘</view>
+              <view class="card-title">压力管理策略</view>
+            </view>
+            <view class="card-content">{{aiAdvice.stressManagement}}</view>
+          </view>
+
+          <!-- 个人成长方向 -->
+          <view class="advice-card" wx:if="{{aiAdvice.growthAreas && aiAdvice.growthAreas.length > 0}}">
+            <view class="card-header">
+              <view class="card-icon">🌱</view>
+              <view class="card-title">个人成长方向</view>
+            </view>
+            <view class="card-content">
+              <view class="growth-list">
+                <view class="growth-item" wx:for="{{aiAdvice.growthAreas}}" wx:key="index">
+                  <text class="growth-number">{{index + 1}}.</text>
+                  <text class="growth-text">{{item}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 避免的误区 -->
+          <view class="advice-card" wx:if="{{aiAdvice.pitfalls && aiAdvice.pitfalls.length > 0}}">
+            <view class="card-header">
+              <view class="card-icon">⚠️</view>
+              <view class="card-title">应避免的误区</view>
+            </view>
+            <view class="card-content">
+              <view class="pitfalls-list">
+                <view class="pitfall-item" wx:for="{{aiAdvice.pitfalls}}" wx:key="index">
+                  <text class="pitfall-number">{{index + 1}}.</text>
+                  <text class="pitfall-text">{{item}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 刷新建议按钮 -->
+          <view class="refresh-advice-section">
+            <view class="refresh-advice-btn" bindtap="refreshAiAdvice">
+              <text class="refresh-text">刷新建议</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 加载状态 -->
+        <view class="loading-advice" wx:elif="{{aiAdviceLoading}}">
+          <view class="loading-icon">🤖</view>
+          <view class="loading-text">AI正在为您生成个性化建议...</view>
+          <view class="loading-tips">这可能需要几秒钟时间</view>
+        </view>
+
+        <!-- 错误状态 -->
+        <view class="error-advice" wx:elif="{{aiAdvice && aiAdvice.error}}">
+          <view class="error-icon">❌</view>
+          <view class="error-text">{{aiAdvice.message || '获取AI建议失败'}}</view>
+          <view class="retry-btn" bindtap="loadAiAdvice">重试</view>
+        </view>
+
+        <!-- 无建议状态 -->
+        <view class="no-advice" wx:else>
+          <view class="no-advice-icon">🤖</view>
+          <view class="no-advice-text">暂无AI建议</view>
+          <view class="load-advice-btn" bindtap="loadAiAdvice">获取个性化建议</view>
+        </view>
+      </block>
+      
+      <block wx:else>
+        <view class="no-result-prompt">
+          <view class="prompt-icon">🤖</view>
+          <view class="prompt-title">请先完成MBTI测试</view>
+          <view class="prompt-description">完成测试后，将根据您的人格类型为您提供AI个性化建议</view>
+          <button class="switch-to-test-btn" bindtap="switchToTestTab">去测试</button>
+        </view>
+      </block>
+    </view>
+
+    <!-- AI算卦标签页 -->
+    <view class="tab-content" hidden="{{activeTab != 3}}">
+      <!-- 今日黄历 -->
+      <view class="lunar-calendar" wx:if="{{lunarCalendar}}">
+        <!-- 黄历头部 -->
+        <view class="calendar-header">
+          <view class="header-left">
+            <view class="suitable-title">宜</view>
+            <view class="suitable-list">
+              <text wx:for="{{lunarCalendar.suitable || lunarCalendar.activities.suitable}}" wx:key="index" class="activity-item">{{item}}</text>
+            </view>
+          </view>
+          
+          <view class="header-center">
+            <view class="date-main">
+              <view class="solar-info">
+                <text class="solar-text">公历 {{lunarCalendar.solarYear}}年{{lunarCalendar.solarMonth}}月{{lunarCalendar.solarDay}}日 {{lunarCalendar.weekday}} {{lunarCalendar.zodiacSign}} (阳历)</text>
+              </view>
+              <view class="date-display">
+                <text class="month-year">【{{lunarCalendar.solarYear}}】</text>
+                <text class="day-large">{{lunarCalendar.solarMonth}}月{{lunarCalendar.solarDay}}日</text>
+              </view>
+              <view class="weekday">{{lunarCalendar.weekday}}</view>
+              <view class="lunar-info">农历 
+                <block wx:if="{{lunarCalendar.lunarDate && lunarCalendar.lunarDate.displayDate}}">
+                  {{lunarCalendar.lunarDate.year || ''}}{{lunarCalendar.lunarDate.zodiac || ''}}年 {{lunarCalendar.lunarDate.displayDate}}
+                </block>
+                <block wx:elif="{{lunarCalendar.lunarDate && lunarCalendar.lunarDate.monthName && lunarCalendar.lunarDate.dayName}}">
+                  {{lunarCalendar.lunarDate.year || ''}}{{lunarCalendar.lunarDate.zodiac || ''}}年 {{lunarCalendar.lunarDate.monthName}}{{lunarCalendar.lunarDate.dayName}}
+                </block>
+                <block wx:elif="{{lunarCalendar.lunarDate && lunarCalendar.lunarDate.month && lunarCalendar.lunarDate.day}}">
+                  {{lunarCalendar.lunarDate.year || ''}}{{lunarCalendar.lunarDate.zodiac || ''}}年 {{lunarCalendar.lunarDate.month}}{{lunarCalendar.lunarDate.day}}
+                </block>
+                <block wx:elif="{{lunarCalendar.lunarDate && lunarCalendar.lunarDate.fullDate}}">
+                  {{lunarCalendar.lunarDate.fullDate}}
+                </block>
+                <block wx:elif="{{lunarCalendar.lunarDate && lunarCalendar.lunarDate.length}}">
+                  {{lunarCalendar.lunarDate}}
+                </block>
+                <block wx:elif="{{lunarCalendar.yearGanzhi && lunarCalendar.monthGanzhi}}">
+                  {{lunarCalendar.yearGanzhi}}年 农历日期
+                </block>
+                <block wx:else>
+                  农历信息加载中
+                </block>
+                (阴历)
+                <!-- 农历数据校验状态提示 -->
+                <view class="lunar-validation-status" wx:if="{{lunarCalendar._corrected || lunarCalendar._isLocalGenerated}}">
+                  <text class="validation-badge corrected" wx:if="{{lunarCalendar._corrected}}">已纠正</text>
+                  <text class="validation-badge local" wx:if="{{lunarCalendar._isLocalGenerated}}">本地计算</text>
+                </view>
+              </view>
+            </view>
+          </view>
+          
+          <view class="header-right">
+            <view class="avoid-title">忌</view>
+            <view class="avoid-list">
+              <text wx:for="{{lunarCalendar.avoid || lunarCalendar.activities.avoid}}" wx:key="index" class="activity-item">{{item}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 黄历内容 -->
+        <view class="calendar-content">
+          <!-- 胎神和五行信息 -->
+          <view class="info-row">
+            <view class="info-section">
+              <view class="info-label">胎神：</view>
+              <view class="info-value">{{lunarCalendar.taishen}}</view>
+            </view>
+            <view class="info-section">
+              <view class="info-label">五行：</view>
+              <view class="info-value">{{lunarCalendar.nayin}} {{lunarCalendar.wuxing}}执位</view>
+            </view>
+          </view>
+
+          <!-- 吉神宜趋 -->
+          <view class="gods-section">
+            <view class="gods-left">
+              <view class="gods-title">吉神宜趋</view>
+              <view class="gods-content">
+                <text wx:for="{{lunarCalendar.jishen}}" wx:key="index" class="gods-item">{{item}}</text>
+              </view>
+            </view>
+
+            <!-- 干支信息 -->
+            <view class="ganzhi-center">
+              <view class="ganzhi-box">
+                <text class="ganzhi-text">{{lunarCalendar.yearGanzhi}} {{lunarCalendar.monthGanzhi}} {{lunarCalendar.dayGanzhi}}</text>
+                <view class="pengzu-text">{{lunarCalendar.pengzu || lunarCalendar.dailyWords}}</view>
+              </view>
+            </view>
+
+            <!-- 凶神宜忌 -->
+            <view class="gods-right">
+              <view class="gods-title">凶神宜忌</view>
+              <view class="gods-content">
+                <text wx:for="{{lunarCalendar.xiongshen}}" wx:key="index" class="gods-item">{{item}}</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 财神方位信息 -->
+          <view class="direction-row">
+            <view class="direction-item">
+              <view class="direction-label">喜神：</view>
+              <view class="direction-value">{{lunarCalendar.xishen}}</view>
+            </view>
+            <view class="direction-item">
+              <view class="direction-label">福神：</view>
+              <view class="direction-value">{{lunarCalendar.fushen}}</view>
+            </view>
+            <view class="direction-item">
+              <view class="direction-label">财神：</view>
+              <view class="direction-value">{{lunarCalendar.caishen}}</view>
+            </view>
+          </view>
+
+          <!-- 冲煞信息 -->
+          <view class="chongsha-row">
+            <view class="chongsha-item">
+              <text class="chongsha-text">{{lunarCalendar.chong}} {{lunarCalendar.sha}}</text>
+            </view>
+          </view>
+
+          <!-- 时辰信息 -->
+          <view class="time-section">
+            <view class="time-row">
+              <view class="time-item lucky-time">
+                <view class="time-label">吉时：</view>
+                <view class="time-value">
+                  <text wx:for="{{lunarCalendar.jishi}}" wx:key="index" class="time-text">{{item}}</text>
+                </view>
+              </view>
+              <view class="time-item unlucky-time">
+                <view class="time-label">凶时：</view>
+                <view class="time-value">
+                  <text wx:for="{{lunarCalendar.xiongshi}}" wx:key="index" class="time-text">{{item}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 每日提示 -->
+          <view class="daily-tips">
+            <view class="tips-content">{{lunarCalendar.tips}}</view>
+          </view>
+          
+          <!-- 黄历刷新按钮 -->
+          <view class="lunar-refresh-section">
+            <view class="refresh-lunar-btn {{lunarRefreshing ? 'loading' : ''}}" bindtap="refreshLunarData">
+              <text class="refresh-text">{{lunarRefreshing ? '更新中' : '刷新黄历'}}</text>
             </view>
           </view>
         </view>
       </view>
-
-      <view class="analysis-result" wx:if="{{divinationResult.tianshi}}">
-        <!-- 天时地利人和分析 -->
-        <view class="section tiandi-section">
-          <view class="section-title">天时地利人和</view>
-          <view class="tiandi-content">
-            <view class="tiandi-item">
-              <view class="tiandi-header">
-                <text class="tiandi-label">天时（{{divinationResult.tianshi.constellation}}宿）</text>
-              </view>
-              <text class="tiandi-analysis">{{divinationResult.tianshi.analysis}}</text>
-              <text class="tiandi-influence">影响：{{divinationResult.tianshi.influence}}</text>
+      
+      <!-- 黄历数据获取失败时的提示 -->
+      <view class="lunar-calendar-error" wx:if="{{!lunarCalendar}}">
+        <view class="error-content">
+          <view class="error-icon">📅</view>
+          <view class="error-title">黄历数据获取失败</view>
+          <view class="error-desc">网络异常，无法获取准确的农历信息</view>
+          <view class="error-retry">
+            <view class="refresh-lunar-btn" bindtap="refreshLunarData">
+              <text class="refresh-text">{{lunarRefreshing ? '重新获取中...' : '重新获取'}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 测事部分 -->
+      <view class="divination-analysis">
+        <view class="input-section">
+          <view class="input-header">
+            <view class="title-row">
+              <text class="input-title">伏羲大模型算卦[VIP专属]</text>
+              <text class="remaining-count">今日剩余：{{remainingCount === '∞' ? '∞ (无限制)' : remainingCount + '/5次'}}</text>
+            </view>
+            <text class="input-desc">请输入想算的事情(完善个人信息更加准确)</text>
+          </view>
+          <view class="input-box">
+            <textarea class="matter-input" 
+                      value="{{inputText}}" 
+                      bindinput="onTextInput" 
+                      placeholder="本模型例如：我最近的工作变动是否顺利？" 
+                      maxlength="100" />
+            <text class="input-limit">{{inputText.length}}/100</text>
+          </view>
+          
+          <!-- 推演提示 -->
+          <view class="divination-tip">
+            <text class="tip-text">推演事情过于复杂的情况可能因推演超时而没有结果，可以尝试换个问题</text>
+          </view>
+          
+          <button class="submit-btn" bindtap="submitDivination">开始分析</button>
+          
+          <!-- 历史问题列表 -->
+          <view class="history-section" wx:if="{{divinationHistoryList.length > 0}}">
+            <view class="history-header" bindtap="toggleHistoryList">
+              <text class="history-title">历史问题列表（{{divinationHistoryList.length}}）</text>
+              <text class="toggle-icon">{{showHistoryList ? '▼' : '▶'}}</text>
             </view>
             
-            <view class="tiandi-item">
-              <view class="tiandi-header">
-                <text class="tiandi-label">地利（{{divinationResult.dili.location}}）</text>
-              </view>
-              <text class="tiandi-analysis">{{divinationResult.dili.analysis}}</text>
-              <text class="tiandi-influence">风水：{{divinationResult.dili.fengshui}}</text>
-            </view>
-            
-            <view class="tiandi-item">
-              <view class="tiandi-header">
-                <text class="tiandi-label">人和（八字命理）</text>
-              </view>
-              <text class="tiandi-analysis">{{divinationResult.renhe.analysis}}</text>
-              <text class="tiandi-influence">八字：{{divinationResult.renhe.bazi}}</text>
-              <text class="tiandi-influence">性格：{{divinationResult.renhe.personality}}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 综合天时地利人和分析 -->
-        <view class="section comprehensive-section" wx:if="{{divinationResult.comprehensive}}">
-          <view class="section-title">综合天时地利人和分析</view>
-          <view class="comprehensive-content">
-            <view class="comprehensive-item">
-              <text class="comprehensive-label">整体分析：</text>
-              <text class="comprehensive-text">{{divinationResult.comprehensive.tianshi_dili_renhe}}</text>
-            </view>
-            <view class="comprehensive-item">
-              <text class="comprehensive-label">综合建议：</text>
-              <text class="comprehensive-text">{{divinationResult.comprehensive.overall_advice}}</text>
-            </view>
-            <view class="comprehensive-item">
-              <text class="comprehensive-label">协同效应：</text>
-              <text class="comprehensive-text">{{divinationResult.comprehensive.synergy_effect}}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 卦象分析 -->
-        <view class="section hexagram-section">
-          <view class="section-title">《易经》卦象分析</view>
-          <view class="hexagram-content">
-            <view class="hexagram-item">本卦：{{divinationResult.hexagram.name}}</view>
-            <view class="hexagram-desc">{{divinationResult.hexagram.description}}</view>
-            <view class="hexagram-analysis">{{divinationResult.hexagram.yijing_analysis}}</view>
-          </view>
-        </view>
-
-        <!-- 命理演算 -->
-        <view class="section mingli-section">
-          <view class="section-title">传统经典命理演算</view>
-          <view class="mingli-content">
-            <view class="mingli-item">
-              <text class="mingli-label">《滴天髓》理论：</text>
-              <text class="mingli-text">{{divinationResult.mingli.ditianshui_analysis}}</text>
-            </view>
-            <view class="mingli-item">
-              <text class="mingli-label">《三命通会》理论：</text>
-              <text class="mingli-text">{{divinationResult.mingli.sanming_analysis}}</text>
-            </view>
-            <view class="mingli-item">
-              <text class="mingli-label">综合分析：</text>
-              <text class="mingli-text">{{divinationResult.mingli.combined_analysis}}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 发展趋势 -->
-        <view class="section trend-section">
-          <view class="section-title">事态发展趋势</view>
-          <view class="trend-content">
-            <view class="trend-item">
-              <text class="trend-label">当前形势：</text>
-              <text class="trend-text">{{divinationResult.trend.current}}</text>
-            </view>
-            <view class="trend-item">
-              <text class="trend-label">短期趋势（1-3个月）：</text>
-              <text class="trend-text">{{divinationResult.trend.short_term}}</text>
-            </view>
-            <view class="trend-item">
-              <text class="trend-label">长期趋势（3-12个月）：</text>
-              <text class="trend-text">{{divinationResult.trend.long_term}}</text>
-            </view>
-            <view class="trend-item">
-              <text class="trend-label">最佳时机：</text>
-              <text class="trend-text">{{divinationResult.trend.timing}}</text>
-            </view>
-          </view>
-        </view>
-
-       
-
-        <!-- 化解方案 -->
-        <view class="section resolution-section">
-          <view class="section-title">注意事项与化解</view>
-          <view class="resolution-content">
-            <view class="challenges">
-              <text class="resolution-label">潜在挑战：</text>
-              <view class="challenge-list">
-                <text class="challenge-item" wx:for="{{divinationResult.resolution.challenges}}" wx:key="index">{{index + 1}}. {{item}}</text>
+            <view class="history-list" wx:if="{{showHistoryList}}">
+              <view class="history-item" wx:for="{{divinationHistoryList}}" wx:key="index">
+                <view class="history-content" bindtap="viewHistoryResult" data-index="{{index}}">
+                  <view class="history-question">{{item.question}}</view>
+                  <view class="history-time">{{item.timeString}}</view>
+                </view>
+                <view class="history-actions">
+                  <text class="action-btn view-btn" bindtap="viewHistoryResult" data-index="{{index}}">查看</text>
+                  <text class="action-btn delete-btn" bindtap="deleteHistoryItem" data-index="{{index}}">删除</text>
+                </view>
               </view>
             </view>
-            <view class="solutions">
-              <text class="resolution-label">化解方案：</text>
-              <view class="solution-list">
-                <text class="solution-item" wx:for="{{divinationResult.resolution.solutions}}" wx:key="index">{{index + 1}}. {{item}}</text>
+          </view>
+        </view>
+
+        <view class="analysis-result" wx:if="{{divinationResult.tianshi}}">
+          <!-- 天时地利人和分析 -->
+          <view class="section tiandi-section">
+            <view class="section-title">天时地利人和</view>
+            <view class="tiandi-content">
+              <view class="tiandi-item">
+                <view class="tiandi-header">
+                  <text class="tiandi-label">天时（{{divinationResult.tianshi.constellation}}宿）</text>
+                </view>
+                <text class="tiandi-analysis">{{divinationResult.tianshi.analysis}}</text>
+                <text class="tiandi-influence">影响：{{divinationResult.tianshi.influence}}</text>
+              </view>
+              
+              <view class="tiandi-item">
+                <view class="tiandi-header">
+                  <text class="tiandi-label">地利（{{divinationResult.dili.location}}）</text>
+                </view>
+                <text class="tiandi-analysis">{{divinationResult.dili.analysis}}</text>
+                <text class="tiandi-influence">风水：{{divinationResult.dili.fengshui}}</text>
+              </view>
+              
+              <view class="tiandi-item">
+                <view class="tiandi-header">
+                  <text class="tiandi-label">人和（八字命理）</text>
+                </view>
+                <text class="tiandi-analysis">{{divinationResult.renhe.analysis}}</text>
+                <text class="tiandi-influence">八字：{{divinationResult.renhe.bazi}}</text>
+                <text class="tiandi-influence">性格：{{divinationResult.renhe.personality}}</text>
               </view>
             </view>
-            <view class="alternatives">
-              <text class="resolution-label">备选方案：</text>
-              <view class="alternative-list">
-                <text class="alternative-item" wx:for="{{divinationResult.resolution.alternative_plans}}" wx:key="index">{{index + 1}}. {{item}}</text>
+          </view>
+
+          <!-- 综合天时地利人和分析 -->
+          <view class="section comprehensive-section" wx:if="{{divinationResult.comprehensive}}">
+            <view class="section-title">综合天时地利人和分析</view>
+            <view class="comprehensive-content">
+              <view class="comprehensive-item">
+                <text class="comprehensive-label">整体分析：</text>
+                <text class="comprehensive-text">{{divinationResult.comprehensive.tianshi_dili_renhe}}</text>
+              </view>
+              <view class="comprehensive-item">
+                <text class="comprehensive-label">综合建议：</text>
+                <text class="comprehensive-text">{{divinationResult.comprehensive.overall_advice}}</text>
+              </view>
+              <view class="comprehensive-item">
+                <text class="comprehensive-label">协同效应：</text>
+                <text class="comprehensive-text">{{divinationResult.comprehensive.synergy_effect}}</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 卦象分析 -->
+          <view class="section hexagram-section">
+            <view class="section-title">《易经》卦象分析</view>
+            <view class="hexagram-content">
+              <view class="hexagram-item">本卦：{{divinationResult.hexagram.name}}</view>
+              <view class="hexagram-desc">{{divinationResult.hexagram.description}}</view>
+              <view class="hexagram-analysis">{{divinationResult.hexagram.yijing_analysis}}</view>
+            </view>
+          </view>
+
+          <!-- 命理演算 -->
+          <view class="section mingli-section">
+            <view class="section-title">传统经典命理演算</view>
+            <view class="mingli-content">
+              <view class="mingli-item">
+                <text class="mingli-label">《滴天髓》理论：</text>
+                <text class="mingli-text">{{divinationResult.mingli.ditianshui_analysis}}</text>
+              </view>
+              <view class="mingli-item">
+                <text class="mingli-label">《三命通会》理论：</text>
+                <text class="mingli-text">{{divinationResult.mingli.sanming_analysis}}</text>
+              </view>
+              <view class="mingli-item">
+                <text class="mingli-label">综合分析：</text>
+                <text class="mingli-text">{{divinationResult.mingli.combined_analysis}}</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 发展趋势 -->
+          <view class="section trend-section">
+            <view class="section-title">事态发展趋势</view>
+            <view class="trend-content">
+              <view class="trend-item">
+                <text class="trend-label">当前形势：</text>
+                <text class="trend-text">{{divinationResult.trend.current}}</text>
+              </view>
+              <view class="trend-item">
+                <text class="trend-label">短期趋势（1-3个月）：</text>
+                <text class="trend-text">{{divinationResult.trend.short_term}}</text>
+              </view>
+              <view class="trend-item">
+                <text class="trend-label">长期趋势（3-12个月）：</text>
+                <text class="trend-text">{{divinationResult.trend.long_term}}</text>
+              </view>
+              <view class="trend-item">
+                <text class="trend-label">最佳时机：</text>
+                <text class="trend-text">{{divinationResult.trend.timing}}</text>
+              </view>
+            </view>
+          </view>
+
+         
+
+          <!-- 化解方案 -->
+          <view class="section resolution-section">
+            <view class="section-title">注意事项与化解</view>
+            <view class="resolution-content">
+              <view class="challenges">
+                <text class="resolution-label">潜在挑战：</text>
+                <view class="challenge-list">
+                  <text class="challenge-item" wx:for="{{divinationResult.resolution.challenges}}" wx:key="index">{{index + 1}}. {{item}}</text>
+                </view>
+              </view>
+              <view class="solutions">
+                <text class="resolution-label">化解方案：</text>
+                <view class="solution-list">
+                  <text class="solution-item" wx:for="{{divinationResult.resolution.solutions}}" wx:key="index">{{index + 1}}. {{item}}</text>
+                </view>
+              </view>
+              <view class="alternatives">
+                <text class="resolution-label">备选方案：</text>
+                <view class="alternative-list">
+                  <text class="alternative-item" wx:for="{{divinationResult.resolution.alternative_plans}}" wx:key="index">{{index + 1}}. {{item}}</text>
+                </view>
               </view>
             </view>
           </view>

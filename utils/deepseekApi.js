@@ -633,7 +633,7 @@ function getZodiacAnimal(year) {
   return zodiacAnimals[index];
 }
 
-// 获取天气预报和穿衣建议
+// 获取天气预报
 export const getWeatherAndAdvice = async (location, userInfo) => {
   // 构建用户信息文本
   let userInfoText = '';
@@ -678,8 +678,6 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
   
   1. 天气详情(温度、天气状况、湿度、风速、空气质量)
   2. 24小时天气预报
-  3. 基于个人信息结合天气的穿衣建议
-  4. 运势提示
   5. 完整的传统黄历信息，包括：
      - 农历日期 
      - 年月日干支
@@ -719,12 +717,6 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
         }
       ]
     },
-    "clothingAdvice": {
-      "index": "穿衣指数",
-      "recommendation": "推荐搭配",
-      "tips": "特别提示",
-      "zodiacAdvice": "星座运势提示"
-    },
     "lunarCalendar": {
       "solarDate": {
         "year": ${today.getFullYear()},
@@ -762,10 +754,7 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
       "times": {
         "lucky": ["吉时1", "吉时2", "吉时3"], 
         "unlucky": ["凶时1", "凶时2", "凶时3"]
-      },
-      "pengzu": "彭祖百忌内容",
-      "dailyWords": "今日一言内容",
-      "tips": "温馨提示内容"
+      }
     }
   }`;
   console.log('发送的 prompt是:'+prompt);
@@ -895,47 +884,46 @@ function formatMajorPeriods(periods) {
 }
 
 // 八字分析功能
-const getBaziAnalysis = async (birthInfo, userInfo = {}) => {
+const getBaziAnalysis = async (birthInfo = {}) => {
   try {
     // 记录请求信息
     console.log('请求', {
       功能: '八字分析',
-      出生信息: birthInfo,
-      用户信息: userInfo
+      出生信息: birthInfo
     });
 
-    // 构建用户信息文本
-    let userInfoText = '';
-    if (userInfo) {
-      userInfoText = `
-      性别：${userInfo.gender || '未知'}
-      昵称：${userInfo.nickname || '未知'}
-      出生地：${userInfo.birthplace || '未知'}
-      星座：${userInfo.zodiac || '未知'}
-      MBTI：${userInfo.mbti || '未知'}
-      `;
-    }
 
-    const prompt = `请根据以下出生信息进行专业的八字分析：
+    const prompt = `请根据以下出生信息进行专业的八字分析，并同时进行姓名学分析：
+
+基本信息：
+姓名：${birthInfo.name}
 出生日期：${birthInfo.birthDate}
 出生时间：${birthInfo.birthTime}
 性别：${birthInfo.gender}
 出生地：${birthInfo.birthplace || '未知'}
 
-用户基本信息：${userInfoText}
+请按照传统八字命理学和姓名学进行综合分析，提供以下内容：
 
-请按照传统八字命理学进行分析，提供以下内容：
-
+【八字分析部分】
 1. 八字排盘：准确计算年柱、月柱、日柱、时柱（天干地支）
 2. 五行分析：分析八字中五行（金木水火土）的分布和强弱
 3. 日主分析：确定日主（日干）的五行属性和旺衰程度
 4. 用神喜忌：分析用神、忌神，以及喜用的五行
-5. 性格特征：基于八字分析性格优缺点和天赋才能
-6. 事业财运：分析适合的职业方向和财运特点
-7. 婚姻感情：分析感情运势和婚姻特点
-8. 健康运势：分析身体健康方面需要注意的事项
-9. 大运流年：分析人生各阶段的大运走势
-10. 开运建议：提供具体的开运方法和注意事项
+
+【姓名学分析部分】
+5. 姓名拆解：按照姓名学将姓名拆解为天格、人格、地格、外格、总格
+6. 姓名五行：分析姓名中每个字的五行属性
+7. 数理分析：计算姓名的数理吉凶和含义
+8. 姓名与八字匹配：分析姓名五行是否与八字用神相符，是否有助于补足八字缺陷
+
+【综合分析部分】
+9. 性格特征：结合八字和姓名分析性格优缺点和天赋才能(至少300字)
+10. 事业财运：分析适合的职业方向和财运特点(100-200字)
+11. 婚姻感情：分析感情运势和婚姻特点(100-200字)
+12. 健康运势：分析身体健康方面需要注意的事项(100-200字)
+13. 大运流年：分析人生各阶段的大运走势
+14. 姓名建议：如果姓名与八字不匹配，提供改名或补救建议(200字)
+15. 开运建议：提供具体的开运方法和注意事项
 
 请以JSON格式返回，包含以下字段：
 {
@@ -960,11 +948,36 @@ const getBaziAnalysis = async (birthInfo, userInfo = {}) => {
     "usefulGod": "用神",
     "tabooGod": "忌神"
   },
-  "personalityAnalysis": "性格特征分析",
+  "nameAnalysis": {
+    "nameBreakdown": {
+      "tianGe": "天格数理和含义",
+      "renGe": "人格数理和含义",
+      "diGe": "地格数理和含义",
+      "waiGe": "外格数理和含义",
+      "zongGe": "总格数理和含义"
+    },
+    "nameWuxing": {
+      "characters": ["姓名每个字的五行属性"],
+      "overallWuxing": "姓名整体五行属性",
+      "wuxingBalance": "姓名五行是否平衡"
+    },
+    "nameScore": "姓名综合评分（0-100分）",
+    "baziNameMatch": {
+      "compatibility": "与八字匹配度（0-100分）",
+      "analysis": "匹配分析详情",
+      "benefitSituation": "姓名是否补益八字用神"
+    }
+  },
+  "personalityAnalysis": "结合八字和姓名的性格特征分析",
   "careerFortune": "事业财运分析", 
   "loveFortune": "婚姻感情分析",
   "healthFortune": "健康运势分析",
   "majorPeriods": "大运流年分析",
+  "nameAdvice": {
+    "isNameGood": "姓名是否适合（true/false）",
+    "suggestions": ["姓名改进建议"],
+    "alternativeNames": ["推荐的改名方案（如果需要）"]
+  },
   "luckyAdvice": {
     "colors": ["有利颜色"],
     "directions": ["有利方位"],
@@ -977,7 +990,7 @@ const getBaziAnalysis = async (birthInfo, userInfo = {}) => {
     const messages = [
       {
         role: 'system',
-        content: '你是一位精通传统八字命理学的大师，具有深厚的易学功底。请严格按照传统八字理论进行分析，确保排盘准确，分析专业。请始终以JSON格式返回数据，不要包含任何其他文本。'
+        content: '你是一位精通传统八字命理学和姓名学的大师，具有深厚的易学功底。请严格按照传统八字理论和姓名学理论进行分析，确保排盘准确，分析专业。对于姓名学分析，请按照五格剖象法计算天格、人格、地格、外格、总格，并结合字义五行进行分析。请始终以JSON格式返回数据，不要包含任何其他文本。'
       },
       {
         role: 'user',
@@ -1035,11 +1048,36 @@ const getBaziAnalysis = async (birthInfo, userInfo = {}) => {
           usefulGod: result.wuxingAnalysis.usefulGod || '未知',
           tabooGod: result.wuxingAnalysis.tabooGod || '未知'
         },
+        nameAnalysis: {
+          nameBreakdown: {
+            tianGe: result.nameAnalysis?.nameBreakdown?.tianGe || '未知',
+            renGe: result.nameAnalysis?.nameBreakdown?.renGe || '未知',
+            diGe: result.nameAnalysis?.nameBreakdown?.diGe || '未知',
+            waiGe: result.nameAnalysis?.nameBreakdown?.waiGe || '未知',
+            zongGe: result.nameAnalysis?.nameBreakdown?.zongGe || '未知'
+          },
+          nameWuxing: {
+            characters: Array.isArray(result.nameAnalysis?.nameWuxing?.characters) ? result.nameAnalysis.nameWuxing.characters : [],
+            overallWuxing: result.nameAnalysis?.nameWuxing?.overallWuxing || '未知',
+            wuxingBalance: result.nameAnalysis?.nameWuxing?.wuxingBalance || '未知'
+          },
+          nameScore: result.nameAnalysis?.nameScore || '未知',
+          baziNameMatch: {
+            compatibility: result.nameAnalysis?.baziNameMatch?.compatibility || '未知',
+            analysis: result.nameAnalysis?.baziNameMatch?.analysis || '未知',
+            benefitSituation: result.nameAnalysis?.baziNameMatch?.benefitSituation || '未知'
+          }
+        },
         personalityAnalysis: result.personalityAnalysis || '暂无分析',
         careerFortune: result.careerFortune || '暂无分析',
         loveFortune: result.loveFortune || '暂无分析',
         healthFortune: result.healthFortune || '暂无分析',
         majorPeriods: formatMajorPeriods(result.majorPeriods),
+        nameAdvice: {
+          isNameGood: result.nameAdvice?.isNameGood || false,
+          suggestions: Array.isArray(result.nameAdvice?.suggestions) ? result.nameAdvice.suggestions : [],
+          alternativeNames: Array.isArray(result.nameAdvice?.alternativeNames) ? result.nameAdvice.alternativeNames : []
+        },
         luckyAdvice: {
           colors: Array.isArray(result.luckyAdvice?.colors) ? result.luckyAdvice.colors : [],
           directions: Array.isArray(result.luckyAdvice?.directions) ? result.luckyAdvice.directions : [],
@@ -1104,11 +1142,36 @@ const getBaziAnalysis = async (birthInfo, userInfo = {}) => {
         usefulGod: '未知',
         tabooGod: '未知'
       },
+      nameAnalysis: {
+        nameBreakdown: {
+          tianGe: '未知',
+          renGe: '未知',
+          diGe: '未知',
+          waiGe: '未知',
+          zongGe: '未知'
+        },
+        nameWuxing: {
+          characters: [],
+          overallWuxing: '未知',
+          wuxingBalance: '未知'
+        },
+        nameScore: '未知',
+        baziNameMatch: {
+          compatibility: '未知',
+          analysis: '未知',
+          benefitSituation: '未知'
+        }
+      },
       personalityAnalysis: '八字分析失败，请稍后重试',
       careerFortune: '暂无分析',
       loveFortune: '暂无分析',
       healthFortune: '暂无分析',
       majorPeriods: '暂无分析',
+      nameAdvice: {
+        isNameGood: false,
+        suggestions: ['请稍后重试'],
+        alternativeNames: []
+      },
       luckyAdvice: {
         colors: [],
         directions: [],

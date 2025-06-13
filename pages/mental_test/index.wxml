@@ -1,0 +1,256 @@
+<!--心理健康测试主页面-->
+<view class="mh-container">
+  <!-- 顶部Hero区域 -->
+  <view class="mh-hero">
+    <view class="mh-hero-bg"></view>
+    <view class="mh-hero-content">
+      <view class="mh-hero-title">
+        <text class="mh-hero-main">探索内心世界</text>
+        <text class="mh-hero-sub">基于国际标准心理测评量表，专业心理健康评估</text>
+      </view>
+      <view class="mh-hero-desc"> 世界卫生组织（WHO）数据表明：中国抑郁症发病率为3.02%，目前已经有超过4000万抑郁患者
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速测试入口 -->
+  <view class="mh-section">
+    <view class="mh-section-header">
+      <text class="mh-section-title">快速测试</text>
+      <text class="mh-section-subtitle">几分钟了解你的心理状态</text>
+    </view>
+    <view class="mh-quick-tests">
+      <view class="mh-quick-card" bindtap="startQuickTest" data-type="health">
+        <view class="mh-quick-icon">🧠</view>
+        <view class="mh-quick-title">抑郁筛查</view>
+        <view class="mh-quick-info">PHQ-9量表 • 9题 • 专业</view>
+        <view class="mh-quick-btn">开始测试</view>
+      </view>
+      <view class="mh-quick-card" bindtap="startQuickTest" data-type="anxiety">
+        <view class="mh-quick-icon">😰</view>
+        <view class="mh-quick-title">焦虑评估</view>
+        <view class="mh-quick-info">GAD-7量表 • 7题 • 专业</view>
+        <view class="mh-quick-btn">开始测试</view>
+      </view>
+      <view class="mh-quick-card" bindtap="startQuickTest" data-type="stress">
+        <view class="mh-quick-icon">🧘</view>
+        <view class="mh-quick-title">压力测评</view>
+        <view class="mh-quick-info">压力感知量表 • 10题 • 中等</view>
+        <view class="mh-quick-btn">开始测试</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 测试分类 -->
+  <view class="mh-section">
+    <view class="mh-section-header">
+      <text class="mh-section-title">专业测评</text>
+      <text class="mh-section-subtitle">全面深入的心理健康评估</text>
+    </view>
+    
+    <!-- 分类标签 -->
+    <view class="mh-category-tabs">
+      <view wx:for="{{categories}}" wx:key="id" 
+            class="mh-tab-item {{currentCategory === item.id ? 'mh-tab-active' : ''}}"
+            bindtap="switchCategory" data-category="{{item.id}}">
+        {{item.name}}
+      </view>
+    </view>
+
+    <!-- 测试列表 -->
+    <view class="mh-test-grid">
+      <view wx:for="{{currentCategory === 'all' ? testList : testList}}" 
+            wx:for-item="item"
+            wx:key="id" 
+            wx:if="{{currentCategory === 'all' || item.categoryId === currentCategory}}"
+            class="mh-test-card mh-card-{{item.color}} {{item.hasResult ? 'mh-card-completed' : ''}}"
+            bindtap="startTest" data-test="{{item}}">
+        <view class="mh-test-header">
+          <view class="mh-test-icon mh-bg-{{item.color}}">
+            <text class="mh-icon">{{item.icon}}</text>
+          </view>
+          <view class="mh-test-badges">
+            <view class="mh-test-badge mh-badge-{{item.color}}">{{item.difficulty}}</view>
+            <!-- 完成状态标识 -->
+            <view wx:if="{{item.hasResult}}" class="mh-completed-badge">
+              <text class="mh-icon">✓</text>
+            </view>
+          </view>
+        </view>
+        
+        <text class="mh-test-title">{{item.name}}</text>
+        <text class="mh-test-desc">{{item.description}}</text>
+        
+        <!-- 如果有结果，显示最新结果信息 -->
+        <view wx:if="{{item.hasResult && item.latestResult}}" class="mh-latest-result">
+          <view class="mh-result-score">
+            <text class="mh-score-value mh-text-{{item.color}}">{{item.latestResult.score}}</text>
+            <text class="mh-score-label">{{item.latestResult.level}}</text>
+          </view>
+          <text class="mh-result-date">{{item.latestResult.date}}</text>
+        </view>
+        
+        <view class="mh-test-tags">
+          <view wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this"
+                class="mh-tag mh-tag-{{item.color}}">{{tag}}</view>
+        </view>
+        
+        <view class="mh-test-meta">
+          <text>{{item.duration}}分钟</text>
+          <text>{{item.questionsCount}}题</text>
+        </view>
+        
+        <view class="mh-test-stats">
+          <view class="mh-progress-wrapper">
+            <text class="mh-progress-label">{{item.hasResult ? '已完成' : '完成度'}}</text>
+            <view class="mh-progress-bar">
+              <view class="mh-progress-fill mh-progress-{{item.color}}" 
+                    style="width: {{item.completion}}%"></view>
+            </view>
+            <text class="mh-progress-text">{{item.completion}}%</text>
+          </view>
+        </view>
+        
+        <!-- 操作按钮 -->
+        <view class="mh-test-action">
+          <text class="mh-action-text">{{item.hasResult ? '查看/重测' : '开始测试'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 测试历史 -->
+  <view class="mh-section" wx:if="{{testHistory.length > 0}}">
+    <view class="mh-section-header">
+      <text class="mh-section-title">测试历史</text>
+      <text class="mh-section-subtitle">查看您的历史测试记录</text>
+    </view>
+    
+    <view class="mh-history-list">
+      <view wx:for="{{testHistory}}" wx:key="id" 
+            class="mh-history-card"
+            bindtap="viewTestResult" data-result="{{item}}">
+        <view class="mh-history-header">
+          <view class="mh-history-icon mh-bg-{{item.color}}">
+            <text class="mh-icon">{{item.icon}}</text>
+          </view>
+          <view class="mh-history-info">
+            <text class="mh-history-title">{{item.testName}}</text>
+            <text class="mh-history-date">{{item.date}}</text>
+          </view>
+          <view class="mh-history-score">
+            <text class="mh-score-value mh-text-{{item.color}}">{{item.score}}</text>
+            <text class="mh-score-label">{{item.level}}</text>
+          </view>
+        </view>
+        <text class="mh-history-summary">{{item.summary}}</text>
+      </view>
+    </view>
+  </view>
+
+  
+
+  <view class="mh-bottom-spacer"></view>
+</view>
+
+<!-- 测试模态框 -->
+<view class="mh-test-modal {{showTestModal ? 'mh-modal-show' : ''}}" wx:if="{{currentTest}}">
+  <view class="mh-test-content">
+    <!-- 测试头部 -->
+    <view class="mh-test-modal-header">
+      <text class="mh-modal-title">{{currentTest.name}}</text>
+      <view class="mh-progress-info">
+        <text>{{currentQuestionIndex + 1}}/{{currentTest.questions.length}}</text>
+      </view>
+      <view class="mh-close-btn" bindtap="closeTest">×</view>
+    </view>
+    
+    <!-- 进度条 -->
+    <view class="mh-progress-container">
+      <view class="mh-progress-bar-full">
+        <view class="mh-progress-fill-full" 
+              style="width: {{(currentQuestionIndex + 1) / currentTest.questions.length * 100}}%"></view>
+      </view>
+    </view>
+
+    <!-- 问题内容 -->
+    <view class="mh-question-container" wx:if="{{currentQuestion}}">
+      <view class="mh-question-header">
+        <view class="mh-question-category mh-badge-{{currentTest.color}}">
+          {{currentTest.category}}
+        </view>
+        <text class="mh-question-number">第 {{currentQuestionIndex + 1}} 题</text>
+      </view>
+      
+      <text class="mh-question-text">{{currentQuestion.question}}</text>
+
+      <!-- 李克特频率量表 -->
+      <view wx:if="{{currentQuestion.type === 'likert_frequency' || currentQuestion.type === 'likert_frequency_reverse'}}" class="mh-likert-container">
+        <view class="mh-likert-options">
+          <view wx:for="{{likertFrequencyOptions}}" wx:key="value"
+                class="mh-likert-option {{selectedAnswer === item.value ? 'mh-likert-selected' : ''}}"
+                bindtap="selectOption" data-value="{{item.value}}">
+            <text class="mh-likert-icon">{{item.icon}}</text>
+            <text class="mh-likert-label">{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 李克特同意量表 -->
+      <view wx:if="{{currentQuestion.type === 'likert_agreement'}}" class="mh-likert-container">
+        <view class="mh-likert-options">
+          <view wx:for="{{likertAgreementOptions}}" wx:key="value"
+                class="mh-likert-option {{selectedAnswer === item.value ? 'mh-likert-selected' : ''}}"
+                bindtap="selectOption" data-value="{{item.value}}">
+            <text class="mh-likert-icon">{{item.icon}}</text>
+            <text class="mh-likert-label">{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 选择题 -->
+      <view wx:if="{{currentQuestion.type === 'choice'}}" class="mh-options-container">
+        <view wx:for="{{currentQuestion.options}}" wx:key="value"
+              class="mh-option-item {{selectedAnswer === item.value ? 'mh-option-selected' : ''}}"
+              bindtap="selectOption" data-value="{{item.value}}">
+          <view class="mh-option-radio">
+            <view wx:if="{{selectedAnswer === item.value}}" class="mh-radio-dot"></view>
+          </view>
+          <text class="mh-option-text">{{item.text}}</text>
+        </view>
+      </view>
+
+      <!-- 滑块 -->
+      <view wx:if="{{currentQuestion.type === 'slider'}}" class="mh-slider-container">
+        <view class="mh-slider-labels">
+          <text>{{currentQuestion.minLabel}}</text>
+          <text>{{currentQuestion.maxLabel}}</text>
+        </view>
+        <slider class="mh-slider" 
+                min="{{currentQuestion.min}}" 
+                max="{{currentQuestion.max}}" 
+                value="{{selectedAnswer || currentQuestion.min}}"
+                bindchange="onSliderChange" />
+        <view class="mh-slider-value">{{selectedAnswer || currentQuestion.min}}</view>
+      </view>
+    </view>
+
+    <!-- 导航按钮 -->
+    <view class="mh-test-navigation">
+      <view class="mh-nav-btn {{currentQuestionIndex === 0 ? 'mh-btn-disabled' : 'mh-btn-secondary'}}"
+            bindtap="previousQuestion">
+        上一题
+      </view>
+      
+      <view class="mh-auto-save-tip">
+        <text class="mh-icon">💾</text>
+        <text>自动保存</text>
+      </view>
+      
+      <view class="mh-nav-btn {{selectedAnswer === null ? 'mh-btn-disabled' : 'mh-btn-primary'}}"
+            bindtap="nextQuestion">
+        {{currentQuestionIndex === currentTest.questions.length - 1 ? '完成测试' : '下一题'}}
+      </view>
+    </view>
+  </view>
+</view> 

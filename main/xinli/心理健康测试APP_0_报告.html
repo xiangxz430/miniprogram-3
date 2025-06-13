@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心理健康测试APP原型设计</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="https://gw.alipayobjects.com/os/lib/echarts/5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #5b8ef2;
+            --secondary-color: #64d6c8;
+            --accent-color: #ff7e67;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #edf2f7;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition-standard: all 0.3s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: var(--transition-standard);
+        }
+
+        .navbar.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: var(--transition-standard);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: var(--transition-standard);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            transition: var(--transition-standard);
+        }
+
+        .btn-primary:hover {
+            background-color: #4a7de0;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card {
+            transition: var(--transition-standard);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .mouse-cursor-gradient-tracking {
+            position: relative;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .mouse-cursor-gradient-tracking::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--x, 0) var(--y, 0), rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .mouse-cursor-gradient-tracking:hover::before {
+            opacity: 1;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .neumorphism {
+            background: #f0f0f3;
+            border-radius: 12px;
+            box-shadow: 10px 10px 20px #d1d1d1, -10px -10px 20px #ffffff;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .parallax-container {
+            perspective: 1000px;
+            height: 100%;
+        }
+
+        .parallax-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .section-title::after {
+                width: 40px;
+            }
+        }
+    </style>
+</head>
+<body class="custom-scrollbar">
+    <!-- 导航栏 -->
+    <nav class="navbar fixed top-0 left-0 w-full z-50 px-4 py-3 transition-all duration-300">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="flex items-center">
+                <i class="fas fa-brain text-2xl mr-2 text-primary-600" style="color: var(--primary-color);"></i>
+                <span class="text-xl font-bold">心灵伴侣</span>
+            </a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#hero" class="nav-link">首页</a>
+                <a href="#features" class="nav-link">核心功能</a>
+                <a href="#tests" class="nav-link">测试分类</a>
+                <a href="#process" class="nav-link">测试流程</a>
+                <a href="#results" class="nav-link">结果展示</a>
+                <a href="#interaction" class="nav-link">交互设计</a>
+                <a href="#special" class="nav-link">特色功能</a>
+                <a href="#support" class="nav-link">专业支持</a>
+            </div>
+            <button class="md:hidden focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <a href="#" class="hidden md:block mouse-cursor-gradient-tracking px-6 py-2 rounded-full font-medium">
+                立即体验
+            </a>
+        </div>
+    </nav>
+
+    <!-- 移动端导航菜单 -->
+    <div class="mobile-menu hidden fixed top-0 left-0 w-full h-full bg-white z-50 p-5 transform transition-transform duration-300 translate-x-full">
+        <div class="flex justify-between items-center mb-8">
+            <a href="#" class="flex items-center">
+                <i class="fas fa-brain text-2xl mr-2" style="color: var(--primary-color);"></i>
+                <span class="text-xl font-bold">心灵伴侣</span>
+            </a>
+            <button class="mobile-close focus:outline-none">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div class="flex flex-col space-y-4">
+            <a href="#hero" class="py-2 border-b border-gray-200">首页</a>
+            <a href="#features" class="py-2 border-b border-gray-200">核心功能</a>
+            <a href="#tests" class="py-2 border-b border-gray-200">测试分类</a>
+            <a href="#process" class="py-2 border-b border-gray-200">测试流程</a>
+            <a href="#results" class="py-2 border-b border-gray-200">结果展示</a>
+            <a href="#interaction" class="py-2 border-b border-gray-200">交互设计</a>
+            <a href="#special" class="py-2 border-b border-gray-200">特色功能</a>
+            <a href="#support" class="py-2 border-b border-gray-200">专业支持</a>
+            <a href="#" class="mt-4 text-center bg-gradient-to-r from-blue-500 to-teal-400 text-white py-3 rounded-full">
+                立即体验
+            </a>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <main>
+        <!-- 各个section将在这里插入 -->
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">心灵伴侣</h3>
+                    <p class="text-gray-400">专业的心理健康测试与支持平台，致力于为每个人提供科学、便捷的心理健康服务。</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">快速链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">关于我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">心理测试</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">专家团队</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">常见问题</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">联系我们</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">测试类别</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">情绪测试</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">人格特质</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">心理健康筛查</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">专业量表</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">关系测试</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">联系我们</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">北京市海淀区中关村大街1号</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-phone-alt mt-1 mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">+86 10 8888 8888</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope mt-1 mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">contact@xinlingbanlu.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 心灵伴侣 - 心理健康测试APP. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 10) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // 移动端菜单
+        const menuButton = document.querySelector('.navbar button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const closeButton = document.querySelector('.mobile-close');
+        
+        menuButton.addEventListener('click', function() {
+            mobileMenu.classList.remove('translate-x-full');
+        });
+        
+        closeButton.addEventListener('click', function() {
+            mobileMenu.classList.add('translate-x-full');
+        });
+
+        // 移动端菜单项点击关闭菜单
+        const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.add('translate-x-full');
+            });
+        });
+
+        // 鼠标跟踪渐变按钮效果
+        document.querySelectorAll('.mouse-cursor-gradient-tracking').forEach(button => {
+            button.addEventListener('mousemove', e => {
+                const rect = button.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / button.offsetWidth) * 100;
+                const y = ((e.clientY - rect.top) / button.offsetHeight) * 100;
+                button.style.setProperty('--x', x + '%');
+                button.style.setProperty('--y', y + '%');
+            });
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // 激活当前导航项
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                if (window.scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -169,6 +169,11 @@ App({
     const userSettings = wx.getStorageSync('userSettings');
     if (userSettings) {
       this.globalData.userSettings = userSettings;
+      // 确保位置信息也同步到全局数据
+      if (userSettings.currentLocation) {
+        this.globalData.userSettings.currentLocation = userSettings.currentLocation;
+        console.log('全局数据已加载位置信息:', userSettings.currentLocation);
+      }
     }
   },
 

@@ -2,7 +2,9 @@
   "pages": [
     "pages/home/index",
     "pages/user_profile/index",
-    "pages/mbti_personality/index"
+    "pages/mbti_personality/index",
+    "pages/mental_test/index",
+    "pages/mental_test/result"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -30,6 +32,10 @@
         "selectedIconPath": "images/icons/mbti.png"
       },
       {
+        "pagePath": "pages/mental_test/index",
+        "text": "心理健康测试"
+      },
+      {
         "pagePath": "pages/user_profile/index",
         "text": "我的",
         "iconPath": "images/icons/user.png",
@@ -40,7 +46,7 @@
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "networkTimeout": {
-    "request": 10000,
+    "request": 120000,
     "connectSocket": 10000,
     "uploadFile": 10000,
     "downloadFile": 10000

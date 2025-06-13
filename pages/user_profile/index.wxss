@@ -1843,4 +1843,326 @@ button::after {
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+/* 姓名解析分析样式 - 简洁蓝色风格 */
+.name-analysis-section {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  border: 1rpx solid #f0f0f0;
+}
+
+/* 姓名五格分析面板 */
+.name-breakdown-panel {
+  background-color: #f8fafc;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  margin-bottom: 25rpx;
+  border: 1rpx solid #e2e8f0;
+}
+
+.breakdown-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15rpx 20rpx;
+}
+
+.breakdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  border: 1rpx solid #e2e8f0;
+}
+
+.breakdown-label {
+  font-size: 24rpx;
+  color: #64748b;
+  margin-bottom: 8rpx;
+  font-weight: 500;
+}
+
+.breakdown-value {
+  font-size: 26rpx;
+  color: #1e293b;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* 姓名五行分析 */
+.name-wuxing-panel {
+  background-color: #f8fafc;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  margin-bottom: 25rpx;
+  border: 1rpx solid #e2e8f0;
+}
+
+.wuxing-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.name-wuxing-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.name-characters {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.characters-label, .overall-label, .balance-label {
+  font-size: 24rpx;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.characters-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.character-tag {
+  background-color: #eff6ff;
+  color: #3b82f6;
+  padding: 6rpx 12rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  border: 1rpx solid #dbeafe;
+}
+
+.overall-value, .balance-value {
+  font-size: 24rpx;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* 姓名匹配度面板 */
+.name-match-panel {
+  background-color: #f8fafc;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  margin-bottom: 25rpx;
+  border: 1rpx solid #e2e8f0;
+}
+
+.match-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.match-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.match-score, .compatibility-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  border: 1rpx solid #e2e8f0;
+}
+
+.score-label, .compatibility-label, .analysis-label, .benefit-label {
+  font-size: 24rpx;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.score-value, .compatibility-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+
+/* 评分颜色样式 - 简洁版本 */
+.name-score-good, .match-score-good {
+  background-color: #dcfce7;
+  color: #16a34a;
+  border: 1rpx solid #bbf7d0;
+}
+
+.name-score-medium, .match-score-medium {
+  background-color: #fef3c7;
+  color: #d97706;
+  border: 1rpx solid #fde68a;
+}
+
+.name-score-poor, .match-score-poor {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1rpx solid #fecaca;
+}
+
+/* 分析文本和补益情况样式 */
+.match-analysis, .benefit-situation {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: 15rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  border-left: 4rpx solid #3b82f6;
+  border: 1rpx solid #e2e8f0;
+}
+
+.analysis-text, .benefit-text {
+  font-size: 24rpx;
+  color: #475569;
+  line-height: 1.6;
+  margin-top: 0;
+}
+
+/* 姓名建议面板 */
+.name-advice-panel {
+  background-color: #f8fafc;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  margin-bottom: 25rpx;
+  border: 1rpx solid #e2e8f0;
+}
+
+.advice-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.name-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+  padding: 15rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  border: 1rpx solid #e2e8f0;
+}
+
+.status-label {
+  font-size: 24rpx;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.status-value {
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+
+.name-status-good {
+  background-color: #dcfce7;
+  color: #16a34a;
+  border: 1rpx solid #bbf7d0;
+}
+
+.name-status-poor {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1rpx solid #fecaca;
+}
+
+.name-suggestions, .alternative-names {
+  margin-bottom: 15rpx;
+}
+
+.suggestions-label, .alternatives-label {
+  font-size: 24rpx;
+  color: #64748b;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.suggestion-item {
+  font-size: 22rpx;
+  color: #475569;
+  line-height: 1.4;
+  padding: 12rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  border-left: 4rpx solid #3b82f6;
+  border: 1rpx solid #e2e8f0;
+}
+
+.alternatives-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.alternative-tag {
+  background-color: #eff6ff;
+  color: #3b82f6;
+  padding: 6rpx 12rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  border: 1rpx solid #dbeafe;
+}
+
+/* 响应式设计 - 小屏幕优化 */
+@media screen and (max-width: 750rpx) {
+  .breakdown-grid {
+    grid-template-columns: 1fr;
+    gap: 12rpx;
+  }
+  
+  .name-wuxing-chars {
+    flex-direction: column;
+    gap: 10rpx;
+  }
+  
+  .name-char-item {
+    margin: 0;
+  }
+  
+  .breakdown-title,
+  .name-wuxing-title,
+  .name-math-title,
+  .name-match-title,
+  .name-suggestions-title {
+    font-size: 26rpx;
+  }
 } 

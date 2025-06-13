@@ -1,0 +1,143 @@
+<view class="result-container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载结果中...</text>
+  </view>
+
+  <!-- 结果内容 -->
+  <view wx:else class="result-content">
+    <!-- 结果头部 -->
+    <view class="result-header">
+      <view class="result-icon" style="background: linear-gradient(135deg, {{result.color}}, #667eea);">
+        <text class="icon-emoji">{{result.icon}}</text>
+      </view>
+      <view class="result-title">
+        <text class="test-name">{{result.testName}}</text>
+        <text class="test-date">{{result.date}}</text>
+      </view>
+    </view>
+
+    <!-- 总体得分卡片 -->
+    <view class="score-card">
+      <view class="score-main">
+        <view class="score-circle" style="border-color: {{result.levelColor}};">
+          <text class="score-number">{{result.score}}</text>
+          <text class="score-unit">分</text>
+        </view>
+        <view class="score-info">
+          <view class="score-level" style="color: {{result.levelColor}};">{{result.level}}</view>
+          <view class="score-summary">{{result.summary}}</view>
+        </view>
+      </view>
+      <view class="score-detail">
+        <text class="score-range">得分范围：{{result.totalScore}}/{{result.maxScore}}</text>
+      </view>
+    </view>
+
+    <!-- 维度分析 -->
+    <view wx:if="{{result.dimensions && result.dimensions.length > 0}}" class="dimensions-section">
+      <view class="section-header">
+        <text class="section-title">📊 维度分析</text>
+        <text class="section-subtitle">各维度得分详情</text>
+      </view>
+      
+      <view class="dimensions-list">
+        <view wx:for="{{result.dimensions}}" wx:key="name" class="dimension-item">
+          <view class="dimension-header">
+            <text class="dimension-name">{{item.name}}</text>
+            <text class="dimension-score">{{item.score}}/{{item.maxScore}}</text>
+          </view>
+          <view class="dimension-bar">
+            <view class="dimension-progress" 
+                  style="width: {{item.percentage}}%; background-color: {{item.color === 'green' ? '#52c41a' : item.color === 'yellow' ? '#faad14' : item.color === 'red' ? '#ff4d4f' : '#1890ff'}};"></view>
+          </view>
+          <text class="dimension-desc">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 专业建议 -->
+    <view wx:if="{{result.suggestions && result.suggestions.length > 0}}" class="suggestions-section">
+      <view class="section-header">
+        <text class="section-title">💡 专业建议</text>
+        <text class="section-subtitle">基于您的测试结果</text>
+      </view>
+      
+      <view class="suggestions-list">
+        <view wx:for="{{result.suggestions}}" wx:key="title" class="suggestion-item" 
+              bindtap="viewSuggestionDetail" data-suggestion="{{item}}"
+              style="border-left-color: {{item.color === 'red' ? '#ff4d4f' : item.color === 'orange' ? '#fa8c16' : item.color === 'yellow' ? '#faad14' : item.color === 'green' ? '#52c41a' : item.color === 'blue' ? '#1890ff' : '#722ed1'}};">
+          <view class="suggestion-header">
+            <text class="suggestion-icon">{{item.icon}}</text>
+            <text class="suggestion-title">{{item.title}}</text>
+          </view>
+          <text class="suggestion-desc">{{item.description}}</text>
+          <view class="suggestion-arrow">
+            <text class="arrow-icon">▶</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 风险提示 -->
+    <view wx:if="{{result.riskLevel === 'severe'}}" class="risk-warning">
+      <view class="warning-content">
+        <text class="warning-icon">⚠️</text>
+        <view class="warning-text">
+          <text class="warning-title">重要提醒</text>
+          <text class="warning-desc">您的测试结果显示需要专业关注，建议尽快咨询心理健康专家</text>
+        </view>
+      </view>
+      <view class="warning-actions">
+        <button class="emergency-btn" bindtap="emergencyHelp">紧急求助</button>
+        <button class="consult-btn" bindtap="consultExpert">咨询专家</button>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="action-btn secondary" bindtap="shareResult">
+        <text class="btn-icon">📤</text>
+        <text class="btn-text">分享结果</text>
+      </button>
+      <button class="action-btn secondary" bindtap="viewHistory">
+        <text class="btn-icon">📋</text>
+        <text class="btn-text">历史记录</text>
+      </button>
+      <button class="action-btn primary" bindtap="retakeTest">
+        <text class="btn-icon">🔄</text>
+        <text class="btn-text">重新测试</text>
+      </button>
+    </view>
+
+    <!-- 专家咨询区域 -->
+    <view wx:if="{{result.riskLevel !== 'low'}}" class="consult-section">
+      <view class="consult-header">
+        <text class="consult-title">👩‍⚕️ 需要专业帮助？</text>
+      </view>
+      <view class="consult-content">
+        <text class="consult-desc">如果您对结果有疑问或需要专业指导，建议咨询心理健康专家</text>
+        <button class="consult-expert-btn" bindtap="consultExpert">联系专家</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 建议详情模态框 -->
+  <view wx:if="{{showSuggestionDetail}}" class="suggestion-modal">
+    <view class="modal-mask" bindtap="closeSuggestionDetail"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-icon">{{selectedSuggestion.icon}}</text>
+        <text class="modal-title">{{selectedSuggestion.title}}</text>
+        <text class="modal-close" bindtap="closeSuggestionDetail">✕</text>
+      </view>
+      <view class="modal-body">
+        <text class="modal-description">{{selectedSuggestion.description}}</text>
+      </view>
+      <view class="modal-footer">
+        <button class="modal-btn" bindtap="closeSuggestionDetail">知道了</button>
+      </view>
+    </view>
+  </view>
+</view> 

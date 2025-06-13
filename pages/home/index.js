@@ -39,13 +39,12 @@ Page({
   },
   
   onShow: function() {
-    // 配置TabBar选中状态
+    // 配置TabBar选中状态 - 让自动检测处理，不手动设置
     if (typeof this.getTabBar === 'function') {
       const tabBar = this.getTabBar()
       if (tabBar) {
-        tabBar.setData({
-          selected: 0
-        })
+        // 调用updateCurrentTab让它自动检测当前页面
+        tabBar.updateCurrentTab();
       }
     }
   },

@@ -100,20 +100,12 @@ Page({
       activeTab: 0
     });
     
-    // 如果没有位置信息，尝试获取一次位置（仅在首次加载时）
+    // 检查是否已有位置信息，如果没有则提示用户设置
     const userSettings = wx.getStorageSync('userSettings') || {};
     if (!userSettings.currentLocation) {
-      console.log('首次加载页面，尝试获取位置');
-      // 设置一个延时，等页面完全加载后再请求位置
-      setTimeout(() => {
-        this.getLocation();
-      }, 1000);
+      console.log('未检测到保存的位置信息，用户可以手动点击设置位置');
     } else {
-      // 已有位置信息，直接使用
-      this.setData({
-        'userInfo.currentLocation': userSettings.currentLocation
-      });
-      console.log('使用已保存的位置信息:', userSettings.currentLocation);
+      console.log('已加载保存的位置信息:', userSettings.currentLocation);
     }
     
     // 加载已保存的八字分析结果
@@ -128,13 +120,11 @@ Page({
     // 输出当前标签状态，用于调试
     console.log('页面显示 - 当前activeTab:', this.data.activeTab);
     
-    // 应用动态TabBar样式
+    // 应用动态TabBar样式 - 让自动检测处理，不手动设置
     if (typeof this.getTabBar === 'function') {
       const tabBar = this.getTabBar();
       if (tabBar) {
-        tabBar.setData({
-          selected: 4 // 更新为4，因为首页是0，每日一挂是1，八字总运是2，MBTI测试是3
-        });
+        tabBar.updateCurrentTab();
       }
     }
   },
@@ -177,7 +167,8 @@ Page({
         'userInfo.gender': userSettings.gender || this.data.userInfo.gender,
         'userInfo.mbti': userSettings.mbti || this.data.userInfo.mbti,
         'userInfo.birthplace': userSettings.birthplace || this.data.userInfo.birthplace,
-        'userInfo.birthplaceArray': userSettings.birthplaceArray || this.data.userInfo.birthplaceArray
+        'userInfo.birthplaceArray': userSettings.birthplaceArray || this.data.userInfo.birthplaceArray,
+        'userInfo.currentLocation': userSettings.currentLocation || this.data.userInfo.currentLocation
       });
       
       // 加载八字分析结果
@@ -201,6 +192,11 @@ Page({
           // 更新星座和农历
           this.updateZodiacAndLunar(year, month, day);
         }
+      }
+      
+      // 如果成功加载到位置信息，输出日志
+      if (userSettings.currentLocation) {
+        console.log('成功加载已保存的位置信息:', userSettings.currentLocation);
       }
     }
     
@@ -368,17 +364,26 @@ Page({
       icon: 'success',
       duration: 1500
     });
+    
+    console.log('用户设置已保存，包括位置信息:', userSettings.currentLocation);
   },
 
   // 生日选择器事件
   bindBirthdateChange: function(e) {
     // 将日期格式从YYYY-MM-DD转为YYYY年MM月DD日
     const dateStr = e.detail.value;
-    const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
+    
+    // 使用字符串分割而不是Date对象来避免时区问题
+    const dateParts = dateStr.split('-');
+    const year = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]);
+    const day = parseInt(dateParts[2]);
+    
     const formattedDate = `${year}年${month}月${day}日`;
+    
+    console.log('生日选择器输入:', dateStr);
+    console.log('解析结果 - 年:', year, '月:', month, '日:', day);
+    console.log('格式化结果:', formattedDate);
     
     this.setData({
       'userInfo.birthdate': formattedDate,
@@ -562,10 +567,8 @@ Page({
               'userInfo.currentLocation': fullAddress
             });
             
-            // 保存到用户设置
-            const userSettings = wx.getStorageSync('userSettings') || {};
-            userSettings.currentLocation = fullAddress;
-            wx.setStorageSync('userSettings', userSettings);
+            // 立即保存用户设置，确保位置信息被持久化
+            this.saveUserSettings();
             
             // 发送自定义事件，通知其他页面更新天气数据
             const pages = getCurrentPages();
@@ -575,12 +578,23 @@ Page({
               }
             });
             
-            console.log('位置更新成功:', fullAddress);
+            console.log('位置更新并保存成功:', fullAddress);
             
             wx.showToast({
-              title: '位置已更新',
-              icon: 'success'
+              title: '位置已永久保存',
+              icon: 'success',
+              duration: 2000
             });
+            
+            // 延迟显示提示，告知用户位置已保存到本地
+            setTimeout(() => {
+              wx.showModal({
+                title: '位置保存成功',
+                content: '您的位置信息已保存到本地，下次进入小程序时会自动加载，无需重新选择。',
+                showCancel: false,
+                confirmText: '知道了'
+              });
+            }, 2500);
           } catch (error) {
             console.error('保存位置信息失败:', error);
             wx.showToast({
@@ -825,9 +839,9 @@ Page({
       // 处理五行数据用于可视化
       const wuxingItems = this.processWuxingData(result.wuxingAnalysis.distribution);
 
-      // 保存结果到页面数据
+      // 保存结果到页面数据 - 直接使用原始数据结构
       this.setData({
-        baziAnalysisResult: result,
+        baziAnalysisResult: result, // 直接使用原始结果，不修改nameAnalysis结构
         wuxingItems: wuxingItems
       });
 
@@ -1689,5 +1703,122 @@ Page({
         });
       }
     });
+  },
+
+  // 处理姓名解析数据
+  processNameAnalysisData: function(nameAnalysis) {
+    if (!nameAnalysis) {
+      return null;
+    }
+
+    try {
+      // 确保数据结构完整
+      const processedData = {
+        nameBreakdown: {
+          tianGe: nameAnalysis.nameBreakdown?.tianGe || '未知',
+          renGe: nameAnalysis.nameBreakdown?.renGe || '未知',
+          diGe: nameAnalysis.nameBreakdown?.diGe || '未知',
+          waiGe: nameAnalysis.nameBreakdown?.waiGe || '未知',
+          zongGe: nameAnalysis.nameBreakdown?.zongGe || '未知'
+        },
+        nameWuxing: {
+          chars: this.processNameCharacters(nameAnalysis.nameWuxing?.characters || []),
+          summary: nameAnalysis.nameWuxing?.overallWuxing || '姓名五行分析暂无'
+        },
+        mathAnalysis: nameAnalysis.nameScore ? `综合评分：${nameAnalysis.nameScore}分` : '数理分析暂无',
+        baziMatch: {
+          score: this.parseScore(nameAnalysis.baziNameMatch?.compatibility),
+          analysis: nameAnalysis.baziNameMatch?.analysis || '匹配度分析暂无'
+        },
+        suggestions: this.formatNameSuggestions(nameAnalysis.nameAdvice)
+      };
+
+      return processedData;
+    } catch (error) {
+      console.error('处理姓名解析数据时出错:', error);
+      return {
+        nameBreakdown: {
+          tianGe: '数据解析失败',
+          renGe: '数据解析失败', 
+          diGe: '数据解析失败',
+          waiGe: '数据解析失败',
+          zongGe: '数据解析失败'
+        },
+        nameWuxing: {
+          chars: [],
+          summary: '数据解析失败'
+        },
+        mathAnalysis: '数据解析失败',
+        baziMatch: {
+          score: 0,
+          analysis: '数据解析失败'
+        },
+        suggestions: '数据解析失败'
+      };
+    }
+  },
+
+  // 处理姓名字符的五行数据
+  processNameCharacters: function(characters) {
+    if (!Array.isArray(characters) || characters.length === 0) {
+      return [];
+    }
+
+    return characters.map((item, index) => {
+      if (typeof item === 'string') {
+        // 如果是字符串，尝试解析
+        return {
+          char: item,
+          wuxing: '未知'
+        };
+      } else if (typeof item === 'object') {
+        return {
+          char: item.char || item.character || `字${index + 1}`,
+          wuxing: item.wuxing || item.element || '未知'
+        };
+      }
+      return {
+        char: `字${index + 1}`,
+        wuxing: '未知'
+      };
+    });
+  },
+
+  // 解析分数
+  parseScore: function(scoreStr) {
+    if (!scoreStr) return 0;
+    
+    // 提取数字
+    const match = scoreStr.toString().match(/(\d+)/);
+    if (match) {
+      const score = parseInt(match[1]);
+      return Math.min(100, Math.max(0, score)); // 确保在0-100范围内
+    }
+    return 0;
+  },
+
+  // 格式化姓名建议
+  formatNameSuggestions: function(nameAdvice) {
+    if (!nameAdvice) {
+      return '暂无建议';
+    }
+
+    let suggestions = [];
+    
+    if (nameAdvice.isNameGood) {
+      suggestions.push('✅ 您的姓名与八字匹配较好');
+    } else {
+      suggestions.push('⚠️ 您的姓名与八字匹配度有待提升');
+    }
+
+    if (Array.isArray(nameAdvice.suggestions) && nameAdvice.suggestions.length > 0) {
+      suggestions = suggestions.concat(nameAdvice.suggestions);
+    }
+
+    if (Array.isArray(nameAdvice.alternativeNames) && nameAdvice.alternativeNames.length > 0) {
+      suggestions.push('💡 推荐改名：' + nameAdvice.alternativeNames.join('、'));
+    }
+
+    return suggestions.length > 0 ? suggestions.join('\n') : '暂无建议';
   }
 }); 

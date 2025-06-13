@@ -1,0 +1,433 @@
+<section id="tests" class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">测试分类中心</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                探索多种专业心理测试，从情绪健康到人格特质，找到适合您需求的评估工具
+            </p>
+        </div>
+
+        <!-- 搜索和筛选区域 -->
+        <div class="glassmorphism p-6 mb-10 max-w-4xl mx-auto">
+            <div class="flex flex-col md:flex-row gap-4 mb-6">
+                <div class="flex-grow relative">
+                    <input type="text" placeholder="搜索测试..." class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-300 transition-all">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="flex gap-2">
+                    <button class="mouse-cursor-gradient-tracking px-4 py-2 rounded-lg">
+                        <i class="fas fa-filter mr-2"></i>筛选
+                    </button>
+                    <button class="bg-white px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all">
+                        <i class="fas fa-sort mr-2"></i>排序
+                    </button>
+                </div>
+            </div>
+
+            <!-- 筛选选项 -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">测试类型</label>
+                    <select class="w-full p-2 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-300">
+                        <option value="">全部类型</option>
+                        <option value="emotion">情绪类</option>
+                        <option value="personality">人格特质</option>
+                        <option value="screening">心理健康筛查</option>
+                        <option value="professional">专业量表</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">测试时长</label>
+                    <select class="w-full p-2 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-300">
+                        <option value="">全部时长</option>
+                        <option value="short">短 (5分钟以内)</option>
+                        <option value="medium">中 (5-15分钟)</option>
+                        <option value="long">长 (15分钟以上)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">难度</label>
+                    <select class="w-full p-2 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-300">
+                        <option value="">全部难度</option>
+                        <option value="easy">简单</option>
+                        <option value="medium">中等</option>
+                        <option value="hard">复杂</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">专业程度</label>
+                    <select class="w-full p-2 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-300">
+                        <option value="">全部</option>
+                        <option value="basic">基础</option>
+                        <option value="advanced">进阶</option>
+                        <option value="professional">专业</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 标签筛选 -->
+            <div class="flex flex-wrap gap-2 mb-2">
+                <span class="text-sm font-medium text-gray-700 mr-2">热门标签:</span>
+                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-full cursor-pointer hover:bg-blue-200 transition-all">抑郁</span>
+                <span class="bg-purple-100 text-purple-800 text-xs font-medium px-3 py-1 rounded-full cursor-pointer hover:bg-purple-200 transition-all">焦虑</span>
+                <span class="bg-green-100 text-green-800 text-xs font-medium px-3 py-1 rounded-full cursor-pointer hover:bg-green-200 transition-all">压力</span>
+                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1 rounded-full cursor-pointer hover:bg-yellow-200 transition-all">睡眠</span>
+                <span class="bg-red-100 text-red-800 text-xs font-medium px-3 py-1 rounded-full cursor-pointer hover:bg-red-200 transition-all">人际关系</span>
+                <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-3 py-1 rounded-full cursor-pointer hover:bg-indigo-200 transition-all">自我认知</span>
+            </div>
+
+            <!-- 已选筛选条件 -->
+            <div class="flex flex-wrap gap-2 mt-4">
+                <div class="bg-blue-50 text-blue-700 text-sm px-3 py-1 rounded-full flex items-center">
+                    情绪类
+                    <button class="ml-2 text-blue-500 hover:text-blue-700">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+                <div class="bg-blue-50 text-blue-700 text-sm px-3 py-1 rounded-full flex items-center">
+                    5-15分钟
+                    <button class="ml-2 text-blue-500 hover:text-blue-700">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+                <button class="text-sm text-gray-500 hover:text-gray-700 ml-2">
+                    清除全部
+                </button>
+            </div>
+        </div>
+
+        <!-- 测试类别标签 -->
+        <div class="flex justify-center mb-8">
+            <div class="inline-flex rounded-md shadow-sm" role="group">
+                <button type="button" class="px-6 py-3 text-sm font-medium bg-primary-600 text-white rounded-l-lg hover:bg-primary-700 focus:z-10 focus:ring-2 focus:ring-primary-500">
+                    情绪类测试
+                </button>
+                <button type="button" class="px-6 py-3 text-sm font-medium bg-white text-gray-700 border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500">
+                    人格特质测试
+                </button>
+                <button type="button" class="px-6 py-3 text-sm font-medium bg-white text-gray-700 border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500">
+                    心理健康筛查
+                </button>
+                <button type="button" class="px-6 py-3 text-sm font-medium bg-white text-gray-700 rounded-r-lg border-t border-b border-r border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-primary-500">
+                    专业量表评估
+                </button>
+            </div>
+        </div>
+
+        <!-- 测试卡片网格 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 情绪类测试卡片 -->
+            <div class="card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                <div class="h-3 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-smile text-blue-500"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold">情绪健康评估</h3>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">情绪类</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">评估您当前的情绪状态，识别可能的情绪问题，并提供针对性建议。</p>
+                    <div class="flex justify-between text-sm text-gray-500 mb-4">
+                        <span><i class="far fa-clock mr-1"></i> 8分钟</span>
+                        <span><i class="fas fa-chart-bar mr-1"></i> 中等难度</span>
+                        <span><i class="fas fa-question-circle mr-1"></i> 20题</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">抑郁</span>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">焦虑</span>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">情绪波动</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="text-sm font-medium text-gray-700 mr-2">完成率</span>
+                                <span class="text-sm text-gray-500">78%</span>
+                            </div>
+                            <div class="w-32 h-2 bg-gray-200 rounded-full mt-1">
+                                <div class="h-2 bg-blue-500 rounded-full" style="width: 78%"></div>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all">
+                            开始测试
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 人格特质测试卡片 -->
+            <div class="card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                <div class="h-3 bg-gradient-to-r from-purple-500 to-purple-600"></div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-fingerprint text-purple-500"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold">大五人格测试</h3>
+                        </div>
+                        <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">人格特质</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">基于心理学大五人格理论，全面评估您的性格特点，了解自己的优势和发展方向。</p>
+                    <div class="flex justify-between text-sm text-gray-500 mb-4">
+                        <span><i class="far fa-clock mr-1"></i> 15分钟</span>
+                        <span><i class="fas fa-chart-bar mr-1"></i> 中等难度</span>
+                        <span><i class="fas fa-question-circle mr-1"></i> 60题</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">开放性</span>
+                        <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">尽责性</span>
+                        <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">外向性</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="text-sm font-medium text-gray-700 mr-2">热门程度</span>
+                                <span class="text-sm text-gray-500">92%</span>
+                            </div>
+                            <div class="w-32 h-2 bg-gray-200 rounded-full mt-1">
+                                <div class="h-2 bg-purple-500 rounded-full" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all">
+                            开始测试
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 心理健康筛查卡片 -->
+            <div class="card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                <div class="h-3 bg-gradient-to-r from-green-500 to-green-600"></div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-heartbeat text-green-500"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold">心理健康筛查</h3>
+                        </div>
+                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">健康筛查</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">全面评估您的心理健康状况，及早发现潜在问题，预防心理健康风险。</p>
+                    <div class="flex justify-between text-sm text-gray-500 mb-4">
+                        <span><i class="far fa-clock mr-1"></i> 10分钟</span>
+                        <span><i class="fas fa-chart-bar mr-1"></i> 简单</span>
+                        <span><i class="fas fa-question-circle mr-1"></i> 30题</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">压力</span>
+                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">睡眠</span>
+                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">情绪稳定</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="text-sm font-medium text-gray-700 mr-2">推荐指数</span>
+                                <span class="text-sm text-gray-500">85%</span>
+                            </div>
+                            <div class="w-32 h-2 bg-gray-200 rounded-full mt-1">
+                                <div class="h-2 bg-green-500 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all">
+                            开始测试
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 专业量表评估卡片 -->
+            <div class="card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                <div class="h-3 bg-gradient-to-r from-red-500 to-red-600"></div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-clipboard-list text-red-500"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold">贝克抑郁量表</h3>
+                        </div>
+                        <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded">专业量表</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">国际公认的抑郁症筛查工具，评估抑郁症状的严重程度，提供专业参考。</p>
+                    <div class="flex justify-between text-sm text-gray-500 mb-4">
+                        <span><i class="far fa-clock mr-1"></i> 12分钟</span>
+                        <span><i class="fas fa-chart-bar mr-1"></i> 专业</span>
+                        <span><i class="fas fa-question-circle mr-1"></i> 21题</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">抑郁</span>
+                        <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">专业评估</span>
+                        <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">临床参考</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="text-sm font-medium text-gray-700 mr-2">专业度</span>
+                                <span class="text-sm text-gray-500">98%</span>
+                            </div>
+                            <div class="w-32 h-2 bg-gray-200 rounded-full mt-1">
+                                <div class="h-2 bg-red-500 rounded-full" style="width: 98%"></div>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all">
+                            开始测试
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 人际关系测试卡片 -->
+            <div class="card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                <div class="h-3 bg-gradient-to-r from-yellow-500 to-yellow-600"></div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-users text-yellow-500"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold">人际关系模式</h3>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">人格特质</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">分析您在人际交往中的行为模式，了解自己的沟通风格和人际关系特点。</p>
+                    <div class="flex justify-between text-sm text-gray-500 mb-4">
+                        <span><i class="far fa-clock mr-1"></i> 18分钟</span>
+                        <span><i class="fas fa-chart-bar mr-1"></i> 中等难度</span>
+                        <span><i class="fas fa-question-circle mr-1"></i> 45题</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">沟通</span>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">人际关系</span>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">社交</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="text-sm font-medium text-gray-700 mr-2">新用户选择</span>
+                                <span class="text-sm text-gray-500">76%</span>
+                            </div>
+                            <div class="w-32 h-2 bg-gray-200 rounded-full mt-1">
+                                <div class="h-2 bg-yellow-500 rounded-full" style="width: 76%"></div>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-all">
+                            开始测试
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 压力管理测试卡片 -->
+            <div class="card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                <div class="h-3 bg-gradient-to-r from-indigo-500 to-indigo-600"></div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-brain text-indigo-500"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold">压力应对能力</h3>
+                        </div>
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded">健康筛查</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">评估您面对压力时的应对方式和韧性水平，提供个性化的压力管理建议。</p>
+                    <div class="flex justify-between text-sm text-gray-500 mb-4">
+                        <span><i class="far fa-clock mr-1"></i> 7分钟</span>
+                        <span><i class="fas fa-chart-bar mr-1"></i> 简单</span>
+                        <span><i class="fas fa-question-circle mr-1"></i> 15题</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">压力</span>
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">韧性</span>
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">应对策略</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="text-sm font-medium text-gray-700 mr-2">推荐指数</span>
+                                <span class="text-sm text-gray-500">89%</span>
+                            </div>
+                            <div class="w-32 h-2 bg-gray-200 rounded-full mt-1">
+                                <div class="h-2 bg-indigo-500 rounded-full" style="width: 89%"></div>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all">
+                            开始测试
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分页 -->
+        <div class="flex justify-center mt-10">
+            <nav aria-label="Page navigation">
+                <ul class="inline-flex items-center -space-x-px">
+                    <li>
+                        <a href="#" class="block px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700">
+                            <span class="sr-only">Previous</span>
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="px-3 py-2 leading-tight text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700">1</a>
+                    </li>
+                    <li>
+                        <a href="#" class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">2</a>
+                    </li>
+                    <li>
+                        <a href="#" class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">3</a>
+                    </li>
+                    <li>
+                        <a href="#" class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">4</a>
+                    </li>
+                    <li>
+                        <a href="#" class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">5</a>
+                    </li>
+                    <li>
+                        <a href="#" class="block px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700">
+                            <span class="sr-only">Next</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <script>
+        // 筛选按钮交互效果
+        document.querySelector('button.mouse-cursor-gradient-tracking').addEventListener('click', function() {
+            const filterOptions = document.querySelector('.grid.grid-cols-2.md\\:grid-cols-4');
+            filterOptions.classList.toggle('hidden');
+        });
+
+        // 测试卡片悬停效果
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // 类别标签切换效果
+        const categoryButtons = document.querySelectorAll('.inline-flex button');
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                categoryButtons.forEach(btn => {
+                    btn.classList.remove('bg-primary-600', 'text-white');
+                    btn.classList.add('bg-white', 'text-gray-700');
+                });
+                this.classList.remove('bg-white', 'text-gray-700');
+                this.classList.add('bg-primary-600', 'text-white');
+            });
+        });
+    </script>
+</section>

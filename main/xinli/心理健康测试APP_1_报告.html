@@ -1,0 +1,192 @@
+<section id="hero" class="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-blue-50 to-teal-50" data-section="hero">
+    <!-- 背景视差元素 -->
+    <div class="parallax-container absolute inset-0 w-full h-full">
+        <div class="parallax-layer" data-depth="0.2">
+            <div class="absolute top-20 left-10 w-32 h-32 rounded-full bg-blue-100 opacity-60 blur-xl"></div>
+        </div>
+        <div class="parallax-layer" data-depth="0.4">
+            <div class="absolute bottom-40 right-20 w-48 h-48 rounded-full bg-teal-100 opacity-70 blur-xl"></div>
+        </div>
+        <div class="parallax-layer" data-depth="0.6">
+            <div class="absolute top-1/2 left-1/3 w-24 h-24 rounded-full bg-purple-100 opacity-60 blur-lg"></div>
+        </div>
+        <div class="parallax-layer" data-depth="0.3">
+            <div class="absolute top-1/4 right-1/4 w-16 h-16 rounded-full bg-yellow-100 opacity-80 blur-md"></div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-16 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="order-2 lg:order-1">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                    <span class="gradient-text">探索内心世界</span>
+                    <br>科学测评，专业指导
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600 mb-8 max-w-lg">
+                    世界卫生组织（WHO）数据表明：中国抑郁症发病率为3.02%，目前已经有超过4000万抑郁患者
+                    通过专业心理测试了解自己，获取个性化建议，开启心灵成长之旅。我们提供科学量表和专业解读，助您维护心理健康。
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#quick-test" class="mouse-cursor-gradient-tracking px-8 py-3 rounded-full font-medium text-white flex items-center">
+                        <i class="fas fa-bolt mr-2"></i>
+                        快速测试
+                    </a>
+                    <a href="#tests" class="bg-white border-2 border-gray-200 hover:border-primary-500 px-8 py-3 rounded-full font-medium text-gray-700 hover:text-primary-600 transition-all flex items-center">
+                        <i class="fas fa-th-list mr-2"></i>
+                        浏览测试
+                    </a>
+                </div>
+            </div>
+            <div class="order-1 lg:order-2 relative">
+                <div class="relative z-10 float-animation">
+                    <img src="https://cdn.dribbble.com/userupload/11485061/file/original-0cac207f89a8574f4443500c374d87d2.png" alt="心理健康测试APP界面" class="rounded-3xl shadow-2xl max-w-full mx-auto" />
+                </div>
+                <div class="absolute top-10 -right-10 w-32 h-32 bg-yellow-100 rounded-full blur-xl opacity-70 z-0"></div>
+                <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-100 rounded-full blur-xl opacity-70 z-0"></div>
+            </div>
+        </div>
+
+        <!-- 快速测试入口 -->
+        <div id="quick-test" class="mt-20 mb-10">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 section-title">快速测试入口</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-smile text-blue-500 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">情绪健康测试</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">快速评估您当前的情绪状态，了解自己的心理健康水平。</p>
+                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                        <span class="flex items-center mr-4"><i class="far fa-clock mr-1"></i> 5分钟</span>
+                        <span class="flex items-center"><i class="fas fa-chart-bar mr-1"></i> 简单</span>
+                    </div>
+                    <a href="#" class="inline-block w-full text-center py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors">
+                        开始测试 <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                <div class="card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-brain text-purple-500 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">压力指数评估</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">评估您当前的压力水平，获取缓解压力的个性化建议。</p>
+                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                        <span class="flex items-center mr-4"><i class="far fa-clock mr-1"></i> 3分钟</span>
+                        <span class="flex items-center"><i class="fas fa-chart-bar mr-1"></i> 简单</span>
+                    </div>
+                    <a href="#" class="inline-block w-full text-center py-2 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded-lg transition-colors">
+                        开始测试 <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                <div class="card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-heart text-green-500 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">心理韧性测试</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">了解您面对挑战和逆境时的心理韧性和应对能力。</p>
+                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                        <span class="flex items-center mr-4"><i class="far fa-clock mr-1"></i> 7分钟</span>
+                        <span class="flex items-center"><i class="fas fa-chart-bar mr-1"></i> 中等</span>
+                    </div>
+                    <a href="#" class="inline-block w-full text-center py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg transition-colors">
+                        开始测试 <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 个性化推荐 -->
+        <div class="mt-16">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 section-title">为您推荐</h2>
+            <div class="glassmorphism p-6 rounded-2xl">
+                <div class="flex flex-col md:flex-row items-start md:items-center mb-6">
+                    <div class="bg-blue-100 rounded-full p-3 mb-4 md:mb-0 md:mr-4">
+                        <i class="fas fa-user-circle text-blue-600 text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-1">个性化测试推荐</h3>
+                        <p class="text-gray-600">基于您的兴趣和需求，我们为您精选了以下测试</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">热门</span>
+                            <span class="text-sm text-gray-500"><i class="far fa-clock mr-1"></i> 10分钟</span>
+                        </div>
+                        <h4 class="font-semibold mb-2">职业倾向性格测试</h4>
+                        <p class="text-sm text-gray-600 mb-3">发现最适合您的职业方向和工作环境</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex -space-x-2">
+                                <div class="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center text-xs text-blue-700">98%</div>
+                                <div class="w-6 h-6 rounded-full bg-green-200 flex items-center justify-center text-xs text-green-700">匹配</div>
+                            </div>
+                            <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">查看详情 →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-full">专业</span>
+                            <span class="text-sm text-gray-500"><i class="far fa-clock mr-1"></i> 15分钟</span>
+                        </div>
+                        <h4 class="font-semibold mb-2">人际关系模式分析</h4>
+                        <p class="text-sm text-gray-600 mb-3">了解您的社交模式和改善人际关系的方法</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex -space-x-2">
+                                <div class="w-6 h-6 rounded-full bg-purple-200 flex items-center justify-center text-xs text-purple-700">85%</div>
+                                <div class="w-6 h-6 rounded-full bg-green-200 flex items-center justify-center text-xs text-green-700">匹配</div>
+                            </div>
+                            <a href="#" class="text-sm font-medium text-purple-600 hover:text-purple-800">查看详情 →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">新增</span>
+                            <span class="text-sm text-gray-500"><i class="far fa-clock mr-1"></i> 8分钟</span>
+                        </div>
+                        <h4 class="font-semibold mb-2">情绪调节能力评估</h4>
+                        <p class="text-sm text-gray-600 mb-3">评估您识别和管理情绪的能力</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex -space-x-2">
+                                <div class="w-6 h-6 rounded-full bg-green-200 flex items-center justify-center text-xs text-green-700">92%</div>
+                                <div class="w-6 h-6 rounded-full bg-green-200 flex items-center justify-center text-xs text-green-700">匹配</div>
+                            </div>
+                            <a href="#" class="text-sm font-medium text-green-600 hover:text-green-800">查看详情 →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 视差滚动效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const parallaxLayers = document.querySelectorAll('.parallax-layer');
+            
+            window.addEventListener('mousemove', function(e) {
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                
+                parallaxLayers.forEach(layer => {
+                    const depth = layer.getAttribute('data-depth');
+                    const moveX = (x - 0.5) * depth * 100;
+                    const moveY = (y - 0.5) * depth * 100;
+                    
+                    layer.style.transform = `translate3d(${moveX}px, ${moveY}px, 0)`;
+                });
+            });
+        });
+    </script>
+</section>

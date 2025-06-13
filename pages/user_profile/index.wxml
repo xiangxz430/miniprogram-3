@@ -165,8 +165,9 @@
               <text>当前位置</text>
             </view>
             <view class="info-value-row">
-              <text class="info-value">{{userInfo.currentLocation || '未获取'}}</text>
-              <text wx:if="{{!isEditing}}" class="location-btn" bindtap="getLocation">刷新</text>
+              <text class="info-value" wx:if="{{userInfo.currentLocation}}">{{userInfo.currentLocation}}</text>
+              <text class="info-value" wx:else style="color: #999;">点击设置位置</text>
+              <text class="location-btn" bindtap="getLocation">{{userInfo.currentLocation ? '更新' : '设置'}}</text>
             </view>
           </view>
         </view>
@@ -327,6 +328,105 @@
               <view class="detail-item">
                 <text class="detail-label">忌神：</text>
                 <text class="detail-value">{{baziAnalysisResult.wuxingAnalysis.tabooGod}}</text>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 姓名解析分析 -->
+          <view class="name-analysis-section" wx:if="{{baziAnalysisResult.nameAnalysis}}">
+            <view class="panel-title">姓名解析</view>
+            
+            <!-- 姓名五格 -->
+            <view class="name-breakdown-panel">
+              <view class="breakdown-title">五格剖象</view>
+              <view class="breakdown-grid">
+                <view class="breakdown-item">
+                  <text class="breakdown-label">天格</text>
+                  <text class="breakdown-value">{{baziAnalysisResult.nameAnalysis.nameBreakdown.tianGe}}</text>
+                </view>
+                <view class="breakdown-item">
+                  <text class="breakdown-label">人格</text>
+                  <text class="breakdown-value">{{baziAnalysisResult.nameAnalysis.nameBreakdown.renGe}}</text>
+                </view>
+                <view class="breakdown-item">
+                  <text class="breakdown-label">地格</text>
+                  <text class="breakdown-value">{{baziAnalysisResult.nameAnalysis.nameBreakdown.diGe}}</text>
+                </view>
+                <view class="breakdown-item">
+                  <text class="breakdown-label">外格</text>
+                  <text class="breakdown-value">{{baziAnalysisResult.nameAnalysis.nameBreakdown.waiGe}}</text>
+                </view>
+                <view class="breakdown-item">
+                  <text class="breakdown-label">总格</text>
+                  <text class="breakdown-value">{{baziAnalysisResult.nameAnalysis.nameBreakdown.zongGe}}</text>
+                </view>
+              </view>
+            </view>
+            
+            <!-- 姓名五行 -->
+            <view class="name-wuxing-panel">
+              <view class="wuxing-title">姓名五行</view>
+              <view class="name-wuxing-content">
+                <view class="name-characters">
+                  <text class="characters-label">字符五行：</text>
+                  <view class="characters-tags">
+                    <text class="character-tag" wx:for="{{baziAnalysisResult.nameAnalysis.nameWuxing.characters}}" wx:key="index">{{item}}</text>
+                  </view>
+                </view>
+                <view class="name-overall-wuxing">
+                  <text class="overall-label">整体五行：</text>
+                  <text class="overall-value">{{baziAnalysisResult.nameAnalysis.nameWuxing.overallWuxing}}</text>
+                </view>
+                <view class="name-balance">
+                  <text class="balance-label">五行平衡：</text>
+                  <text class="balance-value">{{baziAnalysisResult.nameAnalysis.nameWuxing.wuxingBalance}}</text>
+                </view>
+              </view>
+            </view>
+            
+            <!-- 姓名与八字匹配度 -->
+            <view class="name-match-panel">
+              <view class="match-title">八字匹配度</view>
+              <view class="match-content">
+                <view class="match-score">
+                  <text class="score-label">综合评分：</text>
+                  <text class="score-value name-score-{{baziAnalysisResult.nameAnalysis.nameScore >= 80 ? 'good' : baziAnalysisResult.nameAnalysis.nameScore >= 60 ? 'medium' : 'poor'}}">{{baziAnalysisResult.nameAnalysis.nameScore}}分</text>
+                </view>
+                <view class="compatibility-score">
+                  <text class="compatibility-label">匹配度：</text>
+                  <text class="compatibility-value match-score-{{baziAnalysisResult.nameAnalysis.baziNameMatch.compatibility >= 80 ? 'good' : baziAnalysisResult.nameAnalysis.baziNameMatch.compatibility >= 60 ? 'medium' : 'poor'}}">{{baziAnalysisResult.nameAnalysis.baziNameMatch.compatibility}}分</text>
+                </view>
+                <view class="match-analysis">
+                  <text class="analysis-label">详细分析：</text>
+                  <text class="analysis-text">{{baziAnalysisResult.nameAnalysis.baziNameMatch.analysis}}</text>
+                </view>
+                <view class="benefit-situation">
+                  <text class="benefit-label">补益情况：</text>
+                  <text class="benefit-text">{{baziAnalysisResult.nameAnalysis.baziNameMatch.benefitSituation}}</text>
+                </view>
+              </view>
+            </view>
+            
+            <!-- 姓名建议 -->
+            <view class="name-advice-panel" wx:if="{{baziAnalysisResult.nameAdvice}}">
+              <view class="advice-title">姓名建议</view>
+              <view class="name-status">
+                <text class="status-label">姓名适合度：</text>
+                <text class="status-value name-status-{{baziAnalysisResult.nameAdvice.isNameGood ? 'good' : 'poor'}}">{{baziAnalysisResult.nameAdvice.isNameGood ? '适合' : '需要改进'}}</text>
+              </view>
+              
+              <view class="name-suggestions" wx:if="{{baziAnalysisResult.nameAdvice.suggestions.length > 0}}">
+                <text class="suggestions-label">改进建议：</text>
+                <view class="suggestions-list">
+                  <text class="suggestion-item" wx:for="{{baziAnalysisResult.nameAdvice.suggestions}}" wx:key="index">• {{item}}</text>
+                </view>
+              </view>
+              
+              <view class="alternative-names" wx:if="{{baziAnalysisResult.nameAdvice.alternativeNames.length > 0}}">
+                <text class="alternatives-label">推荐名字：</text>
+                <view class="alternatives-tags">
+                  <text class="alternative-tag" wx:for="{{baziAnalysisResult.nameAdvice.alternativeNames}}" wx:key="index">{{item}}</text>
+                </view>
               </view>
             </view>
           </view>

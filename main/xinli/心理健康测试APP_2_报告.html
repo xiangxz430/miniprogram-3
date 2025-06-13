@@ -1,0 +1,580 @@
+<section id="features" class="py-20 bg-gradient-to-b from-white to-blue-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4">核心功能模块</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">我们精心设计的五大核心功能，为您提供全方位的心理健康支持与评估</p>
+        </div>
+
+        <!-- 功能模块导航 -->
+        <div class="flex flex-wrap justify-center mb-12 gap-4">
+            <button class="feature-tab active px-6 py-3 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-300" data-target="quick-test">
+                <i class="fas fa-bolt mr-2 text-yellow-500"></i>快速测试入口
+            </button>
+            <button class="feature-tab px-6 py-3 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-300" data-target="professional-scales">
+                <i class="fas fa-clipboard-list mr-2 text-blue-500"></i>专业量表中心
+            </button>
+            <button class="feature-tab px-6 py-3 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-300" data-target="test-results">
+                <i class="fas fa-chart-pie mr-2 text-purple-500"></i>测试结果档案
+            </button>
+            <button class="feature-tab px-6 py-3 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-300" data-target="personalized-tracking">
+                <i class="fas fa-chart-line mr-2 text-green-500"></i>个性化跟踪
+            </button>
+            <button class="feature-tab px-6 py-3 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-300" data-target="professional-help">
+                <i class="fas fa-hands-helping mr-2 text-red-500"></i>专业帮助通道
+            </button>
+        </div>
+
+        <!-- 功能模块内容 -->
+        <div class="feature-content-container">
+            <!-- 快速测试入口 -->
+            <div id="quick-test" class="feature-content active">
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-full md:w-1/2">
+                        <div class="glassmorphism p-8 rounded-2xl relative overflow-hidden">
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-yellow-100 rounded-full opacity-50"></div>
+                            <h3 class="text-2xl font-bold mb-4 relative z-10">快速测试入口</h3>
+                            <p class="text-gray-600 mb-6 relative z-10">根据您的需求和时间，提供多种快速测试选项，只需几分钟即可获得初步评估结果。</p>
+                            
+                            <div class="space-y-4 relative z-10">
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex items-center">
+                                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mr-4">
+                                        <i class="fas fa-smile text-yellow-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold">情绪健康快速筛查</h4>
+                                        <p class="text-sm text-gray-500">2分钟 · 10个问题</p>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <button class="px-4 py-2 bg-yellow-500 text-white rounded-full hover:bg-yellow-600 transition-colors">
+                                            开始测试
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex items-center">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                                        <i class="fas fa-brain text-blue-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold">压力指数评估</h4>
+                                        <p class="text-sm text-gray-500">3分钟 · 12个问题</p>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <button class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+                                            开始测试
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex items-center">
+                                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mr-4">
+                                        <i class="fas fa-heartbeat text-green-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold">睡眠质量检测</h4>
+                                        <p class="text-sm text-gray-500">1分钟 · 5个问题</p>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <button class="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors">
+                                            开始测试
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <div class="relative">
+                            <img src="https://cdn.sanity.io/images/ordgikwe/production/5fe8899045662c3e6bf0054312716e4ef0f1475f-2048x1536.png?w=2048&h=1536&auto=format" alt="快速测试界面展示" class="rounded-2xl shadow-lg w-full">
+                            <div class="absolute -bottom-5 -right-5 bg-white p-4 rounded-xl shadow-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                                        <i class="fas fa-clock text-yellow-500"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">平均完成时间</p>
+                                        <p class="font-bold">2.5 分钟</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 专业量表中心 -->
+            <div id="professional-scales" class="feature-content hidden">
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-full md:w-1/2">
+                        <div class="glassmorphism p-8 rounded-2xl relative overflow-hidden">
+                            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-100 rounded-full opacity-50"></div>
+                            <h3 class="text-2xl font-bold mb-4 relative z-10">专业量表中心</h3>
+                            <p class="text-gray-600 mb-6 relative z-10">提供国际认可的专业心理测评量表，帮助您深入了解自己的心理状态。</p>
+                            
+                            <div class="space-y-4 relative z-10">
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                            <i class="fas fa-clipboard-check text-blue-500"></i>
+                                        </div>
+                                        <h4 class="font-semibold">贝克抑郁量表 (BDI-II)</h4>
+                                        <div class="ml-auto">
+                                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">专业级</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">广泛用于评估抑郁症状的严重程度，包含21个项目，涵盖情绪、认知和生理症状。</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-500">15-20分钟</span>
+                                        <button class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+                                            开始测试
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                            <i class="fas fa-brain text-purple-500"></i>
+                                        </div>
+                                        <h4 class="font-semibold">大五人格测试 (Big Five)</h4>
+                                        <div class="ml-auto">
+                                            <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">全面评估</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">评估开放性、尽责性、外向性、宜人性和神经质五个维度的人格特质。</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-500">10-15分钟</span>
+                                        <button class="px-4 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors">
+                                            开始测试
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                            <i class="fas fa-wind text-green-500"></i>
+                                        </div>
+                                        <h4 class="font-semibold">广泛性焦虑障碍量表 (GAD-7)</h4>
+                                        <div class="ml-auto">
+                                            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">临床认可</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">筛查和评估广泛性焦虑障碍的严重程度，包含7个核心问题。</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-500">5-10分钟</span>
+                                        <button class="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors">
+                                            开始测试
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <div class="relative">
+                            <img src="https://i.redd.it/mental-health-app-full-practice-need-feedback-v0-7srxkllwfvbd1.jpg?width=1600&format=pjpg&auto=webp&s=ef8e8478335d48ac19f60c759006f41bf032ce0d" alt="专业量表中心界面" class="rounded-2xl shadow-lg w-full">
+                            <div class="absolute -top-5 -right-5 bg-white p-4 rounded-xl shadow-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                        <i class="fas fa-certificate text-blue-500"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">专业认证</p>
+                                        <p class="font-bold">20+ 国际量表</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 测试结果档案 -->
+            <div id="test-results" class="feature-content hidden">
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-full md:w-1/2">
+                        <div class="glassmorphism p-8 rounded-2xl relative overflow-hidden">
+                            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-purple-100 rounded-full opacity-50"></div>
+                            <h3 class="text-2xl font-bold mb-4 relative z-10">测试结果档案</h3>
+                            <p class="text-gray-600 mb-6 relative z-10">系统化管理您的所有测试结果，提供详细解析和历史对比，帮助您了解心理健康变化趋势。</p>
+                            
+                            <div class="space-y-4 relative z-10">
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                                <i class="fas fa-chart-pie text-purple-500"></i>
+                                            </div>
+                                            <h4 class="font-semibold">多维度结果展示</h4>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-gray-400"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">通过图表和数据可视化，直观展示测试结果的各个维度，便于理解和分析。</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                                <i class="fas fa-history text-indigo-500"></i>
+                                            </div>
+                                            <h4 class="font-semibold">历史对比分析</h4>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-gray-400"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">追踪您的心理健康变化趋势，对比不同时期的测试结果，了解改善或恶化的方向。</p>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center mr-3">
+                                                <i class="fas fa-lightbulb text-teal-500"></i>
+                                            </div>
+                                            <h4 class="font-semibold">专业解读与建议</h4>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-gray-400"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">根据测试结果提供专业的解读和个性化建议，帮助您更好地理解自己的心理状态。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <div class="relative">
+                            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                                <h4 class="text-lg font-semibold mb-4">情绪健康趋势</h4>
+                                <div id="emotion-chart" class="w-full h-64"></div>
+                            </div>
+                            <div class="bg-white rounded-2xl shadow-lg p-6">
+                                <h4 class="text-lg font-semibold mb-4">最近测试结果</h4>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                                <i class="fas fa-brain text-blue-500 text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">压力指数评估</p>
+                                                <p class="text-xs text-gray-500">2025年5月28日</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-bold text-blue-600">42分</p>
+                                            <p class="text-xs text-gray-500">中等压力</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                                <i class="fas fa-clipboard-list text-purple-500 text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">大五人格测试</p>
+                                                <p class="text-xs text-gray-500">2025年5月15日</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-bold text-purple-600">查看详情</p>
+                                            <p class="text-xs text-gray-500">5个维度</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 个性化跟踪 -->
+            <div id="personalized-tracking" class="feature-content hidden">
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-full md:w-1/2">
+                        <div class="glassmorphism p-8 rounded-2xl relative overflow-hidden">
+                            <div class="absolute -left-10 -top-10 w-40 h-40 bg-green-100 rounded-full opacity-50"></div>
+                            <h3 class="text-2xl font-bold mb-4 relative z-10">个性化跟踪</h3>
+                            <p class="text-gray-600 mb-6 relative z-10">根据您的测试结果和日常记录，提供个性化的心理健康跟踪和改善建议。</p>
+                            
+                            <div class="space-y-4 relative z-10">
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                            <i class="fas fa-calendar-check text-green-500"></i>
+                                        </div>
+                                        <h4 class="font-semibold">每日情绪记录</h4>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">简单记录每日情绪状态，系统自动生成情绪变化趋势图，帮助您了解情绪波动规律。</p>
+                                    <div class="flex items-center space-x-2">
+                                        <button class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                                            <i class="fas fa-angry text-red-500"></i>
+                                        </button>
+                                        <button class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                                            <i class="fas fa-frown text-orange-500"></i>
+                                        </button>
+                                        <button class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
+                                            <i class="fas fa-meh text-yellow-500"></i>
+                                        </button>
+                                        <button class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <i class="fas fa-smile text-blue-500"></i>
+                                        </button>
+                                        <button class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                            <i class="fas fa-laugh-beam text-green-500"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                            <i class="fas fa-tasks text-blue-500"></i>
+                                        </div>
+                                        <h4 class="font-semibold">个性化改善计划</h4>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">根据您的测试结果和日常记录，系统自动生成个性化的心理健康改善计划。</p>
+                                    <div class="bg-blue-50 p-3 rounded-lg">
+                                        <h5 class="text-sm font-semibold text-blue-700 mb-2">本周计划</h5>
+                                        <ul class="space-y-2 text-sm">
+                                            <li class="flex items-center">
+                                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                                <span>每天进行15分钟正念冥想</span>
+                                            </li>
+                                            <li class="flex items-center">
+                                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                                <span>记录3件让你感到感恩的事情</span>
+                                            </li>
+                                            <li class="flex items-center">
+                                                <i class="far fa-circle text-gray-400 mr-2"></i>
+                                                <span>尝试新的放松技巧</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                            <i class="fas fa-bell text-purple-500"></i>
+                                        </div>
+                                        <h4 class="font-semibold">智能提醒</h4>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">根据您的使用习惯和心理状态，提供智能提醒，帮助您保持良好的心理健康习惯。</p>
+                                    <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-meditation text-purple-500 mr-2"></i>
+                                            <span class="text-sm">冥想提醒</span>
+                                        </div>
+                                        <div class="relative">
+                                            <input type="checkbox" id="toggle" class="hidden">
+                                            <label for="toggle" class="toggle-label block w-12 h-6 rounded-full bg-gray-300 cursor-pointer relative">
+                                                <span class="toggle-dot absolute left-0.5 top-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-300 ease-in-out transform"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <div class="relative">
+                            <img src="https://i.redd.it/mental-health-app-full-practice-need-feedback-v0-fmmlf1nxfvbd1.jpg?width=1600&format=pjpg&auto=webp&s=47378cab4cddc681f3289df101c561ff7ce78508" alt="个性化跟踪界面" class="rounded-2xl shadow-lg w-full">
+                            <div class="absolute -bottom-5 -left-5 bg-white p-4 rounded-xl shadow-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                        <i class="fas fa-chart-line text-green-500"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">进步追踪</p>
+                                        <p class="font-bold">+15% 情绪稳定性</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 专业帮助通道 -->
+            <div id="professional-help" class="feature-content hidden">
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-full md:w-1/2">
+                        <div class="glassmorphism p-8 rounded-2xl relative overflow-hidden">
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-red-100 rounded-full opacity-50"></div>
+                            <h3 class="text-2xl font-bold mb-4 relative z-10">专业帮助通道</h3>
+                            <p class="text-gray-600 mb-6 relative z-10">当您需要专业帮助时，我们提供多种便捷的咨询和求助通道，连接专业心理健康资源。</p>
+                            
+                            <div class="space-y-4 relative z-10">
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                            <i class="fas fa-user-md text-red-500"></i>
+                                        </div>
+                                        <h4 class="font-semibold">一键咨询专家</h4>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">根据您的测试结果和需求，匹配合适的心理健康专家，提供在线咨询服务。</p>
+                                    <button class="w-full py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center">
+                                        <i class="fas fa-comments mr-2"></i>
+                                        立即咨询
+                                    </button>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center mr-3">
+                                            <i class="fas fa-phone-alt text-orange-500"></i>
+                                        </div>
+                                        <h4 class="font-semibold">紧急求助热线</h4>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">24小时紧急心理援助热线，专业人员随时为您提供帮助和支持。</p>
+                                    <div class="bg-orange-50 p-3 rounded-lg flex items-center justify-between">
+                                        <span class="font-semibold text-orange-700">400-888-9999</span>
+                                        <button class="w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors">
+                                            <i class="fas fa-phone-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div class="flex items-center mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                            <i class="fas fa-book-reader text-purple-500"></i>
+                                        </div>
+                                        <h4 class="font-semibold">心理健康资源库</h4>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">提供丰富的心理健康知识、自助工具和专业资源，帮助您更好地了解和管理心理健康。</p>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button class="py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm">
+                                            自助指南
+                                        </button>
+                                        <button class="py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm">
+                                            专家文章
+                                        </button>
+                                        <button class="py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm">
+                                            放松练习
+                                        </button>
+                                        <button class="py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm">
+                                            社区支持
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <div class="relative">
+                            <img src="https://onix-systems.com/_next/image?url=https%3A%2F%2Fcdn.onix-systems.com%2Fuploads%2FZF_Bav_S_Tb_D3s2kj_Zkd_Es_T2dis6_Ib_QMA_Qc_07fe81061e.jpg&w=3840&q=100" alt="专业帮助通道界面" class="rounded-2xl shadow-lg w-full">
+                            <div class="absolute -top-5 -left-5 bg-white p-4 rounded-xl shadow-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                        <i class="fas fa-shield-alt text-red-500"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">专业认证</p>
+                                        <p class="font-bold">100+ 心理咨询师</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     功能模块切换
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.feature-tab');
+            const contents = document.querySelectorAll('.feature-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const target = this.getAttribute('data-target');
+                    
+                    // 移除所有活动状态
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.add('hidden'));
+                    
+                    // 添加当前活动状态
+                    this.classList.add('active');
+                    document.getElementById(target).classList.remove('hidden');
+                });
+            });
+            
+            // 情绪图表
+            if(document.getElementById('emotion-chart')) {
+                const emotionChart = echarts.init(document.getElementById('emotion-chart'));
+                
+                const option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        formatter: '{b}: {c}'
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+                    },
+                    yAxis: {
+                        type: 'value',
+                        min: 0,
+                        max: 100,
+                        interval: 20
+                    },
+                    series: [
+                        {
+                            name: '情绪指数',
+                            type: 'line',
+                            smooth: true,
+                            lineStyle: {
+                                width: 3,
+                                color: '#5b8ef2'
+                            },
+                            areaStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {
+                                        offset: 0,
+                                        color: 'rgba(91, 142, 242, 0.5)'
+                                    },
+                                    {
+                                        offset: 1,
+                                        color: 'rgba(91, 142, 242, 0.1)'
+                                    }
+                                ])
+                            },
+                            data: [65, 59, 80, 81, 56, 72, 85]
+                        }
+                    ]
+                };
+                
+                emotionChart.setOption(option);
+                
+                // 响应窗口大小变化
+                window.addEventListener('resize', function() {
+                    emotionChart.resize();
+                });
+            }
+            
+            // 切换按钮效果
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const toggleDot = this.nextElementSibling.querySelector('.toggle-dot');
+                    if (this.checked) {
+                        toggleDot.classList.add('translate-x-6');
+                        this.nextElementSibling.classList.add('bg-green-500');
+                        this.nextElementSibling.classList.remove('bg-gray-300');
+                    } else {
+                        toggleDot.classList.remove('translate-x-6');
+                        this.nextElementSibling.classList.remove('bg-green-500');
+                        this.nextElementSibling.classList.add('bg-gray-300');
+                    }
+                });
+            });
+        });
+    </script>
+</section>

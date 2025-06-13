@@ -15,10 +15,10 @@ Page({
   data: {
     activeTab: 0,           // 当前激活的标签页（0: 性格测试, 1: 玄学人格模型, 2: AI建议）
     tabItems: [
-      { text: 'MBTI测试' },
-      { text: '人格雷达' },
-      { text: 'AI建议' },
-      { text: '每日分析' }
+      { index: 0, text: '性格测试', key: 'test' },
+      { index: 1, text: '人格模型', key: 'model' },
+      { index: 2, text: '伏羲建议', key: 'ai' },
+      { index: 3, text: '伏羲算卦', key: 'divination' }
     ],
     hasTestResult: false,   // 是否有测试结果
     isTestActive: false,    // 是否正在测试中
@@ -27,7 +27,7 @@ Page({
     selectedOption: '',     // 当前选中的选项
     questions: [],          // 当前测试的题目集
     testMode: 'standard',           // 测试模式：'standard'(标准版) 或 'short'(简化版)
-    showTestModeSelection: true, // 是否显示测试模式选择界面
+    showTestModeSelection: false, // 是否显示测试模式选择界面，默认不显示
     currentStep: 'mode_selection', // welcome, testing, result
     currentQuestionIndex: 0,
     scores: {
@@ -69,13 +69,6 @@ Page({
       hourlyForecast: []
     },
     currentTime: '',
-    // 穿衣建议
-    clothingAdvice: {
-      index: '舒适',
-      recommendation: '轻薄外套配长裤，透气舒适',
-      tips: '早晚温差较大，建议携带外套',
-      zodiacAdvice: '今日适合穿着明亮色彩，提升运势'
-    },
     // 字测相关
     inputCharacter: '',
     characterResult: null,
@@ -137,9 +130,8 @@ Page({
     lunarRefreshing: false // 黄历数据刷新状态
   },
 
-  onLoad(options) {
-    console.log('MBTI页面加载...');
-    
+  // 初始化页面数据
+  initializeData() {
     this.loadTabConfig();
     
     // 初始化默认题库为完整版
@@ -157,13 +149,6 @@ Page({
     
     // 加载之前保存的答题进度
     this.loadProgress();
-    
-    // 加载保存的测试结果
-    this.loadLatestResult();
-    
-    // 加载测试历史和类型分布
-    this.loadTestHistory();
-    this.loadTypeDistribution();
     
     // 初始化模型数据（保持不变）
     this.setData({
@@ -198,34 +183,76 @@ Page({
         socialMask: null
       }
     });
+  },
+
+  onLoad(options) {
+    console.log('MBTI页面加载...');
     
+    // 初始化数据
+    this.initializeData();
+    
+    // 加载测试历史
+    this.loadTestHistory();
+    
+    // 加载类型分布数据
+    this.loadTypeDistribution();
+    
+    // 加载最新的测试结果
+    this.loadLatestResult();
+    
+    // 加载AI建议
+    this.loadAiAdvice();
+    
+    // 更新当前时间
     this.updateCurrentTime();
     
-    // 先设置默认的黄历数据，确保页面有内容显示
-    const defaultLunarCalendar = this.getLunarCalendarData();
-    this.setData({
-      lunarCalendar: defaultLunarCalendar
-    });
+    // 设置定时器，每分钟更新一次时间
+    this.timeInterval = setInterval(() => {
+      this.updateCurrentTime();
+    }, 60000);
     
-    // 然后异步加载天气和更新的黄历数据
+    // 检查并加载AI算卦数据
+    this.checkAndLoadDailyAnalysisData();
+    
+    // 加载天气和黄历数据
     this.loadWeatherData();
+    
+    // 加载测事历史记录
+    this.loadDivinationHistory();
+    
+    // 更新剩余测事次数
+    this.updateRemainingDivinationCount();
+    
     // 移除单独的黄历数据加载，现在由loadWeatherData方法统一处理
     // this.getLunarCalendarData();
     
-    // 确保黄历数据被正确初始化
+    // 确保黄历数据被正确初始化 - 立即加载本地数据作为备用
+    const localLunarCalendar = this.getLunarCalendarData();
+    this.setData({
+      lunarCalendar: localLunarCalendar
+    });
+    console.log('本地黄历数据已加载:', localLunarCalendar.lunarDate);
+    
+    // 然后尝试从API获取更准确的数据
     setTimeout(() => {
-      if (!this.data.lunarCalendar || !this.data.lunarCalendar.lunarDate) {
-        console.log('黄历数据未正确加载，使用本地计算数据');
-        const localLunarCalendar = this.getLunarCalendarData();
+      if (!this.data.lunarCalendar || !this.data.lunarCalendar.lunarDate || !this.data.lunarCalendar.lunarDate.displayDate) {
+        console.log('黄历数据未正确加载，重新使用本地计算数据');
+        const freshLocalLunarCalendar = this.getLunarCalendarData();
         this.setData({
-          lunarCalendar: localLunarCalendar
+          lunarCalendar: freshLocalLunarCalendar
         });
       }
-    }, 2000); // 给API调用2秒时间
+    }, 3000); // 给API调用3秒时间
   },
 
   onShow() {
     console.log('页面显示');
+    
+    // 设置TabBar选中状态 - 让自动检测处理，不手动设置
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().updateCurrentTab();
+    }
+    
     this.updateCurrentTime();
     
     // 每分钟更新一次时间
@@ -234,7 +261,7 @@ Page({
     }
     this.timeInterval = setInterval(() => {
       this.updateCurrentTime();
-    }, 60000);
+    }, 100000);
     
     // 检查并加载用户设置
     const userSettings = wx.getStorageSync('userSettings');
@@ -401,7 +428,7 @@ Page({
       }
     }
     
-    // 如果切换到每日分析标签页，检查天气和黄历数据
+    // 如果切换到AI算卦标签页，检查天气和黄历数据
     if (index == 3) {
       this.checkAndLoadDailyAnalysisData();
     }
@@ -545,6 +572,10 @@ Page({
         // 计算结果
         const result = this.calculateResult(answers);
         
+        // 测试完成后清除进度数据，避免下次进入时提示未完成测试
+        wx.removeStorageSync('mbti_progress');
+        console.log('测试完成，已清除进度数据');
+        
         // 更新人格模型数据
         this.updateModelData(result);
         
@@ -552,7 +583,9 @@ Page({
         this.setData({
           testCompleted: true,
           result: result,
-          selectedOption: ''
+          selectedOption: '',
+          isTestActive: false, // 标记测试已结束
+          activeTab: 1 // 自动跳转到结果页面（人格模型）
         });
         
         // 如果当前在AI建议标签页，自动加载AI建议
@@ -930,17 +963,32 @@ Page({
           testCompleted: true,
           hasTestResult: true,
           result: savedResult,
-          currentStep: 'result' // 设置当前步骤为结果展示
+          currentStep: 'result', // 设置当前步骤为结果展示
+          showTestModeSelection: false, // 隐藏测试模式选择界面
+          isTestActive: false // 确保测试状态为非活跃
         });
       } else {
         console.log('没有找到保存的测试结果');
         this.setData({
           hasTestResult: false,
-          currentStep: 'welcome' // 设置当前步骤为欢迎页
+          testCompleted: false,
+          currentStep: 'welcome', // 设置当前步骤为欢迎页
+          showTestModeSelection: false, // 不显示测试模式选择界面
+          isTestActive: false,
+          result: null
         });
       }
     } catch (e) {
       console.error('加载测试结果失败:', e);
+      // 出错时也设置为欢迎状态
+      this.setData({
+        hasTestResult: false,
+        testCompleted: false,
+        currentStep: 'welcome',
+        showTestModeSelection: false,
+        isTestActive: false,
+        result: null
+      });
     }
   },
   
@@ -2243,7 +2291,8 @@ Page({
             tabItems: [
               { index: 0, text: '性格测试', key: 'test' },
               { index: 1, text: '人格模型', key: 'model' },
-              { index: 2, text: 'AI建议', key: 'ai' }
+              { index: 2, text: '伏羲建议', key: 'ai' },
+              { index: 3, text: '伏羲占卜', key: 'divination' }
             ]
           });
         }
@@ -2255,7 +2304,8 @@ Page({
           tabItems: [
             { index: 0, text: '性格测试', key: 'test' },
             { index: 1, text: '人格模型', key: 'model' },
-            { index: 2, text: 'AI建议', key: 'ai' }
+            { index: 2, text: '伏羲建议', key: 'ai' },
+            { index: 3, text: '伏羲占卜', key: 'divination' }
           ]
         });
       }
@@ -2274,7 +2324,7 @@ Page({
 
   // 检查并加载每日分析数据
   async checkAndLoadDailyAnalysisData() {
-    console.log('检查每日分析数据...');
+    console.log('检查AI算卦数据...');
     
     try {
       // 检查当前是否有天气数据
@@ -2328,7 +2378,7 @@ Page({
           duration: 1500
         });
         await this.loadWeatherData();
-        console.log('每日分析数据更新完成');
+        console.log('AI算卦数据更新完成');
       } else {
         console.log('使用历史数据，无需更新');
         // 如果有缓存数据但页面数据不完整，从缓存恢复
@@ -2345,16 +2395,10 @@ Page({
             });
             console.log('从缓存恢复黄历数据');
           }
-          if (cachedData.clothingAdvice) {
-            this.setData({
-              clothingAdvice: cachedData.clothingAdvice
-            });
-            console.log('从缓存恢复穿衣建议');
-          }
         }
       }
     } catch (error) {
-      console.error('检查每日分析数据失败:', error);
+      console.error('检查AI算卦数据失败:', error);
       // 如果检查失败，尝试加载数据
       try {
         await this.loadWeatherData();
@@ -2458,10 +2502,10 @@ Page({
     }
 
     // 如果是API返回的数据格式，保留完整的农历信息
-    if (lunarCalendar.lunarDate && typeof lunarCalendar.lunarDate === 'object') {
+    if (lunarCalendar.lunarDate && lunarCalendar.lunarDate.year) {
       const apiData = lunarCalendar;
       
-      // 保留API返回的准确农历数据，不要转换成字符串
+      // 保留API返回的准确农历数据，统一转换为对象格式
       const formattedData = {
         // 基本日期信息
         solarYear: apiData.solarDate?.year || new Date().getFullYear(),
@@ -2470,15 +2514,16 @@ Page({
         weekday: apiData.solarDate?.weekday || ['日', '一', '二', '三', '四', '五', '六'][new Date().getDay()],
         zodiacSign: this.getZodiacSign(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`),
         
-        // 农历信息 - 保留完整的API数据
+        // 农历信息 - 确保有完整的显示数据，统一为对象格式
         lunarDate: {
           year: apiData.lunarDate.year || apiData.ganzhi?.year || '乙巳',
-          month: apiData.lunarDate.month,
-          day: apiData.lunarDate.day,
-          monthName: apiData.lunarDate.month, // 使用month而不是monthName
-          dayName: apiData.lunarDate.dayName,
-          displayDate: apiData.lunarDate.month + apiData.lunarDate.dayName, // 使用month而不是monthName
-          zodiac: apiData.lunarDate.zodiac || this.getChineseZodiac(`${new Date().getFullYear()}-01-01`) // 优先使用API返回的生肖
+          month: apiData.lunarDate.month || '正月',
+          day: apiData.lunarDate.day || '初一',
+          monthName: apiData.lunarDate.monthName || apiData.lunarDate.month || '正月',
+          dayName: apiData.lunarDate.dayName || apiData.lunarDate.day || '初一',
+          displayDate: (apiData.lunarDate.monthName || apiData.lunarDate.month || '正月') + (apiData.lunarDate.dayName || apiData.lunarDate.day || '初一'),
+          zodiac: apiData.lunarDate.zodiac || this.getChineseZodiac(`${new Date().getFullYear()}-01-01`),
+          fullDate: `${apiData.lunarDate.year || '甲辰'}${apiData.lunarDate.zodiac || '龙'}年 ${(apiData.lunarDate.monthName || apiData.lunarDate.month || '正月')}${(apiData.lunarDate.dayName || apiData.lunarDate.day || '初一')}`
         },
         
         // 干支信息
@@ -2527,18 +2572,42 @@ Page({
       return formattedData;
     }
 
-    // 兼容旧的字符串格式数据
-    if (typeof lunarCalendar.lunarDate === 'string') {
-      // 为旧的字符串格式数据创建兼容的对象格式
+    // 处理旧的字符串格式数据，统一转换为对象格式
+    if (lunarCalendar.lunarDate && lunarCalendar.lunarDate.length && !lunarCalendar.lunarDate.year) {
+      // 字符串格式的农历日期，转换为对象格式
+      const lunarDateStr = lunarCalendar.lunarDate;
       return {
         ...lunarCalendar,
         lunarDate: {
-          displayDate: lunarCalendar.lunarDate
+          displayDate: lunarDateStr,
+          monthName: lunarDateStr.substring(0, 2) || '正月',
+          dayName: lunarDateStr.substring(2) || '初一',
+          fullDate: `${lunarCalendar.yearGanzhi || '甲辰'}年 ${lunarDateStr}`,
+          month: lunarDateStr.substring(0, 2) || '正月',
+          day: lunarDateStr.substring(2) || '初一'
         }
       };
     }
 
-    // 如果已经是本地格式，直接返回
+    // 如果已经是正确的对象格式，确保有所有必要字段
+    if (lunarCalendar.lunarDate && lunarCalendar.lunarDate.year) {
+      if (!lunarCalendar.lunarDate.displayDate) {
+        lunarCalendar.lunarDate.displayDate = 
+          (lunarCalendar.lunarDate.month || lunarCalendar.lunarDate.monthName || '正月') + 
+          (lunarCalendar.lunarDate.day || lunarCalendar.lunarDate.dayName || '初一');
+      }
+      if (!lunarCalendar.lunarDate.fullDate) {
+        lunarCalendar.lunarDate.fullDate = 
+          `${lunarCalendar.lunarDate.year || '甲辰'}${lunarCalendar.lunarDate.zodiac || ''}年 ${lunarCalendar.lunarDate.displayDate}`;
+      }
+      if (!lunarCalendar.lunarDate.monthName) {
+        lunarCalendar.lunarDate.monthName = lunarCalendar.lunarDate.month || '正月';
+      }
+      if (!lunarCalendar.lunarDate.dayName) {
+        lunarCalendar.lunarDate.dayName = lunarCalendar.lunarDate.day || '初一';
+      }
+    }
+
     return lunarCalendar;
   },
 
@@ -3248,6 +3317,8 @@ MBTI类型：${userInfo.mbti || '未知'}
       year: `${yearGanzhi}年`,
       month: lunarMonth,
       day: lunarDay,
+      monthName: lunarMonth,
+      dayName: lunarDay,
       zodiac: zodiacAnimal,
       fullDate: `${yearGanzhi}年${lunarMonth}${lunarDay}`,
       displayDate: `${lunarMonth}${lunarDay}`,
@@ -3439,7 +3510,7 @@ MBTI类型：${userInfo.mbti || '未知'}
     });
   },
 
-  // 刷新天气数据
+  /* 刷新天气数据
   async refreshWeatherData() {
     try {
       // 显示加载状态
@@ -3479,7 +3550,7 @@ MBTI类型：${userInfo.mbti || '未知'}
         weatherRefreshing: false
       });
     }
-  },
+  },*/
 
   // 刷新黄历数据
   async refreshLunarData() {
