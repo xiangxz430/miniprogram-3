@@ -19,7 +19,7 @@ Page({
       { index: 0, text: '性格测试', key: 'test' },
       { index: 1, text: '人格模型', key: 'model' },
       { index: 2, text: '伏羲建议', key: 'ai' },
-      { index: 3, text: '伏羲算卦', key: 'divination' }
+      { index: 3, text: '伏羲占卜', key: 'divination' }
     ],
     hasTestResult: false,   // 是否有测试结果
     isTestActive: false,    // 是否正在测试中
@@ -2818,6 +2818,12 @@ Page({
   async getDivination(text, userInfo) {
     // 获取当前日期和星宿信息
     const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const date = today.getDate();
+    const weekday = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][today.getDay()];
+    const todayString = `${year}年${month}月${date}日 ${weekday}`;
+    
     const constellations = [
       '角', '亢', '氐', '房', '心', '尾', '箕', '斗', '牛', '女', '虚', '危',
       '室', '壁', '奎', '娄', '胃', '昴', '毕', '觜', '参', '井', '鬼', '柳',
@@ -2829,12 +2835,18 @@ Page({
     const currentLocation = userInfo.currentLocation || userInfo.birthplace || '未知';
     
     console.log('=== 测事分析开始 ===');
+    console.log('今天日期:', todayString);
     console.log('用户输入:', text);
     console.log('用户信息:', userInfo);
     console.log('今日星宿:', todayConstellation);
     console.log('当前位置:', currentLocation);
     
-    const prompt = `用户想测的事情是："${text}"
+    const prompt = `今天是${todayString}，用户想测的事情是："${text}"
+
+当前时间信息：
+今天日期：${todayString}
+农历信息：请根据${year}年${month}月${date}日计算对应的农历日期
+今日星宿：${todayConstellation}宿
 
 用户基本信息：
 出生日期：${userInfo.birthdate || '未知'}
@@ -2844,26 +2856,30 @@ Page({
 MBTI类型：${userInfo.mbti || '未知'}
 
 天时地利人和分析要素：
-天时：今日星宿为${todayConstellation}宿
+天时：今天是${todayString}，今日星宿为${todayConstellation}宿
 地利：所在地为${currentLocation}
 人和：本人八字信息（出生日期：${userInfo.birthdate || '未知'}，出生时间：${userInfo.birthtime || '未知'}）
 
-请综合考虑今天的天时（今日星宿）、地利（所在地）、人和（本人八字），结合《易经》《滴天髓》《三命通会》三本书籍进行演算分析。
+请特别注意：今天是${todayString}，请基于这个具体日期来分析时机和给出建议。不要给出过时的建议，要结合当前时间点来分析。
+
+请综合考虑今天的天时（今日星宿和具体日期${todayString}）、地利（所在地）、人和（本人八字），结合《易经》《滴天髓》《三命通会》三本书籍进行演算分析。
 
 基于以上信息对此事进行专业分析：
 
-1. 天时分析：结合今日${todayConstellation}宿的特性分析时机（150字）
+1. 天时分析：结合今日${todayString}和${todayConstellation}宿的特性分析时机（150字）
 2. 地利分析：结合所在地${currentLocation}的地理位置和风水影响（150字）
 3. 人和分析：结合用户八字和个人命理特征（300字）
 4. 综合天时地利人和分析：将天时、地利、人和三要素结合起来，给出整体的综合建议和分析（300字）
 5. 卦象综合分析：基于《易经》理论的卦象解读（200字）
 6. 命理演算：参考《滴天髓》和《三命通会》的命理分析,其中综合命理分析200字（整体400字）
-7. 事情发展趋势：综合天时地利人和的发展预测（150字）
+7. 事情发展趋势：综合天时地利人和的发展预测，特别考虑从今天${todayString}开始的时间线（150字）
 8. 注意事项和化解方案（如有不利因素）100字
 
 请以JSON格式返回，包含以下字段：
 {
+  "current_date": "${todayString}",
   "tianshi": {
+    "date": "${todayString}",
     "constellation": "${todayConstellation}",
     "analysis": "天时分析内容",
     "influence": "对此事的影响"
@@ -2897,7 +2913,7 @@ MBTI类型：${userInfo.mbti || '未知'}
     "current": "当前形势",
     "short_term": "短期趋势（1-3个月）",
     "long_term": "长期趋势（3-12个月）",
-    "timing": "最佳时机分析"
+    "timing": "最佳时机分析，从今天${todayString}开始计算"
   },
   "resolution": {
     "challenges": ["潜在挑战"],
@@ -2909,7 +2925,7 @@ MBTI类型：${userInfo.mbti || '未知'}
     const messages = [
       {
         role: 'system',
-        content: '你是一位精通周易八卦、五行命理、《易经》、《滴天髓》、《三命通会》的大师。请综合天时（星宿）、地利（地理位置）、人和（八字命理）三要素，结合传统经典理论进行专业分析。特别注意：除了分别分析天时、地利、人和外，还必须提供一个综合分析，将三个要素结合起来给出整体建议。请始终以JSON格式返回数据，确保完全符合要求的结构。'
+        content: `你是一位精通周易八卦、五行命理、《易经》、《滴天髓》、《三命通会》的大师。今天是${todayString}，请基于这个具体的日期时间来进行分析。请综合天时（星宿和具体日期）、地利（地理位置）、人和（八字命理）三要素，结合传统经典理论进行专业分析。特别注意：除了分别分析天时、地利、人和外，还必须提供一个综合分析，将三个要素结合起来给出整体建议。所有的时间建议都要基于今天${todayString}这个时间点来计算，不要给出过时的建议。请始终以JSON格式返回数据，确保完全符合要求的结构。`
       },
       {
         role: 'user',
@@ -3723,55 +3739,6 @@ MBTI类型：${userInfo.mbti || '未知'}
       }
     } catch (error) {
       console.error('保存伏羲记录到云数据库异常:', error);
-    }
-  },
-
-  // 手动初始化数据库（调试用）
-  async initDatabase() {
-    try {
-      wx.showLoading({
-        title: '初始化数据库中...',
-        mask: true
-      });
-
-      console.log('手动初始化数据库...');
-      
-      // 调用初始化云函数
-      const initResult = await wx.cloud.callFunction({
-        name: 'createCollections',
-        data: {}
-      });
-      
-      console.log('数据库初始化结果:', initResult.result);
-      
-      wx.hideLoading();
-      
-      if (initResult.result.code === 0) {
-        wx.showToast({
-          title: '数据库初始化成功',
-          icon: 'success',
-          duration: 2000
-        });
-        
-        // 初始化完成后，自动初始化用户
-        setTimeout(() => {
-          this.initCloudUser();
-        }, 1000);
-      } else {
-        wx.showToast({
-          title: '初始化失败: ' + initResult.result.message,
-          icon: 'none',
-          duration: 3000
-        });
-      }
-    } catch (error) {
-      wx.hideLoading();
-      console.error('手动初始化数据库失败:', error);
-      wx.showToast({
-        title: '初始化失败: ' + error.message,
-        icon: 'none',
-        duration: 3000
-      });
     }
   }
 }) 

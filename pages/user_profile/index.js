@@ -1926,54 +1926,5 @@ Page({
         this.updateBirthdayReminders(localFriends);
       }
     }
-  },
-
-  // 初始化数据库（调试用）
-  async initializeDatabase() {
-    wx.showLoading({
-      title: '初始化数据库...'
-    });
-    
-    try {
-      console.log('开始初始化数据库...');
-      
-      // 调用云函数初始化数据库
-      const result = await wx.cloud.callFunction({
-        name: 'createCollections',
-        data: {}
-      });
-      
-      console.log('数据库初始化结果:', result);
-      
-      wx.hideLoading();
-      
-      if (result.result && result.result.code === 0) {
-        wx.showToast({
-          title: '数据库初始化成功',
-          icon: 'success',
-          duration: 2000
-        });
-        
-        // 初始化成功后，重新加载云数据
-        setTimeout(() => {
-          this.loadCloudData();
-        }, 1000);
-      } else {
-        wx.showModal({
-          title: '初始化失败',
-          content: result.result?.message || '数据库初始化失败',
-          showCancel: false
-        });
-      }
-      
-    } catch (error) {
-      console.error('初始化数据库异常:', error);
-      wx.hideLoading();
-      wx.showModal({
-        title: '初始化失败',
-        content: '数据库初始化异常: ' + error.message,
-        showCancel: false
-      });
-    }
   }
 }); 

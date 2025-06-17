@@ -1076,9 +1076,6 @@
       帮助你更好地认识自己，提升人际关系和职业发展。
     </view>
     
-    <!-- 临时数据库初始化按钮 -->
-    <button class="debug-button" bindtap="initDatabase" style="margin: 20rpx 0; background: #ff6b6b; color: white;">初始化数据库（调试用）</button>
-    
     <button class="start-button" bindtap="startTest">
       开始测试
     </button>

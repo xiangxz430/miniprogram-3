@@ -178,17 +178,6 @@
         <view class="section-title">设置</view>
         
         <view class="settings-list">
-          <!-- 初始化数据库按钮（调试用） -->
-          <view class="setting-item debug-item" bindtap="initializeDatabase">
-            <view class="setting-label">
-              <view class="setting-icon debug-icon">
-                <text class="iconfont icon-database"></text>
-              </view>
-              <text class="setting-text debug-text">初始化数据库（调试用）</text>
-            </view>
-            <view class="setting-arrow"></view>
-          </view>
-          
           <view class="setting-item" bindtap="goToSettings" data-type="通知">
             <view class="setting-label">
               <view class="setting-icon">
