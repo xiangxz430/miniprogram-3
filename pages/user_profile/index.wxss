@@ -2165,4 +2165,20 @@ button::after {
   .name-suggestions-title {
     font-size: 26rpx;
   }
+}
+
+/* 调试按钮样式 */
+.debug-item {
+  border: 2px solid #ff4757 !important;
+  background: linear-gradient(135deg, #ff6b7a 0%, #ff4757 100%) !important;
+}
+
+.debug-icon {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+.debug-text {
+  color: #fff !important;
+  font-weight: bold;
 } 

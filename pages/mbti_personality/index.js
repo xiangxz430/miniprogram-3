@@ -5,6 +5,7 @@ const mbtiTypes = require('./mbti-types.js')
 const mbtiData = require('../../utils/mbtiFullDataMerged')
 const deepseekApi = require('../../utils/deepseekApi')
 const { getWeatherAndAdvice } = deepseekApi
+const CloudDatabase = require('../../utils/cloudDatabase')
 
 console.log('加载MBTI页面相关资源...');
 console.log('完整版题目数量:', questions.length);
@@ -191,6 +192,9 @@ Page({
     // 初始化数据
     this.initializeData();
     
+    // 初始化用户到云数据库
+    this.initCloudUser();
+    
     // 加载测试历史
     this.loadTestHistory();
     
@@ -243,6 +247,40 @@ Page({
         });
       }
     }, 3000); // 给API调用3秒时间
+  },
+
+  // 初始化云数据库用户
+  async initCloudUser() {
+    try {
+      console.log('开始初始化云数据库用户...');
+      
+      // 获取用户设置
+      const userSettings = wx.getStorageSync('userSettings') || {};
+      const userInfo = {
+        nickname: userSettings.nickname || '未知用户',
+        avatarUrl: userSettings.avatarUrl || '',
+        birthdate: userSettings.birthdate || '',
+        birthtime: userSettings.birthtime || '',
+        birthplace: userSettings.birthplace || '',
+        currentLocation: userSettings.currentLocation || '',
+        mbti: userSettings.mbti || '',
+        lastLoginTime: new Date(),
+        appVersion: '1.0.0',
+        device: 'miniprogram'
+      };
+      
+      console.log('准备保存用户信息:', userInfo);
+      
+      // 初始化用户信息
+      const result = await CloudDatabase.initUser(userInfo);
+      if (result.code === 0) {
+        console.log('用户初始化成功');
+      } else {
+        console.error('用户初始化失败:', result.message);
+      }
+    } catch (error) {
+      console.error('初始化云数据库用户失败:', error);
+    }
   },
 
   onShow() {
@@ -843,6 +881,9 @@ Page({
       app.globalData.mbtiName = typeInfo.name;
       
       console.log('测试结果已保存到本地存储');
+      
+      // 保存到云数据库
+      this.saveMbtiResultToCloud(result);
       
       // 添加到测试历史
       this.addTestHistory(result);
@@ -2440,7 +2481,6 @@ Page({
         
         this.setData({
           weatherData: cachedData.data,
-          clothingAdvice: cachedData.clothingAdvice,
           lunarCalendar: lunarCalendar
         });
         return;
@@ -2450,15 +2490,13 @@ Page({
       console.log('正在静默更新天气和黄历数据...');
       
       // 调用API获取新数据（现在包含黄历信息）
-      const { weather, clothingAdvice, lunarCalendar } = await getWeatherAndAdvice(location, userInfo);
+      const { lunarCalendar } = await getWeatherAndAdvice(location, userInfo);
       
       // 格式化黄历数据，确保所有字段都是正确的格式
       const formattedLunarCalendar = this.formatLunarCalendarData(lunarCalendar || this.getLunarCalendarData());
       
       // 更新数据
       this.setData({
-        weatherData: weather,
-        clothingAdvice,
         lunarCalendar: formattedLunarCalendar
       });
       
@@ -2466,13 +2504,10 @@ Page({
       wx.setStorageSync('weatherData', {
         date: today,
         location: location.city,
-        data: weather,
-        clothingAdvice,
         lunarCalendar: formattedLunarCalendar
       });
       
       console.log('天气和黄历数据更新完成:', {
-        weather: weather?.condition,
         lunarDate: formattedLunarCalendar?.lunarDate,
         ganzhi: formattedLunarCalendar?.yearGanzhi
       });
@@ -2730,6 +2765,15 @@ Page({
       todayHistory.push(newRecord);
       divinationHistory[today] = todayHistory;
       wx.setStorageSync('divinationHistory', divinationHistory);
+      
+      // 保存伏羲记录到云数据库
+      this.saveFuxiRecordToCloud({
+        question: inputText,
+        result: result,
+        userInfo: userInfo,
+        date: new Date(),
+        type: 'divination'
+      });
       
       // 检查是否为无限制模式来决定剩余次数显示
       const remainingDisplay = isUnlimited ? '∞' : (5 - todayHistory.length);
@@ -3650,6 +3694,83 @@ MBTI类型：${userInfo.mbti || '未知'}
     } finally {
       this.setData({
         lunarRefreshing: false
+      });
+    }
+  },
+
+  // 保存MBTI测试结果到云数据库
+  async saveMbtiResultToCloud(result) {
+    try {
+      const cloudResult = await CloudDatabase.saveMbtiResult(result);
+      if (cloudResult.code === 0) {
+        console.log('MBTI测试结果保存到云数据库成功');
+      } else {
+        console.error('保存MBTI测试结果到云数据库失败:', cloudResult.message);
+      }
+    } catch (error) {
+      console.error('保存MBTI测试结果到云数据库异常:', error);
+    }
+  },
+
+  // 保存伏羲记录到云数据库
+  async saveFuxiRecordToCloud(record) {
+    try {
+      const cloudResult = await CloudDatabase.saveFuxiRecord(record);
+      if (cloudResult.code === 0) {
+        console.log('伏羲记录保存到云数据库成功');
+      } else {
+        console.error('保存伏羲记录到云数据库失败:', cloudResult.message);
+      }
+    } catch (error) {
+      console.error('保存伏羲记录到云数据库异常:', error);
+    }
+  },
+
+  // 手动初始化数据库（调试用）
+  async initDatabase() {
+    try {
+      wx.showLoading({
+        title: '初始化数据库中...',
+        mask: true
+      });
+
+      console.log('手动初始化数据库...');
+      
+      // 调用初始化云函数
+      const initResult = await wx.cloud.callFunction({
+        name: 'createCollections',
+        data: {}
+      });
+      
+      console.log('数据库初始化结果:', initResult.result);
+      
+      wx.hideLoading();
+      
+      if (initResult.result.code === 0) {
+        wx.showToast({
+          title: '数据库初始化成功',
+          icon: 'success',
+          duration: 2000
+        });
+        
+        // 初始化完成后，自动初始化用户
+        setTimeout(() => {
+          this.initCloudUser();
+        }, 1000);
+      } else {
+        wx.showToast({
+          title: '初始化失败: ' + initResult.result.message,
+          icon: 'none',
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      wx.hideLoading();
+      console.error('手动初始化数据库失败:', error);
+      wx.showToast({
+        title: '初始化失败: ' + error.message,
+        icon: 'none',
+        duration: 3000
       });
     }
   }

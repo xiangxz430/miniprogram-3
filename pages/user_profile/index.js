@@ -2,6 +2,7 @@ const app = getApp();
 const calendar = require('../../utils/lunar');
 const tabConfigUtil = require('../../utils/tabConfig');
 const { getBaziAnalysis } = require('../../utils/deepseekApi');
+const CloudDatabase = require('../../utils/cloudDatabase');
 
 Page({
   data: {
@@ -110,6 +111,9 @@ Page({
     
     // 加载已保存的八字分析结果
     this.loadSavedBaziResult();
+    
+    // 从云数据库加载用户信息和好友列表
+    this.loadCloudData();
   },
 
   onShow: function() {
@@ -331,7 +335,7 @@ Page({
   },
 
   // 保存用户设置
-  saveUserSettings: function() {
+  async saveUserSettings() {
     const userSettings = {
       nickname: this.data.userInfo.nickname,
       firstLetter: this.data.userInfo.firstLetter,
@@ -346,8 +350,32 @@ Page({
       baziAnalysisResult: this.data.baziAnalysisResult
     };
     
-    // 保存到本地存储
-    wx.setStorageSync('userSettings', userSettings);
+    try {
+      // 保存到本地存储
+      wx.setStorageSync('userSettings', userSettings);
+      
+      // 保存到云数据库
+      console.log('开始保存用户信息到云数据库...');
+      const cloudResult = await CloudDatabase.updateUserInfo(userSettings);
+      
+      if (cloudResult.code === 0) {
+        console.log('用户信息保存到云数据库成功');
+      } else {
+        console.error('保存到云数据库失败:', cloudResult.message);
+        // 如果是用户不存在，尝试创建用户
+        if (cloudResult.code === 1) {
+          console.log('用户不存在，尝试创建新用户...');
+          const createResult = await CloudDatabase.createUserProfile(userSettings);
+          if (createResult.code === 0) {
+            console.log('创建用户成功');
+          } else {
+            console.error('创建用户失败:', createResult.message);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('保存用户信息到云数据库异常:', error);
+    }
     
     // 同步到全局数据
     if (app.globalData) {
@@ -593,7 +621,7 @@ Page({
                 content: '您的位置信息已保存到本地，下次进入小程序时会自动加载，无需重新选择。',
                 showCancel: false,
                 confirmText: '知道了'
-              });
+            });
             }, 2500);
           } catch (error) {
             console.error('保存位置信息失败:', error);
@@ -854,6 +882,19 @@ Page({
       userSettings.baziAnalysisResult = result;
       wx.setStorageSync('userSettings', userSettings);
 
+      // 保存到云数据库
+      try {
+        console.log('保存八字分析结果到云数据库...');
+        const cloudResult = await CloudDatabase.updateUserInfo({ baziAnalysisResult: result });
+        if (cloudResult.code === 0) {
+          console.log('八字分析结果保存到云数据库成功');
+        } else {
+          console.error('保存八字分析结果到云数据库失败:', cloudResult.message);
+        }
+      } catch (cloudError) {
+        console.error('保存八字分析结果到云数据库异常:', cloudError);
+      }
+
       wx.hideLoading();
       wx.showToast({
         title: '八字分析完成',
@@ -1021,91 +1062,157 @@ Page({
     });
   },
 
-  // 保存为我的朋友
-  saveAsFriend: function() {
-    const baziForm = this.data.baziForm;
-    const baziResult = this.data.baziAnalysisResult;
-    
-    if (!baziForm.name || !baziResult) {
-      wx.showToast({
-        title: '数据不完整',
-        icon: 'none'
-      });
-      return;
-    }
+  // 保存好友
+  async saveFriend() {
+    const form = this.data.friendForm;
+    const friends = this.data.friends || [];
     
     // 计算星座
     let zodiac = '未知';
-    if (baziForm.birthDate) {
-      const date = new Date(baziForm.birthDate);
+    if (form.birthDate) {
+      const date = new Date(form.birthDate);
       const month = date.getMonth() + 1;
       const day = date.getDate();
       zodiac = this.calculateZodiac(month, day);
     }
     
-    // 构造朋友数据
+    // 计算农历年份
+    let lunarYear = '未知';
+    if (form.birthDate) {
+      const date = new Date(form.birthDate);
+      try {
+        const lunarData = calendar.solarToLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
+        if (lunarData && lunarData.gzYear) {
+          lunarYear = lunarData.gzYear + '年';
+        }
+      } catch (error) {
+        console.error('计算农历年份失败:', error);
+      }
+    }
+    
+    // 构造好友数据
     const friendData = {
-      name: baziForm.name,
-      firstLetter: baziForm.name.charAt(0),
+      name: form.name,
+      firstLetter: form.name.charAt(0),
       bgColor: this.getRandomBgColor(),
       zodiac: zodiac,
       zodiacColor: this.getZodiacColor(zodiac),
-      mbti: 'UNKNOWN', // 可以后续完善
-      lunarYear: baziResult.baziInfo.year || '未知',
-      relationship: '朋友',
-      birthdate: this.formatDateForDisplay(baziForm.birthDate),
-      birthtime: baziForm.birthTime,
-      gender: baziForm.gender,
-      birthplace: baziForm.birthplace,
-      baziInfo: baziResult
+      mbti: form.mbti || 'UNKNOWN',
+      lunarYear: lunarYear,
+      relationship: form.relationship,
+      birthdate: this.formatDateForDisplay(form.birthDate),
+      birthtime: form.birthTime,
+      gender: form.gender,
+      birthplace: form.birthplace,
+      baziInfo: null // 八字信息待后续计算
     };
-    
-    // 获取现有朋友列表
-    const currentFriends = this.data.friends || [];
-    
-    // 检查是否已存在同名朋友
-    const existingFriend = currentFriends.find(friend => friend.name === baziForm.name);
-    if (existingFriend) {
-      wx.showModal({
-        title: '朋友已存在',
-        content: `朋友列表中已有名为"${baziForm.name}"的朋友，是否覆盖其信息？`,
-        success: (res) => {
-          if (res.confirm) {
-            this.updateFriendsList(friendData, currentFriends);
-          }
+
+    try {
+      if (this.data.isEditingFriend) {
+        // 编辑模式：更新现有好友
+        const editIndex = this.data.editingFriendIndex;
+        friends[editIndex] = friendData;
+        
+        // 更新到云数据库
+        console.log('更新好友信息到云数据库...');
+        const cloudResult = await CloudDatabase.updateFriendInfo('friend_' + editIndex, friendData);
+        if (cloudResult.code === 0) {
+          console.log('好友信息更新到云数据库成功');
+        } else {
+          console.error('更新好友信息到云数据库失败:', cloudResult.message);
         }
-      });
-    } else {
-      // 直接添加新朋友
-      this.updateFriendsList(friendData, currentFriends);
+        
+        wx.showToast({
+          title: '好友信息已更新',
+          icon: 'success'
+        });
+      } else {
+        // 添加模式：检查重名
+        const existingFriend = friends.find(friend => friend.name === form.name);
+        if (existingFriend) {
+          wx.showModal({
+            title: '好友已存在',
+            content: `好友列表中已有名为"${form.name}"的好友，是否覆盖其信息？`,
+            success: async (res) => {
+              if (res.confirm) {
+                const existingIndex = friends.findIndex(friend => friend.name === form.name);
+                friends[existingIndex] = friendData;
+                
+                // 更新到云数据库
+                console.log('覆盖好友信息到云数据库...');
+                const cloudResult = await CloudDatabase.updateFriendInfo('friend_' + existingIndex, friendData);
+                if (cloudResult.code === 0) {
+                  console.log('好友信息覆盖到云数据库成功');
+                } else {
+                  console.error('覆盖好友信息到云数据库失败:', cloudResult.message);
+                }
+                
+                this.updateFriendsData(friends);
+              }
+            }
+          });
+          return;
+        } else {
+          friends.push(friendData);
+          
+          // 添加到云数据库
+          console.log('添加好友到云数据库...');
+          const cloudResult = await CloudDatabase.addFriend('friend_' + (friends.length - 1), friendData);
+          if (cloudResult.code === 0) {
+            console.log('好友添加到云数据库成功');
+          } else {
+            console.error('添加好友到云数据库失败:', cloudResult.message);
+          }
+          
+          wx.showToast({
+            title: '好友添加成功',
+            icon: 'success'
+          });
+        }
+      }
+    } catch (error) {
+      console.error('保存好友到云数据库异常:', error);
     }
+    
+    this.updateFriendsData(friends);
+    this.hideFriendModal();
   },
 
-  // 更新朋友列表
-  updateFriendsList: function(friendData, currentFriends) {
-    // 查找是否已存在
-    const existingIndex = currentFriends.findIndex(friend => friend.name === friendData.name);
+  // 更新好友数据
+  async updateFriendsData(friends) {
+    this.setData({
+      friends: friends
+    });
     
-    if (existingIndex >= 0) {
-      // 更新现有朋友
-      currentFriends[existingIndex] = friendData;
-    } else {
-      // 添加新朋友
-      currentFriends.push(friendData);
+    try {
+      // 保存到本地存储
+      wx.setStorageSync('friendsList', friends);
+      
+      // 批量保存到云数据库
+      console.log('批量保存好友列表到云数据库...');
+      for (let i = 0; i < friends.length; i++) {
+        const friend = friends[i];
+        const cloudResult = await CloudDatabase.addFriend('friend_' + i, friend);
+        if (cloudResult.code === 0) {
+          console.log(`好友 ${friend.name} 保存到云数据库成功`);
+        } else if (cloudResult.code === 1) {
+          // 好友已存在，尝试更新
+          const updateResult = await CloudDatabase.updateFriendInfo('friend_' + i, friend);
+          if (updateResult.code === 0) {
+            console.log(`好友 ${friend.name} 更新到云数据库成功`);
+          } else {
+            console.error(`更新好友 ${friend.name} 到云数据库失败:`, updateResult.message);
+          }
+        } else {
+          console.error(`保存好友 ${friend.name} 到云数据库失败:`, cloudResult.message);
+        }
+      }
+    } catch (error) {
+      console.error('批量保存好友到云数据库异常:', error);
     }
     
-    // 更新页面数据
-    this.setData({
-      friends: currentFriends
-    });
-    
-    // 保存到本地存储
-    wx.setStorageSync('friendsList', currentFriends);
-    
-    wx.showToast({
-      title: '已保存到朋友列表',
-      icon: 'success'
-    });
+    // 更新生日提醒
+    this.updateBirthdayReminders(friends);
   },
 
   // 获取随机背景色
@@ -1307,99 +1414,6 @@ Page({
     });
   },
 
-  // 保存好友
-  saveFriend: function() {
-    const form = this.data.friendForm;
-    const friends = this.data.friends || [];
-    
-    // 计算星座
-    let zodiac = '未知';
-    if (form.birthDate) {
-      const date = new Date(form.birthDate);
-      const month = date.getMonth() + 1;
-      const day = date.getDate();
-      zodiac = this.calculateZodiac(month, day);
-    }
-    
-    // 计算农历年份
-    let lunarYear = '未知';
-    if (form.birthDate) {
-      const date = new Date(form.birthDate);
-      try {
-        const lunarData = calendar.solarToLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
-        if (lunarData && lunarData.gzYear) {
-          lunarYear = lunarData.gzYear + '年';
-        }
-      } catch (error) {
-        console.error('计算农历年份失败:', error);
-      }
-    }
-    
-    // 构造好友数据
-    const friendData = {
-      name: form.name,
-      firstLetter: form.name.charAt(0),
-      bgColor: this.getRandomBgColor(),
-      zodiac: zodiac,
-      zodiacColor: this.getZodiacColor(zodiac),
-      mbti: form.mbti || 'UNKNOWN',
-      lunarYear: lunarYear,
-      relationship: form.relationship,
-      birthdate: this.formatDateForDisplay(form.birthDate),
-      birthtime: form.birthTime,
-      gender: form.gender,
-      birthplace: form.birthplace,
-      baziInfo: null // 八字信息待后续计算
-    };
-    
-    if (this.data.isEditingFriend) {
-      // 编辑模式：更新现有好友
-      const editIndex = this.data.editingFriendIndex;
-      friends[editIndex] = friendData;
-      wx.showToast({
-        title: '好友信息已更新',
-        icon: 'success'
-      });
-    } else {
-      // 添加模式：检查重名
-      const existingFriend = friends.find(friend => friend.name === form.name);
-      if (existingFriend) {
-        wx.showModal({
-          title: '好友已存在',
-          content: `好友列表中已有名为"${form.name}"的好友，是否覆盖其信息？`,
-          success: (res) => {
-            if (res.confirm) {
-              const existingIndex = friends.findIndex(friend => friend.name === form.name);
-              friends[existingIndex] = friendData;
-              this.updateFriendsData(friends);
-            }
-          }
-        });
-        return;
-      } else {
-        friends.push(friendData);
-        wx.showToast({
-          title: '好友添加成功',
-          icon: 'success'
-        });
-      }
-    }
-    
-    this.updateFriendsData(friends);
-    this.hideFriendModal();
-  },
-
-  // 更新好友数据
-  updateFriendsData: function(friends) {
-    this.setData({
-      friends: friends
-    });
-    // 保存到本地存储
-    wx.setStorageSync('friendsList', friends);
-    // 更新生日提醒
-    this.updateBirthdayReminders(friends);
-  },
-
   // 查看好友详情
   viewFriendDetail: function(e) {
     const index = e.currentTarget.dataset.index;
@@ -1466,22 +1480,40 @@ Page({
   },
 
   // 删除好友
-  deleteFriend: function(e) {
+  async deleteFriend(e) {
     const index = e.currentTarget.dataset.index;
     const friend = this.data.friends[index];
     
     wx.showModal({
       title: '删除好友',
       content: `确定要删除好友"${friend.name}"吗？此操作不可恢复。`,
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          const friends = this.data.friends;
-          friends.splice(index, 1);
-          this.updateFriendsData(friends);
-          wx.showToast({
-            title: '好友已删除',
-            icon: 'success'
-          });
+          try {
+            const friends = this.data.friends;
+            friends.splice(index, 1);
+            
+            // 从云数据库删除
+            console.log(`从云数据库删除好友 ${friend.name}...`);
+            const cloudResult = await CloudDatabase.removeFriend('friend_' + index);
+            if (cloudResult.code === 0) {
+              console.log('从云数据库删除好友成功');
+            } else {
+              console.error('从云数据库删除好友失败:', cloudResult.message);
+            }
+            
+            this.updateFriendsData(friends);
+            wx.showToast({
+              title: '好友已删除',
+              icon: 'success'
+            });
+          } catch (error) {
+            console.error('删除好友异常:', error);
+            wx.showToast({
+              title: '删除失败，请重试',
+              icon: 'none'
+            });
+          }
         }
       }
     });
@@ -1820,5 +1852,128 @@ Page({
     }
 
     return suggestions.length > 0 ? suggestions.join('\n') : '暂无建议';
+  },
+
+  // 从云数据库加载数据
+  async loadCloudData() {
+    try {
+      console.log('开始从云数据库加载用户数据...');
+      
+      // 加载用户信息
+      const userResult = await CloudDatabase.getUserInfo();
+      if (userResult.code === 0 && userResult.data) {
+        console.log('从云数据库加载用户信息成功:', userResult.data);
+        const cloudUserInfo = userResult.data;
+        
+        // 更新用户信息
+        this.setData({
+          'userInfo.nickname': cloudUserInfo.nickname || this.data.userInfo.nickname,
+          'userInfo.firstLetter': cloudUserInfo.firstLetter || this.data.userInfo.firstLetter,
+          'userInfo.birthdate': cloudUserInfo.birthdate || this.data.userInfo.birthdate,
+          'userInfo.birthtime': cloudUserInfo.birthtime || this.data.userInfo.birthtime,
+          'userInfo.gender': cloudUserInfo.gender || this.data.userInfo.gender,
+          'userInfo.mbti': cloudUserInfo.mbti || this.data.userInfo.mbti,
+          'userInfo.birthplace': cloudUserInfo.birthplace || this.data.userInfo.birthplace,
+          'userInfo.birthplaceArray': cloudUserInfo.birthplaceArray || this.data.userInfo.birthplaceArray,
+          'userInfo.currentLocation': cloudUserInfo.currentLocation || this.data.userInfo.currentLocation
+        });
+        
+        // 如果有八字分析结果，也更新
+        if (cloudUserInfo.baziAnalysisResult) {
+          const wuxingItems = this.processWuxingData(cloudUserInfo.baziAnalysisResult.wuxingAnalysis.distribution);
+          this.setData({
+            baziAnalysisResult: cloudUserInfo.baziAnalysisResult,
+            wuxingItems: wuxingItems
+          });
+        }
+      } else {
+        console.log('云数据库中没有用户信息，使用本地数据');
+      }
+      
+      // 加载好友列表
+      const friendsResult = await CloudDatabase.getFriendsList();
+      if (friendsResult.code === 0 && friendsResult.data && friendsResult.data.length > 0) {
+        console.log('从云数据库加载好友列表成功:', friendsResult.data.length, '个好友');
+        
+        // 处理好友数据格式
+        const cloudFriends = friendsResult.data.map(item => item.friendInfo);
+        this.setData({
+          friends: cloudFriends
+        });
+        
+        // 更新生日提醒
+        this.updateBirthdayReminders(cloudFriends);
+      } else {
+        console.log('云数据库中没有好友数据，使用本地数据');
+        // 从本地存储加载好友列表
+        const localFriends = wx.getStorageSync('friendsList') || [];
+        if (localFriends.length > 0) {
+          this.setData({
+            friends: localFriends
+          });
+          this.updateBirthdayReminders(localFriends);
+        }
+      }
+      
+    } catch (error) {
+      console.error('从云数据库加载数据异常:', error);
+      // 如果云数据库加载失败，使用本地数据
+      const localFriends = wx.getStorageSync('friendsList') || [];
+      if (localFriends.length > 0) {
+        this.setData({
+          friends: localFriends
+        });
+        this.updateBirthdayReminders(localFriends);
+      }
+    }
+  },
+
+  // 初始化数据库（调试用）
+  async initializeDatabase() {
+    wx.showLoading({
+      title: '初始化数据库...'
+    });
+    
+    try {
+      console.log('开始初始化数据库...');
+      
+      // 调用云函数初始化数据库
+      const result = await wx.cloud.callFunction({
+        name: 'createCollections',
+        data: {}
+      });
+      
+      console.log('数据库初始化结果:', result);
+      
+      wx.hideLoading();
+      
+      if (result.result && result.result.code === 0) {
+        wx.showToast({
+          title: '数据库初始化成功',
+          icon: 'success',
+          duration: 2000
+        });
+        
+        // 初始化成功后，重新加载云数据
+        setTimeout(() => {
+          this.loadCloudData();
+        }, 1000);
+      } else {
+        wx.showModal({
+          title: '初始化失败',
+          content: result.result?.message || '数据库初始化失败',
+          showCancel: false
+        });
+      }
+      
+    } catch (error) {
+      console.error('初始化数据库异常:', error);
+      wx.hideLoading();
+      wx.showModal({
+        title: '初始化失败',
+        content: '数据库初始化异常: ' + error.message,
+        showCancel: false
+      });
+    }
   }
 }); 

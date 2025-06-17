@@ -703,7 +703,7 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
   {
     "weather": {
       "currentTemp": "当前温度",
-      "maxTemp": "最高温度", 
+      "maxTemp": "最高温度",
       "minTemp": "最低温度",
       "condition": "天气状况",
       "humidity": "湿度",
@@ -787,7 +787,7 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
       const result = JSON.parse(jsonStr);
       
       // 验证返回的数据结构
-      if (!result.weather || !result.clothingAdvice || !result.lunarCalendar) {
+      if (!result.lunarCalendar) {
         console.error('返回的数据结构不完整:', result);
         throw new Error('返回的数据结构不完整');
       }
@@ -800,32 +800,11 @@ export const getWeatherAndAdvice = async (location, userInfo) => {
 
       // 仅对天气和穿衣建议提供默认值，农历数据必须从AI获取
       const formattedResult = {
-        weather: {
-          city: location.city,
-          currentTemp: result.weather.currentTemp || '--',
-          maxTemp: result.weather.maxTemp || '--',
-          minTemp: result.weather.minTemp || '--',
-          condition: result.weather.condition || '未知',
-          humidity: result.weather.humidity || '--',
-          windSpeed: result.weather.windSpeed || '--',
-          airQuality: result.weather.airQuality || '--',
-          hourlyForecast: result.weather.hourlyForecast || []
-        },
-        clothingAdvice: {
-          index: result.clothingAdvice.index || '舒适',
-          recommendation: result.clothingAdvice.recommendation || '暂无建议',
-          tips: result.clothingAdvice.tips || '暂无提示',
-          zodiacAdvice: result.clothingAdvice.zodiacAdvice || '暂无星座建议'
-        },
         // 农历数据完全来自AI，不提供任何默认值
         lunarCalendar: validateAndCorrectLunarData(result.lunarCalendar, today)
       };
 
       console.log('成功格式化天气和黄历数据:', {
-        city: formattedResult.weather.city,
-        currentTemp: formattedResult.weather.currentTemp,
-        condition: formattedResult.weather.condition,
-        clothingIndex: formattedResult.clothingAdvice.index,
         lunarDate: formattedResult.lunarCalendar.lunarDate,
         ganzhi: formattedResult.lunarCalendar.ganzhi
       });
@@ -924,9 +903,9 @@ const getBaziAnalysis = async (birthInfo = {}) => {
 13. 大运流年：分析人生各阶段的大运走势
 14. 姓名建议：如果姓名与八字不匹配，提供改名或补救建议(200字)
 15. 开运建议：提供具体的开运方法和注意事项
-
-请以JSON格式返回，包含以下字段：
-{
+  
+  请以JSON格式返回，包含以下字段：
+  {
   "baziInfo": {
     "year": "年柱（天干地支）",
     "month": "月柱（天干地支）", 
@@ -984,19 +963,19 @@ const getBaziAnalysis = async (birthInfo = {}) => {
     "numbers": ["幸运数字"],
     "elements": ["需要补充的五行"],
     "suggestions": ["具体开运建议"]
-  }
-}`;
+    }
+  }`;
 
-    const messages = [
-      {
-        role: 'system',
+  const messages = [
+    {
+      role: 'system',
         content: '你是一位精通传统八字命理学和姓名学的大师，具有深厚的易学功底。请严格按照传统八字理论和姓名学理论进行分析，确保排盘准确，分析专业。对于姓名学分析，请按照五格剖象法计算天格、人格、地格、外格、总格，并结合字义五行进行分析。请始终以JSON格式返回数据，不要包含任何其他文本。'
-      },
-      {
-        role: 'user',
-        content: prompt
-      }
-    ];
+    },
+    {
+      role: 'user',
+      content: prompt
+    }
+  ];
 
     console.log('正在调用AI接口进行八字分析...');
     const response = await callDeepseek(messages);
@@ -1006,7 +985,7 @@ const getBaziAnalysis = async (birthInfo = {}) => {
     console.log('AI回答', {
       原始回答: response.substring(0, 200) + '...'
     });
-
+    
     // 从响应中提取JSON字符串
     const jsonContent = response.match(/```json\n([\s\S]*?)\n```/) || response.match(/\{[\s\S]*\}/);
     if (!jsonContent) {

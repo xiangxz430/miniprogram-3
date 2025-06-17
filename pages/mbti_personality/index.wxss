@@ -5533,7 +5533,7 @@
   text-align: center;
   padding: 80rpx 40rpx;
   color: #666;
-}
+} 
 
 .loading-icon {
   font-size: 64rpx;

@@ -178,6 +178,17 @@
         <view class="section-title">设置</view>
         
         <view class="settings-list">
+          <!-- 初始化数据库按钮（调试用） -->
+          <view class="setting-item debug-item" bindtap="initializeDatabase">
+            <view class="setting-label">
+              <view class="setting-icon debug-icon">
+                <text class="iconfont icon-database"></text>
+              </view>
+              <text class="setting-text debug-text">初始化数据库（调试用）</text>
+            </view>
+            <view class="setting-arrow"></view>
+          </view>
+          
           <view class="setting-item" bindtap="goToSettings" data-type="通知">
             <view class="setting-label">
               <view class="setting-icon">
@@ -564,9 +575,9 @@
           <text class="empty-title">还没有好友</text>
           <text class="empty-desc">添加好友，开始探索八字匹配的奥秘</text>
           <button class="empty-action-btn" catchtap="showAddFriendModal">立即添加好友</button>
+          </view>
         </view>
       </view>
-    </view>
       
     <!-- 好友添加/编辑模态框 -->
     <view class="modal-overlay" wx:if="{{showFriendModal}}" catchtap="hideFriendModal">
@@ -601,21 +612,21 @@
             <picker mode="selector" range="{{['男', '女']}}" value="{{friendForm.genderIndex}}" bindchange="onFriendGenderChange">
               <view class="form-input">{{friendForm.gender || '请选择性别'}}</view>
             </picker>
-          </view>
-          
+              </view>
+              
           <view class="form-group">
             <text class="form-label">出生地</text>
             <picker mode="region" value="{{friendForm.birthplaceArray}}" bindchange="onFriendBirthplaceChange">
               <view class="form-input">{{friendForm.birthplace || '请选择出生地'}}</view>
             </picker>
-          </view>
+              </view>
           
           <view class="form-group">
             <text class="form-label">关系</text>
             <picker mode="selector" range="{{relationshipOptions}}" value="{{friendForm.relationshipIndex}}" bindchange="onFriendRelationshipChange">
               <view class="form-input">{{friendForm.relationship || '请选择关系'}}</view>
             </picker>
-          </view>
+            </view>
           
           <view class="form-group">
             <text class="form-label">MBTI (可选)</text>
@@ -630,10 +641,10 @@
           <button class="modal-btn confirm-btn" catchtap="saveFriend" disabled="{{!canSaveFriend}}">
             {{isEditingFriend ? '保存' : '添加'}}
           </button>
+          </view>
         </view>
       </view>
-    </view>
-    
+      
     <!-- 好友详情模态框 -->
     <view class="modal-overlay" wx:if="{{showFriendDetailModal}}" catchtap="hideFriendDetailModal">
       <view class="friend-detail-modal" catchtap="preventModalClose">
@@ -658,15 +669,15 @@
               <view class="detail-item">
                 <text class="detail-label">出生时间：</text>
                 <text class="detail-value">{{selectedFriend.birthtime}}</text>
-              </view>
+            </view>
               <view class="detail-item">
                 <text class="detail-label">性别：</text>
                 <text class="detail-value">{{selectedFriend.gender}}</text>
-              </view>
+                </view>
               <view class="detail-item">
                 <text class="detail-label">出生地：</text>
                 <text class="detail-value">{{selectedFriend.birthplace}}</text>
-              </view>
+                </view>
               <view class="detail-item">
                 <text class="detail-label">MBTI：</text>
                 <text class="detail-value">{{selectedFriend.mbti}}</text>
@@ -681,11 +692,11 @@
                 <view class="friend-pillar">
                   <text class="friend-pillar-label">年</text>
                   <text class="friend-pillar-value">{{selectedFriend.baziInfo.baziInfo.year}}</text>
-                </view>
+              </view>
                 <view class="friend-pillar">
                   <text class="friend-pillar-label">月</text>
                   <text class="friend-pillar-value">{{selectedFriend.baziInfo.baziInfo.month}}</text>
-                </view>
+            </view>
                 <view class="friend-pillar">
                   <text class="friend-pillar-label">日</text>
                   <text class="friend-pillar-value">{{selectedFriend.baziInfo.baziInfo.day}}</text>
