@@ -36,13 +36,11 @@ Page({
   },
   onShow() {
     this.syncUserData();
-    // 应用动态TabBar样式
+    // 设置TabBar选中状态 - 让自动检测处理，不手动设置
     if (typeof this.getTabBar === 'function') {
       const tabBar = this.getTabBar();
       if (tabBar) {
-        tabBar.setData({
-          selected: 2
-        });
+        tabBar.updateCurrentTab();
       }
     }
   },

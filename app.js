@@ -154,11 +154,19 @@ App({
         const tabBar = page.getTabBar();
         // 如果实例存在，则通过setData更新数据
         if (tabBar) {
+          console.log('更新自定义TabBar数据:', this.globalData.tabConfig);
           tabBar.setData({
             tabConfig: this.globalData.tabConfig,
             loaded: this.globalData.tabConfig && this.globalData.tabConfig.length > 0
-          });
+          }, () => {
+            // 数据更新完成后，触发样式更新
+            if (tabBar.updateTabBarStyle) {
+              tabBar.updateTabBarStyle();
+            }
+            // 更新当前选中状态
           tabBar.updateCurrentTab();
+            console.log('TabBar数据和样式更新完成');
+          });
         }
       }
     }

@@ -19,6 +19,7 @@
   box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08);
   border-top-left-radius: 20rpx;
   border-top-right-radius: 20rpx;
+  transition: all 0.3s ease;
 }
 
 .tab-bar {
@@ -41,11 +42,13 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 16rpx;
   margin: 8rpx 2rpx;
+  will-change: transform, background-color;
 }
 
 .tab-bar-item.active {
   transform: translateY(-3rpx);
-  background: rgba(59, 130, 246, 0.05);
+  background: rgba(var(--primary-color-rgb, 59, 130, 246), 0.05);
+  box-shadow: 0 2rpx 8rpx rgba(var(--primary-color-rgb, 59, 130, 246), 0.15);
 }
 
 .tab-bar-item-content {
@@ -75,6 +78,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  will-change: transform;
 }
 
 /* 首页图标 - 房子 */
@@ -93,6 +97,7 @@
   top: 8rpx;
   left: 50%;
   transform: translateX(-50%);
+  transition: border-bottom-color 0.3s ease;
 }
 
 .icon-home::after {
@@ -105,6 +110,7 @@
   left: 50%;
   transform: translateX(-50%);
   border-radius: 0 0 3rpx 3rpx;
+  transition: background-color 0.3s ease;
 }
 
 .icon-home-active::before {
@@ -132,6 +138,7 @@
   border-radius: 3rpx;
   top: 6rpx;
   left: 6rpx;
+  transition: background-color 0.3s ease;
 }
 
 .icon-mbti:after {
@@ -144,6 +151,7 @@
   top: 6rpx;
   right: 6rpx;
   box-shadow: 0 20rpx 0 #94a3b8, -20rpx 0 0 #94a3b8;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .icon-mbti-active:before,
@@ -173,6 +181,7 @@
   top: 6rpx;
   left: 50%;
   transform: translateX(-50%);
+  transition: background-color 0.3s ease;
 }
 
 .icon-mental::after {
@@ -190,6 +199,7 @@
     6rpx 2rpx 0 -1rpx #94a3b8,
     -3rpx 8rpx 0 -2rpx #94a3b8,
     3rpx 8rpx 0 -2rpx #94a3b8;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .icon-mental-active::before,
@@ -224,6 +234,7 @@
   top: 10rpx;
   left: 50%;
   transform: translateX(-50%);
+  transition: background-color 0.3s ease;
 }
 
 .icon-user::after {
@@ -236,6 +247,7 @@
   bottom: 10rpx;
   left: 50%;
   transform: translateX(-50%);
+  transition: background-color 0.3s ease;
 }
 
 .icon-user-active::before,
@@ -253,7 +265,7 @@
   width: 60rpx;
   height: 60rpx;
   border-radius: 50%;
-  background: rgba(59, 130, 246, 0.08);
+  background: rgba(var(--primary-color-rgb, 59, 130, 246), 0.08);
   z-index: -1;
   animation: pulse 2.5s infinite;
 }
@@ -270,6 +282,7 @@
   white-space: nowrap;
   word-break: keep-all;
   margin-top: 2rpx;
+  will-change: color, transform;
 }
 
 .tab-bar-item.active .tab-bar-item-text {
@@ -277,6 +290,35 @@
   transform: scale(1.05);
 }
 
+/* 动态样式支持 - 响应数据变化 */
+.tab-bar-item-text[data-active="true"] {
+  font-weight: 600;
+  transform: scale(1.05);
+}
+
+.tab-bar-item[data-active="true"] {
+  transform: translateY(-3rpx);
+  background: rgba(var(--primary-color-rgb, 59, 130, 246), 0.05);
+  box-shadow: 0 2rpx 8rpx rgba(var(--primary-color-rgb, 59, 130, 246), 0.15);
+}
+
+.tab-bar-item[data-active="true"] .tab-icon {
+  transform: scale(1.1);
+}
+
+/* 加载状态 */
+.tab-bar[data-loaded="false"] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.tab-bar[data-loaded="true"] {
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity 0.3s ease;
+}
+
+/* 脉冲动画 */
 @keyframes pulse {
   0% {
     transform: scale(0.9);
@@ -290,4 +332,67 @@
     transform: scale(0.9);
     opacity: 0.6;
   }
+}
+
+/* 样式更新动画 */
+@keyframes styleUpdate {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.tab-bar-item.style-updating {
+  animation: styleUpdate 0.3s ease;
+}
+
+/* 支持更多动态主题颜色 */
+.tab-bar-container.theme-blue {
+  --primary-color: #3b82f6;
+  --inactive-color: #94a3b8;
+}
+
+.tab-bar-container.theme-green {
+  --primary-color: #10b981;
+  --inactive-color: #9ca3af;
+}
+
+.tab-bar-container.theme-purple {
+  --primary-color: #8b5cf6;
+  --inactive-color: #a1a1aa;
+}
+
+/* 使用CSS变量支持动态颜色 */
+.tab-bar-item.active {
+  background: rgba(var(--primary-color-rgb, 59, 130, 246), 0.05);
+}
+
+.tab-bar-item-circle {
+  background: rgba(var(--primary-color-rgb, 59, 130, 246), 0.08);
+}
+
+/* 加载状态样式 */
+.tab-bar-loading {
+  position: relative;
+  display: flex;
+  height: 120rpx;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.98);
+  border-top-left-radius: 20rpx;
+  border-top-right-radius: 20rpx;
+}
+
+.loading-text {
+  font-size: 24rpx;
+  color: #94a3b8;
+  opacity: 0.8;
 } 

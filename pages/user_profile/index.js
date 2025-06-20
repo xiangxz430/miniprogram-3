@@ -351,8 +351,8 @@ Page({
     };
     
     try {
-      // 保存到本地存储
-      wx.setStorageSync('userSettings', userSettings);
+    // 保存到本地存储
+    wx.setStorageSync('userSettings', userSettings);
       
       // 保存到云数据库
       console.log('开始保存用户信息到云数据库...');
@@ -1103,8 +1103,7 @@ Page({
       birthdate: this.formatDateForDisplay(form.birthDate),
       birthtime: form.birthTime,
       gender: form.gender,
-      birthplace: form.birthplace,
-      baziInfo: null // 八字信息待后续计算
+      birthplace: form.birthplace
     };
 
     try {
@@ -1115,7 +1114,10 @@ Page({
         
         // 更新到云数据库
         console.log('更新好友信息到云数据库...');
-        const cloudResult = await CloudDatabase.updateFriendInfo('friend_' + editIndex, friendData);
+        const friendId = this.generateFriendId(friendData);
+        const cleanFriendInfo = this.cleanFriendInfo(friendData);
+        const cloudResult = await CloudDatabase.updateFriendInfo(friendId, cleanFriendInfo);
+        
         if (cloudResult.code === 0) {
           console.log('好友信息更新到云数据库成功');
         } else {
@@ -1140,7 +1142,9 @@ Page({
                 
                 // 更新到云数据库
                 console.log('覆盖好友信息到云数据库...');
-                const cloudResult = await CloudDatabase.updateFriendInfo('friend_' + existingIndex, friendData);
+                const friendId = this.generateFriendId(friendData);
+                const cleanFriendInfo = this.cleanFriendInfo(friendData);
+                const cloudResult = await CloudDatabase.updateFriendInfo(friendId, cleanFriendInfo);
                 if (cloudResult.code === 0) {
                   console.log('好友信息覆盖到云数据库成功');
                 } else {
@@ -1157,7 +1161,9 @@ Page({
           
           // 添加到云数据库
           console.log('添加好友到云数据库...');
-          const cloudResult = await CloudDatabase.addFriend('friend_' + (friends.length - 1), friendData);
+          const friendId = this.generateFriendId(friendData);
+          const cleanFriendInfo = this.cleanFriendInfo(friendData);
+          const cloudResult = await CloudDatabase.addFriend(friendId, cleanFriendInfo);
           if (cloudResult.code === 0) {
             console.log('好友添加到云数据库成功');
           } else {
@@ -1192,12 +1198,19 @@ Page({
       console.log('批量保存好友列表到云数据库...');
       for (let i = 0; i < friends.length; i++) {
         const friend = friends[i];
-        const cloudResult = await CloudDatabase.addFriend('friend_' + i, friend);
+        
+        // 生成唯一的好友ID，基于姓名和生日
+        const friendId = this.generateFriendId(friend);
+        
+        // 清理好友数据，移除可能导致问题的null字段
+        const cleanFriendInfo = this.cleanFriendInfo(friend);
+        
+        const cloudResult = await CloudDatabase.addFriend(friendId, cleanFriendInfo);
         if (cloudResult.code === 0) {
           console.log(`好友 ${friend.name} 保存到云数据库成功`);
         } else if (cloudResult.code === 1) {
           // 好友已存在，尝试更新
-          const updateResult = await CloudDatabase.updateFriendInfo('friend_' + i, friend);
+          const updateResult = await CloudDatabase.updateFriendInfo(friendId, cleanFriendInfo);
           if (updateResult.code === 0) {
             console.log(`好友 ${friend.name} 更新到云数据库成功`);
           } else {
@@ -1213,6 +1226,33 @@ Page({
     
     // 更新生日提醒
     this.updateBirthdayReminders(friends);
+  },
+
+  // 生成好友唯一ID
+  generateFriendId: function(friend) {
+    // 使用姓名和生日生成唯一ID
+    const name = friend.name || 'unknown';
+    const birthdate = friend.birthdate || 'unknown';
+    return `friend_${name}_${birthdate}`.replace(/[^a-zA-Z0-9_]/g, '_');
+  },
+
+  // 清理好友信息，移除可能导致数据库问题的字段
+  cleanFriendInfo: function(friend) {
+    const cleanInfo = { ...friend };
+    
+    // 移除值为null的字段
+    Object.keys(cleanInfo).forEach(key => {
+      if (cleanInfo[key] === null || cleanInfo[key] === undefined) {
+        delete cleanInfo[key];
+      }
+    });
+    
+    // 特别处理baziInfo字段
+    if (cleanInfo.baziInfo === null || cleanInfo.baziInfo === undefined) {
+      delete cleanInfo.baziInfo;
+    }
+    
+    return cleanInfo;
   },
 
   // 获取随机背景色

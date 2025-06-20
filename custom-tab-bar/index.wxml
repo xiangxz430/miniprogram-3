@@ -1,19 +1,32 @@
 <!-- custom-tab-bar/index.wxml -->
 <view class="tab-bar-container">
   <view class="tab-bar-bg"></view>
-  <view class="tab-bar" wx:if="{{loaded && tabConfig && tabConfig.length > 0}}">
-    <view wx:for="{{tabConfig}}" wx:key="index" 
-          class="tab-bar-item {{selected === index ? 'active' : ''}}" 
+  <view class="tab-bar" 
+        data-loaded="{{loaded}}" 
+        wx:if="{{loaded && tabConfig && tabConfig.length > 0}}">
+    <view wx:for="{{tabConfig}}" 
+          wx:key="index" 
+          class="tab-bar-item {{selected === index ? 'active' : ''}} {{styleUpdating ? 'style-updating' : ''}}" 
           data-index="{{index}}" 
           data-path="{{item.pagePath}}" 
+          data-active="{{selected === index}}"
           bindtap="switchTab">
       <view class="tab-bar-item-content">
         <view class="icon-container">
           <view class="tab-icon {{selected === index ? item.selectedIconClass : item.iconClass}}"></view>
           <view class="tab-bar-item-circle" wx:if="{{selected === index}}"></view>
         </view>
-        <view class="tab-bar-item-text" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</view>
+        <view class="tab-bar-item-text" 
+              data-active="{{selected === index}}"
+              style="color: {{selected === index ? selectedColor : color}}">
+          {{item.text}}
+        </view>
       </view>
     </view>
+  </view>
+  
+  <!-- 加载中状态 -->
+  <view class="tab-bar-loading" wx:if="{{!loaded}}">
+    <view class="loading-text">加载中...</view>
   </view>
 </view> 
